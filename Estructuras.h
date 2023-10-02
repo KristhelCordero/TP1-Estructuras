@@ -38,6 +38,7 @@ struct ListaClientes{
     void insertarInicioCliente (string codigoCliente, string nombreCliente,int prioridad);
     void leerArchivoClientes();
     void annadirClienteAlArchivo(string codigoCliente, string nombreCliente,int prioridad);
+    int buscarPrioridadCliente(string codigoCliente);
 };
 
 //Lista de Productos
@@ -82,6 +83,7 @@ struct NodoPedido{
 
 struct ColaPedidos{
     NodoPedido * primerPedido, * ultimoPedido;
+    mutex mtx;
 
     ColaPedidos(){
         primerPedido=ultimoPedido=NULL;
@@ -91,12 +93,12 @@ struct ColaPedidos{
     void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos);
     void imprimir();
     int largo();
-    void leerPedido(string nombreArchivo);
     NodoPedido * desencolar();
 };
 
 struct ColaPedidosPrioridad{
     NodoPedido * primerPedido, * ultimoPedido;
+    mutex mtx;
 
     ColaPedidosPrioridad(){
         primerPedido=ultimoPedido=NULL;
@@ -106,7 +108,6 @@ struct ColaPedidosPrioridad{
     void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos);
     void imprimir();
     int largo();
-    void leerPedido(string nombreArchivo);
     NodoPedido * desencolar();
 };
 
@@ -159,17 +160,28 @@ struct threadPedidos {
     // Función que será ejecutada por el thread
     void leerArchivosPedidos() {
         while (!terminar) {
-            string dir="C:\\Users\\krisc\\OneDrive\\Escritorio\\Homeworks\\2k23 II SEMESTRE\\Estructuras de Datos\\TP1-Estructuras\\Pedidos-Clientes";
-            string elem;
-            DIR * direccion;
-            dirent * elementos;
-            if (direccion=opendir(dir.c_str())){
-                while (elementos=readdir(direccion)){
-                    if (terminaEnTxt(elementos->d_name)){
-                        
-                    }
-                }
-            }
+            // string dir="C:\\Users\\krisc\\OneDrive\\Escritorio\\Homeworks\\2k23 II SEMESTRE\\Estructuras de Datos\\TP1-Estructuras\\Pedidos-Clientes";
+            // string elem;
+            // DIR * direccion;
+            // dirent * elementos;
+            // ifstream archivo;
+	        // string texto;
+            // if (direccion=opendir(dir.c_str())){
+            //     while (elementos=readdir(direccion)){
+            //         if (terminaEnTxt(elementos->d_name)){
+	        //             archivo.open(elementos->d_name,ios::in);
+	        //             if (archivo.fail()){
+		    //                 cout<<"No lei el archivo"<<endl;
+		    //                 exit(1);
+	        //             }else{
+		    //                 getline(archivo,texto);
+            //                 getline(archivo,texto);
+		    //                 archivo.close();
+            //                 if texto
+	        //             }
+            //         }
+            //     }
+            // }
             this_thread::sleep_for(chrono::seconds(1));
         }
     }

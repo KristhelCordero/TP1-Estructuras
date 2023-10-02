@@ -2,10 +2,12 @@
 
 //COLA PEDIDOS------------------------------------------------
 bool ColaPedidos::estaVacia(){
+	lock_guard<mutex> lock(mtx);
 	return primerPedido==0;
 }
 
 void ColaPedidos::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
+	lock_guard<mutex> lock(mtx);
 	if(estaVacia())
 		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
 	else{
@@ -16,6 +18,7 @@ void ColaPedidos::encolar(int _numeroPedido, string _codigoCliente,ListaProducto
 }
 
 NodoPedido * ColaPedidos::desencolar(){
+	lock_guard<mutex> lock(mtx);
 	NodoPedido * borrado= primerPedido;
 	if(primerPedido==ultimoPedido){
 		primerPedido=ultimoPedido=NULL;
@@ -28,6 +31,7 @@ NodoPedido * ColaPedidos::desencolar(){
 }
 
 void ColaPedidos::imprimir(){
+	lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
 	while(tmp!=NULL){
 		cout<<tmp->numeroPedido<<endl; 
@@ -36,6 +40,7 @@ void ColaPedidos::imprimir(){
 }
 
 int ColaPedidos::largo(){
+	lock_guard<mutex> lock(mtx);
     NodoPedido * tmp = primerPedido;
     int contador=0;
     while(tmp!=NULL){
@@ -45,36 +50,14 @@ int ColaPedidos::largo(){
 	return contador;
 }
 
-void ColaPedidos::leerPedido(string _nombreArchivo){
-	ifstream archivo;
-	string texto;
-	string numPedido, codigoCliente, codigoProducto, cantidadP;
-	ListaProductos * productos;
-	archivo.open(_nombreArchivo,ios::in);
-	
-	if (archivo.fail()){
-		cout<<"No lei el archivo"<<endl;
-		exit(1);
-	}else{
-		getline(archivo,numPedido);
-		getline(archivo,codigoCliente);
-		while(getline(archivo, texto)){
-			istringstream ss(texto);
-			getline(ss,codigoProducto,'\t');
-			getline(ss,cantidadP,'\t');
-			productos->insertarFinalProducto(codigoProducto,stoi(cantidadP));
-		}
-		encolar(stoi(numPedido),codigoCliente, productos);
-		archivo.close();
-	}
-}
-
 ///COLA PRIORIDAD --------------------------------------
 bool ColaPedidosPrioridad::estaVacia(){
+	lock_guard<mutex> lock(mtx);
 	return primerPedido==0;
 }
 
 void ColaPedidosPrioridad::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
+	lock_guard<mutex> lock(mtx);
 	if(estaVacia())
 		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
 	else{
@@ -85,6 +68,7 @@ void ColaPedidosPrioridad::encolar(int _numeroPedido, string _codigoCliente,List
 }
 
 NodoPedido * ColaPedidosPrioridad::desencolar(){
+	lock_guard<mutex> lock(mtx);
 	NodoPedido * borrado= primerPedido;
 	if(primerPedido==ultimoPedido){
 		primerPedido=ultimoPedido=NULL;
@@ -97,6 +81,7 @@ NodoPedido * ColaPedidosPrioridad::desencolar(){
 }
 
 void ColaPedidosPrioridad::imprimir(){
+	lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
 	while(tmp!=NULL){
 		cout<<tmp->numeroPedido<<endl; 
@@ -105,7 +90,8 @@ void ColaPedidosPrioridad::imprimir(){
 }
 
 int ColaPedidosPrioridad::largo(){
-    NodoPedido * tmp = primerPedido;
+    lock_guard<mutex> lock(mtx);
+	NodoPedido * tmp = primerPedido;
     int contador=0;
     while(tmp!=NULL){
 	    contador++;
@@ -114,29 +100,6 @@ int ColaPedidosPrioridad::largo(){
 	return contador;
 }
 
-void ColaPedidosPrioridad::leerPedido(string _nombreArchivo){
-	ifstream archivo;
-	string texto;
-	string numPedido, codigoCliente, codigoProducto, cantidadP;
-	ListaProductos * productos;
-	archivo.open(_nombreArchivo,ios::in);
-	
-	if (archivo.fail()){
-		cout<<"No lei el archivo"<<endl;
-		exit(1);
-	}else{
-		getline(archivo,numPedido);
-		getline(archivo,codigoCliente);
-		while(getline(archivo, texto)){
-			istringstream ss(texto);
-			getline(ss,codigoProducto,'\t');
-			getline(ss,cantidadP,'\t');
-			productos->insertarFinalProducto(codigoProducto,stoi(cantidadP));
-		}
-		encolar(stoi(numPedido),codigoCliente, productos);
-		archivo.close();
-	}
-}
 //LISTA DOBLE ARTICULOS ----------------------------------------
 void NodoArticulo::imprimir(){
 	cout<<codigo<<endl; 
@@ -265,13 +228,6 @@ void ListaClientes::imprimir(){
 			tmp=tmp->siguiente;
         }
     }
-//------------------ cliente ----------------------
-void Cliente::imprimir(){
-	cout<<codigoCliente<<endl; 
-	cout<<nombreCliente<<endl; 
-	cout<<prioridad<<endl; 
-	cout<<"------------"<<endl;
-}
 
 void ListaClientes::leerArchivoClientes(){
 	ifstream archivo;
@@ -308,6 +264,17 @@ void ListaClientes::annadirClienteAlArchivo(string codigoCliente, string nombreC
 	}
 }
 
+int ListaClientes::buscarPrioridadCliente(string codigoCliente){
+	
+}
+//------------------ cliente ----------------------
+void Cliente::imprimir(){
+	cout<<codigoCliente<<endl; 
+	cout<<nombreCliente<<endl; 
+	cout<<prioridad<<endl; 
+	cout<<"------------"<<endl;
+}
+
 //------------------------------------------------------------------------------------------
 void swap(int& a, int& b) {
     int temp = a;
@@ -340,3 +307,30 @@ void QuickSort(std::vector<int>& arr, int low, int high) {
 }
 
 //-----------------------------------------------------------
+
+void leerYEncolarPedidos(ColaPedidos& cola, ColaPedidosPrioridad& colaPrioridad,string _nombreArchivo){
+	ifstream archivo;
+	string texto;
+	string numPedido, codigoCliente, codigoProducto, cantidadP;
+	ListaProductos * productos;
+	archivo.open(_nombreArchivo,ios::in);
+	
+	if (archivo.fail()){
+		cout<<"No lei el archivo"<<endl;
+		exit(1);
+	}else{
+		getline(archivo,numPedido);
+		getline(archivo,codigoCliente);
+		while(getline(archivo, texto)){
+			istringstream ss(texto);
+			getline(ss,codigoProducto,'\t');
+			getline(ss,cantidadP,'\t');
+			productos->insertarFinalProducto(codigoProducto,stoi(cantidadP));
+		}
+		if ()
+			cola.encolar(stoi(numPedido),codigoCliente, productos);
+		else
+			colaPrioridad.encolar(stoi(numPedido),codigoCliente, productos);
+		archivo.close();
+	}
+}
