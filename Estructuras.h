@@ -2,7 +2,16 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <thread>
+#include <chrono>
+#include <atomic>
+#include <mutex>
+#include <vector>
+#include <dirent.h>
 using namespace std;
+
+//LISTA BASE
+
 
 //Lista de Clientes(Ordenar por Prioridad)
 struct Cliente{
@@ -62,9 +71,9 @@ struct NodoPedido{
     NodoPedido * anterior;
     int numeroPedido;
     string codigoCliente;
-    ListaProductos productos;
+    ListaProductos * productos;
 
-    NodoPedido(int _numeroPedido, string _codigoCliente,ListaProductos _productos){
+    NodoPedido(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
         numeroPedido=_numeroPedido;
         codigoCliente=_codigoCliente;
         productos=_productos;
@@ -75,13 +84,29 @@ struct ColaPedidos{
     NodoPedido * primerPedido, * ultimoPedido;
 
     ColaPedidos(){
-        primerPedido=NULL;
+        primerPedido=ultimoPedido=NULL;
     }
 
     bool estaVacia();
-    void encolar(int _numeroPedido, string _codigoCliente,ListaProductos _productos);
+    void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos);
     void imprimir();
     int largo();
+    void leerPedido(string nombreArchivo);
+    NodoPedido * desencolar();
+};
+
+struct ColaPedidosPrioridad{
+    NodoPedido * primerPedido, * ultimoPedido;
+
+    ColaPedidosPrioridad(){
+        primerPedido=ultimoPedido=NULL;
+    }
+
+    bool estaVacia();
+    void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos);
+    void imprimir();
+    int largo();
+    void leerPedido(string nombreArchivo);
     NodoPedido * desencolar();
 };
 
@@ -117,3 +142,73 @@ struct ListaDoble {
     void leerArchivoArticulos();
     void imprimir();
 };
+
+//------------------------------------------THREADS--------------------------------------------------
+struct threadPedidos {
+    thread thread; 
+    ColaPedidos * cola;
+    ColaPedidosPrioridad * colaPrioridad; 
+    atomic<bool> pausado; 
+    atomic<bool> terminar; 
+    mutex mutex;
+    // Constructor
+    threadPedidos(ColaPedidos * _cola, ColaPedidosPrioridad * _colaPrioridad) : 
+    cola(_cola), colaPrioridad(_colaPrioridad), pausado(false), terminar(false) {
+        thread = std::thread(threadPedidos::leerArchivosPedidos, this);
+    }
+    // Función que será ejecutada por el thread
+    void leerArchivosPedidos() {
+        while (!terminar) {
+            string dir="C:\\Users\\krisc\\OneDrive\\Escritorio\\Homeworks\\2k23 II SEMESTRE\\Estructuras de Datos\\TP1-Estructuras\\Pedidos-Clientes";
+            string elem;
+            DIR * direccion;
+            dirent * elementos;
+            if (direccion=opendir(dir.c_str())){
+                while (elementos=readdir(direccion)){
+                    if (terminaEnTxt(elementos->d_name)){
+                        
+                    }
+                }
+            }
+            this_thread::sleep_for(chrono::seconds(1));
+        }
+    }
+
+    bool terminaEnTxt(string str) {
+        size_t tamano = str.length();
+        string extension = ".txt";
+        if (tamano < extension.length()) {
+            return false;
+        }
+        return (str.compare(tamano - extension.length(), extension.length(), extension) == 0);
+    }
+
+    void Pausar() {
+        pausado = true;
+    }
+
+    void Reanudar() {
+        pausado = false;
+    }
+
+    void Terminar() {
+        terminar = true;
+        if (thread.joinable()) {
+            thread.join();
+        }
+    }
+
+    ~threadPedidos() {
+        Terminar();
+    }
+};
+
+// {
+//                 unique_lock<std::mutex> lock(mutex);
+//                 while (pausado) {
+//                     // El thread está en pausa, espera
+//                     lock.unlock();
+//                     this_thread::sleep_for(chrono::milliseconds(100));
+//                     lock.lock();
+//                 }
+//             }

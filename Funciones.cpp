@@ -5,7 +5,7 @@ bool ColaPedidos::estaVacia(){
 	return primerPedido==0;
 }
 
-void ColaPedidos::encolar(int _numeroPedido, string _codigoCliente,ListaProductos _productos){
+void ColaPedidos::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
 	if(estaVacia())
 		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
 	else{
@@ -45,6 +45,98 @@ int ColaPedidos::largo(){
 	return contador;
 }
 
+void ColaPedidos::leerPedido(string _nombreArchivo){
+	ifstream archivo;
+	string texto;
+	string numPedido, codigoCliente, codigoProducto, cantidadP;
+	ListaProductos * productos;
+	archivo.open(_nombreArchivo,ios::in);
+	
+	if (archivo.fail()){
+		cout<<"No lei el archivo"<<endl;
+		exit(1);
+	}else{
+		getline(archivo,numPedido);
+		getline(archivo,codigoCliente);
+		while(getline(archivo, texto)){
+			istringstream ss(texto);
+			getline(ss,codigoProducto,'\t');
+			getline(ss,cantidadP,'\t');
+			productos->insertarFinalProducto(codigoProducto,stoi(cantidadP));
+		}
+		encolar(stoi(numPedido),codigoCliente, productos);
+		archivo.close();
+	}
+}
+
+///COLA PRIORIDAD --------------------------------------
+bool ColaPedidosPrioridad::estaVacia(){
+	return primerPedido==0;
+}
+
+void ColaPedidosPrioridad::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
+	if(estaVacia())
+		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+	else{
+		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+		ultimoPedido->siguiente->anterior=ultimoPedido;
+		ultimoPedido=ultimoPedido->anterior; 
+    }
+}
+
+NodoPedido * ColaPedidosPrioridad::desencolar(){
+	NodoPedido * borrado= primerPedido;
+	if(primerPedido==ultimoPedido){
+		primerPedido=ultimoPedido=NULL;
+	}else{
+		primerPedido=primerPedido->siguiente;
+		borrado->siguiente=NULL;
+		primerPedido->anterior=NULL;
+	}
+	return borrado;
+}
+
+void ColaPedidosPrioridad::imprimir(){
+	NodoPedido * tmp = primerPedido;
+	while(tmp!=NULL){
+		cout<<tmp->numeroPedido<<endl; 
+		tmp=tmp->siguiente;
+    }
+}
+
+int ColaPedidosPrioridad::largo(){
+    NodoPedido * tmp = primerPedido;
+    int contador=0;
+    while(tmp!=NULL){
+	    contador++;
+	    tmp=tmp->siguiente;
+    }
+	return contador;
+}
+
+void ColaPedidosPrioridad::leerPedido(string _nombreArchivo){
+	ifstream archivo;
+	string texto;
+	string numPedido, codigoCliente, codigoProducto, cantidadP;
+	ListaProductos * productos;
+	archivo.open(_nombreArchivo,ios::in);
+	
+	if (archivo.fail()){
+		cout<<"No lei el archivo"<<endl;
+		exit(1);
+	}else{
+		getline(archivo,numPedido);
+		getline(archivo,codigoCliente);
+		while(getline(archivo, texto)){
+			istringstream ss(texto);
+			getline(ss,codigoProducto,'\t');
+			getline(ss,cantidadP,'\t');
+			productos->insertarFinalProducto(codigoProducto,stoi(cantidadP));
+		}
+		encolar(stoi(numPedido),codigoCliente, productos);
+		archivo.close();
+	}
+}
 //LISTA DOBLE ARTICULOS ----------------------------------------
 void NodoArticulo::imprimir(){
 	cout<<codigo<<endl; 
@@ -203,7 +295,7 @@ void ListaClientes::leerArchivoClientes(){
 		archivo.close();
 	}
 }
-
+//Falta probar esta función
 void ListaClientes::annadirClienteAlArchivo(string codigoCliente, string nombreCliente,int prioridad){
 	ofstream archivo;
 	archivo.open("clientes.txt",ios::app);
@@ -216,3 +308,35 @@ void ListaClientes::annadirClienteAlArchivo(string codigoCliente, string nombreC
 	}
 }
 
+//------------------------------------------------------------------------------------------
+void swap(int& a, int& b) {
+    int temp = a;
+    a = b;
+    b = temp;
+}
+
+// Función que particiona el vector y devuelve el índice del pivote
+int Partition(std::vector<int>& arr, int low, int high) {
+    int pivot = arr[high];
+    int i = (low - 1);
+
+    for (int j = low; j <= high - 1; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            swap(arr[i], arr[j]);
+        }
+    }
+    swap(arr[i + 1], arr[high]);
+    return (i + 1);
+}
+
+// Función recursiva de QuickSort
+void QuickSort(std::vector<int>& arr, int low, int high) {
+    if (low < high) {
+        int pi = Partition(arr, low, high);
+        QuickSort(arr, low, pi - 1);
+        QuickSort(arr, pi + 1, high);
+    }
+}
+
+//-----------------------------------------------------------
