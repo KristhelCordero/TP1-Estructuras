@@ -1,11 +1,34 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
 using namespace std;
 
 //Lista de Clientes(Ordenar por Prioridad)
 struct Cliente{
-    string codigoCliente;
-    string nombreCliente;
+    string codigoCliente, nombreCliente;
     int prioridad;
+    Cliente * siguiente;
+
+    Cliente(string _codigoCliente, string _nombreCliente,int _prioridad){
+        codigoCliente=_codigoCliente;
+        nombreCliente=_nombreCliente;
+        prioridad=_prioridad;
+        siguiente=NULL;
+    }
+    void imprimir();
+};
+
+struct ListaClientes{
+    Cliente * primerCliente;
+
+    ListaClientes(){
+		primerCliente=NULL;
+    }
+    void imprimir();
+    void insertarInicioCliente (string codigoCliente, string nombreCliente,int prioridad);
+    void leerArchivoClientes();
+    void annadirClienteAlArchivo(string codigoCliente, string nombreCliente,int prioridad);
 };
 
 //Lista de Productos
@@ -17,6 +40,7 @@ struct Producto{
     Producto(string _codigoProducto, int _cantidad){
         codigoProducto=_codigoProducto;
         cantidad=_cantidad;
+        siguienteProducto=productoAnterior=NULL;
     }
 };
 
@@ -62,26 +86,34 @@ struct ColaPedidos{
 };
 
 // Lista Doble 
-struct NodoDoble{
-	int dato;
-	NodoDoble * siguiente;
-	NodoDoble * anterior;
+struct NodoArticulo{
+    string codigo, categoria, ubicacion;
+	int cantidad, tiempoFabricacion;
+	NodoArticulo * siguiente;
+	NodoArticulo * anterior;
     
-	NodoDoble(int _dato){
-		dato=_dato;
+	NodoArticulo(int _cantidad, string _codigo, string _categoria, string _ubicacion, int _tiempoFabricacion){
+		cantidad=_cantidad;
+        categoria=_categoria;
+        ubicacion=_ubicacion;
+        tiempoFabricacion=_tiempoFabricacion;
+        codigo=_codigo;
 		siguiente= anterior=NULL;
     }
+
+    void imprimir();
 };
 
 struct ListaDoble {
-	NodoDoble * pn, *un;
+	NodoArticulo * primerArticulo, * ultimoArticulo;
 	
     ListaDoble(){
-		pn=un=NULL;
+		primerArticulo=ultimoArticulo=NULL;
     }
 
-    void insertarInicio(int _dato);
-    void insertarFinal (int _dato);
-    void imprimirAlReves();
-	NodoDoble * borrarAlFinal();
+    void insertarInicio(int _cantidad, string _codigo, string _categoria, string _ubicacion, int _tiempoFabricacion);
+    void insertarFinal (int _cantidad, string _codigo, string _categoria, string _ubicacion, int _tiempoFabricacion);
+	NodoArticulo * borrarAlFinal();
+    void leerArchivoArticulos();
+    void imprimir();
 };
