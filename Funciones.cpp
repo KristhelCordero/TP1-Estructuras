@@ -10,7 +10,7 @@ bool ColaPedidos::estaVacia(){
 }
 
 void ColaPedidos::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	if(estaVacia())
 		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
 	else{
@@ -36,12 +36,15 @@ NodoPedido * ColaPedidos::desencolar(){
 void ColaPedidos::imprimir(){
 	lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
-	while(tmp!=NULL){
+	while(tmp!=ultimoPedido){
 		cout<<tmp->numeroPedido<<endl; 
 		cout<<tmp->codigoCliente<<endl;
 		cout<<"----------------------"<<endl;
 		tmp=tmp->siguiente;
     }
+	cout<<tmp->numeroPedido<<endl; 
+	cout<<tmp->codigoCliente<<endl;
+	cout<<"----------------------"<<endl; 
 }
 
 int ColaPedidos::largo(){
@@ -62,13 +65,13 @@ bool ColaPedidosPrioridad::estaVacia(){
 }
 
 void ColaPedidosPrioridad::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	if(estaVacia())
 		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
 	else{
 		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos);
 		ultimoPedido->siguiente->anterior=ultimoPedido;
-		ultimoPedido=ultimoPedido->anterior; 
+		ultimoPedido=ultimoPedido->siguiente; 
     }
 }
 
@@ -88,12 +91,15 @@ NodoPedido * ColaPedidosPrioridad::desencolar(){
 void ColaPedidosPrioridad::imprimir(){
 	lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
-	while(tmp!=NULL){
+	while(tmp!=ultimoPedido){
 		cout<<tmp->numeroPedido<<endl; 
 		cout<<tmp->codigoCliente<<endl;
 		cout<<"----------------------"<<endl; 
 		tmp=tmp->siguiente;
     }
+	cout<<tmp->numeroPedido<<endl; 
+	cout<<tmp->codigoCliente<<endl;
+	cout<<"----------------------"<<endl; 
 }
 
 int ColaPedidosPrioridad::largo(){
@@ -299,38 +305,7 @@ void Cliente::imprimir(){
 	cout<<"------------"<<endl;
 }
 
-//------------------------------------------------------------------------------------------
-void swap(int& a, int& b) {
-    int temp = a;
-    a = b;
-    b = temp;
-}
-
-// Función que particiona el vector y devuelve el índice del pivote
-int Partition(std::vector<int>& arr, int low, int high) {
-    int pivot = arr[high];
-    int i = (low - 1);
-
-    for (int j = low; j <= high - 1; j++) {
-        if (arr[j] < pivot) {
-            i++;
-            swap(arr[i], arr[j]);
-        }
-    }
-    swap(arr[i + 1], arr[high]);
-    return (i + 1);
-}
-
-// Función recursiva de QuickSort
-void QuickSort(std::vector<int>& arr, int low, int high) {
-    if (low < high) {
-        int pi = Partition(arr, low, high);
-        QuickSort(arr, low, pi - 1);
-        QuickSort(arr, pi + 1, high);
-    }
-}
-
-//-----------------------------------------------------------
+//-----------------------------------------------------------------------
 
 string leerYEncolarPedidos(ColaPedidos* cola, ColaPedidosPrioridad* colaPrioridad,string _nombreArchivo,
 ListaClientes* listaClientes, ListaDoble* listaArticulos){
@@ -359,12 +334,14 @@ ListaClientes* listaClientes, ListaDoble* listaArticulos){
 			}
 			productos->insertarFinalProducto(codigoProducto,stoi(cantidadP));
 		}
-		if (listaClientes->buscarPrioridadCliente(codigoCliente)!=10){
+		cout<<"Llegué hasta aqui wuuu"<<endl;
+		if (listaClientes->buscarPrioridadCliente(codigoCliente)!=10 && listaClientes->buscarPrioridadCliente(codigoCliente)!=0){
 			cola->encolar(stoi(numPedido),codigoCliente, productos);
 		}else if (listaClientes->buscarPrioridadCliente(codigoCliente)!=0){
 			colaPrioridad->encolar(stoi(numPedido),codigoCliente, productos);
 		}else{
 			archivo.close();
+			cout<<"Aqui pedido2"<<endl;
 			return "Error";
 		}
 		cout<<"Terminé leer y encolar"<<endl;
@@ -381,7 +358,6 @@ void threadPedidos::leerArchivosPedidos() {
         }
 		cout<<"Entré"<<endl;
         if(direccion=opendir(dir.c_str())){
-			cout<<"Dirección: "<<direccion<<endl;
             while(elementos=readdir(direccion)){
 				_nombreArchivo=".\\Pedidos-Clientes\\";
 				_nombreArchivo+=elementos->d_name;
@@ -390,17 +366,24 @@ void threadPedidos::leerArchivosPedidos() {
                 	nombreArchivo=leerYEncolarPedidos(cola, colaPrioridad,_nombreArchivo, listaClientes, listaArticulos);
                 	if(nombreArchivo=="Error"){
 						cout<<"Llegué1"<<endl;
-                	    rename(elementos->d_name,".\\Errores");
+                	    nombreArchivo=".\\Errores\\"+_nombreArchivo.erase(0,19);;
+						cout<<nombreArchivo<<endl;
+						_nombreArchivo=".\\Pedidos-Clientes\\"+_nombreArchivo;
+						cout<<_nombreArchivo<<endl;
+                	    rename(_nombreArchivo.c_str(),nombreArchivo.c_str());
 						cout<<"Llegué4"<<endl;
                 	}else{
 						cout<<"Llegué2"<<endl;
+						nombreArchivo.erase(0,19);
                 	    nombreArchivo=".\\Pedidos-Procesados\\"+nombreArchivo;
-                	    rename(elementos->d_name, nombreArchivo.c_str());
+						cout<<nombreArchivo<<endl;
+                	    rename(_nombreArchivo.c_str(), nombreArchivo.c_str());
 						cout<<"Llegué 3"<<endl;
                 	}
 				}
             }
         }
+		closedir(direccion);
         this_thread::sleep_for(chrono::seconds(1));
     }
 }

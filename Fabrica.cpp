@@ -27,6 +27,7 @@ int main(int argc, char const *argv[])
 
     cout<<"---------------------------- COLAS ------------------------------------"<<endl;
     colaPrioridad->imprimir();
+    cout<<"---------------------------- COLAS ------------------------------------"<<endl;
     cola->imprimir();
     return 0;
 }
