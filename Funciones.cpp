@@ -413,6 +413,49 @@ void Cliente::imprimir(){
 	cout<<"------------"<<endl;
 }
 
+// THREAD PEDIDOS -------------------------------------------------------------------------------------------
+void threadPedidos::leerArchivosPedidos() {
+    while (!terminar) {
+        while(pausado){
+            this_thread::sleep_for(chrono::milliseconds(2000));
+        }
+		cout<<"Entré"<<endl;
+        if(direccion=opendir(dir.c_str())){
+            while(elementos=readdir(direccion)){
+				_nombreArchivo=".\\Pedidos-Clientes\\";
+				_nombreArchivo+=elementos->d_name;
+				cout<<_nombreArchivo<<endl;
+				if(_nombreArchivo!=".\\Pedidos-Clientes\\." && _nombreArchivo!=".\\Pedidos-Clientes\\.."){
+                	nombreArchivo=leerYEncolarPedidos(cola, colaPrioridad,_nombreArchivo, listaClientes, listaArticulos);
+                	if(nombreArchivo=="Error"){
+						cout<<"Llegué1"<<endl;
+                	    nombreArchivo=".\\Errores\\"+_nombreArchivo.erase(0,19);;
+						cout<<nombreArchivo<<endl;
+						_nombreArchivo=".\\Pedidos-Clientes\\"+_nombreArchivo;
+						cout<<_nombreArchivo<<endl;
+                	    rename(_nombreArchivo.c_str(),nombreArchivo.c_str());
+						cout<<"Llegué4"<<endl;
+                	}else{
+						cout<<"Llegué2"<<endl;
+						nombreArchivo.erase(0,19);
+                	    nombreArchivo=".\\Pedidos-Procesados\\"+nombreArchivo;
+						cout<<nombreArchivo<<endl;
+                	    rename(_nombreArchivo.c_str(), nombreArchivo.c_str());
+						cout<<"Llegué 3"<<endl;
+                	}
+				}
+            }
+        }
+		closedir(direccion);
+        this_thread::sleep_for(chrono::seconds(1));
+    }
+}
+
+// THREAD BALANCEADOR ---------------------------------------------------------------------------------------
+void ThreadBalanceador::procesarPedidos(){
+	//Esto es lo que estoy haciendo :v
+}
+
 //--------------------------------------- FUNCIONES SIN ESTRUCTURA ------------------------------------------
 string leerYEncolarPedidos(ColaPedidos* cola, ColaPedidosPrioridad* colaPrioridad,string _nombreArchivo,
 ListaClientes* listaClientes, ListaDoble* listaArticulos){
@@ -457,46 +500,10 @@ ListaClientes* listaClientes, ListaDoble* listaArticulos){
 	}
 }
 
-// THREAD PEDIDOS -------------------------------------------------------------------------------------------
-void threadPedidos::leerArchivosPedidos() {
-    while (!terminar) {
-        while(pausado){
-            this_thread::sleep_for(chrono::milliseconds(2000));
-        }
-		cout<<"Entré"<<endl;
-        if(direccion=opendir(dir.c_str())){
-            while(elementos=readdir(direccion)){
-				_nombreArchivo=".\\Pedidos-Clientes\\";
-				_nombreArchivo+=elementos->d_name;
-				cout<<_nombreArchivo<<endl;
-				if(_nombreArchivo!=".\\Pedidos-Clientes\\." && _nombreArchivo!=".\\Pedidos-Clientes\\.."){
-                	nombreArchivo=leerYEncolarPedidos(cola, colaPrioridad,_nombreArchivo, listaClientes, listaArticulos);
-                	if(nombreArchivo=="Error"){
-						cout<<"Llegué1"<<endl;
-                	    nombreArchivo=".\\Errores\\"+_nombreArchivo.erase(0,19);;
-						cout<<nombreArchivo<<endl;
-						_nombreArchivo=".\\Pedidos-Clientes\\"+_nombreArchivo;
-						cout<<_nombreArchivo<<endl;
-                	    rename(_nombreArchivo.c_str(),nombreArchivo.c_str());
-						cout<<"Llegué4"<<endl;
-                	}else{
-						cout<<"Llegué2"<<endl;
-						nombreArchivo.erase(0,19);
-                	    nombreArchivo=".\\Pedidos-Procesados\\"+nombreArchivo;
-						cout<<nombreArchivo<<endl;
-                	    rename(_nombreArchivo.c_str(), nombreArchivo.c_str());
-						cout<<"Llegué 3"<<endl;
-                	}
-				}
-            }
-        }
-		closedir(direccion);
-        this_thread::sleep_for(chrono::seconds(1));
-    }
-}
+string ListaProductos::revisarProductosFaltantes(ListaDoble *listaArticulos){
+	Producto *tmp=listaProductos->primerProducto;
+	while(){
 
-// THREAD BALANCEADOR ---------------------------------------------------------------------------------------
-void ThreadBalanceador::procesarPedidos(){
-	//Esto es lo que estoy haciendo :v
+	}
+	
 }
-

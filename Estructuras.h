@@ -66,6 +66,7 @@ struct ListaProductos{
     void insertarInicioProducto(string _codigoProducto, int _cantidad);
     void insertarFinalProducto (string _codigoProducto, int _cantidad);
 	Producto * borrarAlFinal();
+    string revisarProductosFaltantes(ListaDoble *listaArticulos);
 };
 
 // Cola de Pedidos ------------------------------------------------------------------------------------
