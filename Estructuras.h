@@ -218,7 +218,23 @@ struct ThreadBalanceador{
     ColaPedidosPrioridad *colaPrioridad;
     ColaPedidosEspeciales *colaEspecial;
     ListaDoble *listaArticulos;
-
+    // Constructor
+    ThreadBalanceador(ColaPedidos *_cola, ColaPedidosPrioridad *_colaPrioridad, ListaDoble *_listaArticulos, ColaPedidosEspeciales * _colaEspecial):
+    pausado(false), terminar(false), cola(_cola), colaPrioridad(_colaPrioridad), listaArticulos(_listaArticulos), colaEspecial(_colaEspecial){
+        thread = std::thread(ThreadBalanceador::procesarPedidos, this);
+    }
+    // Función que será ejecutada por el thread
+    void procesarPedidos(); 
+    void Pausar() {pausado = true;}
+    void Reanudar() {pausado = false;}
+    void Terminar() {
+        terminar = true;
+        if (thread.joinable()) {
+            thread.join();
+        }
+    }
+    //Destructor
+    ~ThreadBalanceador() {Terminar();}
 };
 
 

@@ -414,7 +414,6 @@ void Cliente::imprimir(){
 }
 
 //--------------------------------------- FUNCIONES SIN ESTRUCTURA ------------------------------------------
-
 string leerYEncolarPedidos(ColaPedidos* cola, ColaPedidosPrioridad* colaPrioridad,string _nombreArchivo,
 ListaClientes* listaClientes, ListaDoble* listaArticulos){
 	ifstream archivo;
@@ -458,7 +457,7 @@ ListaClientes* listaClientes, ListaDoble* listaArticulos){
 	}
 }
 
-// THREAD PEDIDOS--------------------------------------------------------------------------------------------
+// THREAD PEDIDOS -------------------------------------------------------------------------------------------
 void threadPedidos::leerArchivosPedidos() {
     while (!terminar) {
         while(pausado){
@@ -496,6 +495,8 @@ void threadPedidos::leerArchivosPedidos() {
     }
 }
 
-
-
+// THREAD BALANCEADOR ---------------------------------------------------------------------------------------
+void ThreadBalanceador::procesarPedidos(){
+	//Esto es lo que estoy haciendo :v
+}
 
