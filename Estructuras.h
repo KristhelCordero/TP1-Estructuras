@@ -8,6 +8,8 @@
 #include <mutex>
 #include <vector>
 #include <dirent.h>
+#include <cstdlib>
+#include <cstdio>
 using namespace std;
 
 //LISTA BASE
@@ -142,49 +144,30 @@ struct ListaDoble {
 	NodoArticulo * borrarAlFinal();
     void leerArchivoArticulos();
     void imprimir();
+    bool encontrarArticulo(string _codigo);
 };
 
 //------------------------------------------THREADS--------------------------------------------------
 struct threadPedidos {
     thread thread; 
-    ColaPedidos * cola;
-    ColaPedidosPrioridad * colaPrioridad; 
+    string nombreArchivo, _nombreArchivo;
+    string dir=".\\Pedidos-Clientes";
+    DIR *direccion;
+    dirent *elementos;
     atomic<bool> pausado; 
     atomic<bool> terminar; 
+    ColaPedidos* cola;
+    ColaPedidosPrioridad *colaPrioridad;
+    ListaClientes *listaClientes;
+    ListaDoble *listaArticulos;
     mutex mutex;
     // Constructor
-    threadPedidos(ColaPedidos * _cola, ColaPedidosPrioridad * _colaPrioridad) : 
-    cola(_cola), colaPrioridad(_colaPrioridad), pausado(false), terminar(false) {
+    threadPedidos(ColaPedidos *_cola, ColaPedidosPrioridad *_colaPrioridad, ListaClientes *_listaClientes, ListaDoble *_listaArticulos):
+    pausado(false), terminar(false), cola(_cola), colaPrioridad(_colaPrioridad), listaClientes(_listaClientes), listaArticulos(_listaArticulos){
         thread = std::thread(threadPedidos::leerArchivosPedidos, this);
     }
     // Función que será ejecutada por el thread
-    void leerArchivosPedidos() {
-        while (!terminar) {
-            // string dir="C:\\Users\\krisc\\OneDrive\\Escritorio\\Homeworks\\2k23 II SEMESTRE\\Estructuras de Datos\\TP1-Estructuras\\Pedidos-Clientes";
-            // string elem;
-            // DIR * direccion;
-            // dirent * elementos;
-            // ifstream archivo;
-	        // string texto;
-            // if (direccion=opendir(dir.c_str())){
-            //     while (elementos=readdir(direccion)){
-            //         if (terminaEnTxt(elementos->d_name)){
-	        //             archivo.open(elementos->d_name,ios::in);
-	        //             if (archivo.fail()){
-		    //                 cout<<"No lei el archivo"<<endl;
-		    //                 exit(1);
-	        //             }else{
-		    //                 getline(archivo,texto);
-            //                 getline(archivo,texto);
-		    //                 archivo.close();
-            //                 if texto
-	        //             }
-            //         }
-            //     }
-            // }
-            this_thread::sleep_for(chrono::seconds(1));
-        }
-    }
+    void leerArchivosPedidos(); 
 
     bool terminaEnTxt(string str) {
         size_t tamano = str.length();

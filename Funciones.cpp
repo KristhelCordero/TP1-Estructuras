@@ -1,5 +1,8 @@
 #include "Estructuras.h"
 
+string leerYEncolarPedidos(ColaPedidos* cola, ColaPedidosPrioridad* colaPrioridad,string _nombreArchivo,
+ListaClientes* listaClientes, ListaDoble* listaArticulos);
+
 //COLA PEDIDOS------------------------------------------------
 bool ColaPedidos::estaVacia(){
 	lock_guard<mutex> lock(mtx);
@@ -35,6 +38,8 @@ void ColaPedidos::imprimir(){
 	NodoPedido * tmp = primerPedido;
 	while(tmp!=NULL){
 		cout<<tmp->numeroPedido<<endl; 
+		cout<<tmp->codigoCliente<<endl;
+		cout<<"----------------------"<<endl;
 		tmp=tmp->siguiente;
     }
 }
@@ -85,6 +90,8 @@ void ColaPedidosPrioridad::imprimir(){
 	NodoPedido * tmp = primerPedido;
 	while(tmp!=NULL){
 		cout<<tmp->numeroPedido<<endl; 
+		cout<<tmp->codigoCliente<<endl;
+		cout<<"----------------------"<<endl; 
 		tmp=tmp->siguiente;
     }
 }
@@ -173,6 +180,17 @@ void ListaDoble::imprimir(){
 		tmp->imprimir();
 		tmp=tmp->siguiente;
     }
+}
+
+bool ListaDoble::encontrarArticulo(string _codigo){
+	NodoArticulo * tmp = primerArticulo;
+	while(tmp!=NULL){
+		if(tmp->codigo==_codigo){
+			return true;
+		}
+		tmp=tmp->siguiente;
+    }
+	return false;
 }
 
 //LISTA PRODUCTOS -------------------------
@@ -265,7 +283,13 @@ void ListaClientes::annadirClienteAlArchivo(string codigoCliente, string nombreC
 }
 
 int ListaClientes::buscarPrioridadCliente(string codigoCliente){
-	
+	Cliente * tmp=primerCliente;
+	while (tmp!=NULL){
+		if(tmp->codigoCliente==codigoCliente)
+			return tmp->prioridad;
+		tmp=tmp->siguiente;
+	}
+	return 0;
 }
 //------------------ cliente ----------------------
 void Cliente::imprimir(){
@@ -308,13 +332,13 @@ void QuickSort(std::vector<int>& arr, int low, int high) {
 
 //-----------------------------------------------------------
 
-void leerYEncolarPedidos(ColaPedidos& cola, ColaPedidosPrioridad& colaPrioridad,string _nombreArchivo){
+string leerYEncolarPedidos(ColaPedidos* cola, ColaPedidosPrioridad* colaPrioridad,string _nombreArchivo,
+ListaClientes* listaClientes, ListaDoble* listaArticulos){
 	ifstream archivo;
-	string texto;
-	string numPedido, codigoCliente, codigoProducto, cantidadP;
-	ListaProductos * productos;
+	string texto, numPedido, codigoCliente, codigoProducto, cantidadP, cont;
+	ListaProductos * productos= new ListaProductos();
 	archivo.open(_nombreArchivo,ios::in);
-	
+	cout<<"Estoy en leer y encolar"<<endl;
 	if (archivo.fail()){
 		cout<<"No lei el archivo"<<endl;
 		exit(1);
@@ -324,13 +348,59 @@ void leerYEncolarPedidos(ColaPedidos& cola, ColaPedidosPrioridad& colaPrioridad,
 		while(getline(archivo, texto)){
 			istringstream ss(texto);
 			getline(ss,codigoProducto,'\t');
+			if (!listaArticulos->encontrarArticulo(codigoProducto)){
+				archivo.close();
+				return "Error";
+			}
 			getline(ss,cantidadP,'\t');
+			if (stoi(cantidadP)<1){
+				archivo.close();
+				return "Error";
+			}
 			productos->insertarFinalProducto(codigoProducto,stoi(cantidadP));
 		}
-		if ()
-			cola.encolar(stoi(numPedido),codigoCliente, productos);
-		else
-			colaPrioridad.encolar(stoi(numPedido),codigoCliente, productos);
+		if (listaClientes->buscarPrioridadCliente(codigoCliente)!=10){
+			cola->encolar(stoi(numPedido),codigoCliente, productos);
+		}else if (listaClientes->buscarPrioridadCliente(codigoCliente)!=0){
+			colaPrioridad->encolar(stoi(numPedido),codigoCliente, productos);
+		}else{
+			archivo.close();
+			return "Error";
+		}
+		cout<<"Terminé leer y encolar"<<endl;
 		archivo.close();
+		return _nombreArchivo;
 	}
+}
+
+// THREAD PEDIDOS--------------------------------------------------------
+void threadPedidos::leerArchivosPedidos() {
+    while (!terminar) {
+        while(pausado){
+            this_thread::sleep_for(chrono::milliseconds(2000));
+        }
+		cout<<"Entré"<<endl;
+        if(direccion=opendir(dir.c_str())){
+			cout<<"Dirección: "<<direccion<<endl;
+            while(elementos=readdir(direccion)){
+				_nombreArchivo=".\\Pedidos-Clientes\\";
+				_nombreArchivo+=elementos->d_name;
+				cout<<_nombreArchivo<<endl;
+				if(_nombreArchivo!=".\\Pedidos-Clientes\\." && _nombreArchivo!=".\\Pedidos-Clientes\\.."){
+                	nombreArchivo=leerYEncolarPedidos(cola, colaPrioridad,_nombreArchivo, listaClientes, listaArticulos);
+                	if(nombreArchivo=="Error"){
+						cout<<"Llegué1"<<endl;
+                	    rename(elementos->d_name,".\\Errores");
+						cout<<"Llegué4"<<endl;
+                	}else{
+						cout<<"Llegué2"<<endl;
+                	    nombreArchivo=".\\Pedidos-Procesados\\"+nombreArchivo;
+                	    rename(elementos->d_name, nombreArchivo.c_str());
+						cout<<"Llegué 3"<<endl;
+                	}
+				}
+            }
+        }
+        this_thread::sleep_for(chrono::seconds(1));
+    }
 }
