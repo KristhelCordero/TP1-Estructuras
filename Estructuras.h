@@ -15,7 +15,7 @@ using namespace std;
 //LISTA BASE
 
 
-//Lista de Clientes(Ordenar por Prioridad)
+//Lista de Clientes(Ordenar por Prioridad*) ------------------------------------------------------------
 struct Cliente{
     string codigoCliente, nombreCliente;
     int prioridad;
@@ -43,7 +43,7 @@ struct ListaClientes{
     int buscarPrioridadCliente(string codigoCliente);
 };
 
-//Lista de Productos
+//Lista de Productos ----------------------------------------------------------------------------------
 struct Producto{
     Producto * siguienteProducto, * productoAnterior;
     string codigoProducto;
@@ -68,7 +68,7 @@ struct ListaProductos{
 	Producto * borrarAlFinal();
 };
 
-// Cola de Pedidos
+// Cola de Pedidos ------------------------------------------------------------------------------------
 struct NodoPedido{
     NodoPedido * siguiente;
     NodoPedido * anterior;
@@ -113,7 +113,22 @@ struct ColaPedidosPrioridad{
     NodoPedido * desencolar();
 };
 
-// Lista Doble 
+struct ColaPedidosEspeciales{
+    NodoPedido * primerPedido, * ultimoPedido;
+    mutex mtx;
+
+    ColaPedidosEspeciales(){
+        primerPedido=ultimoPedido=NULL;
+    }
+
+    bool estaVacia();
+    void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos);
+    void imprimir();
+    int largo();
+    NodoPedido * desencolar();
+};
+
+// Lista Doble ----------------------------------------------------------------------------------------
 struct NodoArticulo{
     string codigo, categoria, ubicacion;
 	int cantidad, tiempoFabricacion;
@@ -146,9 +161,12 @@ struct ListaDoble {
     void imprimir();
     bool encontrarArticulo(string _codigo);
     void actualizarArchivoArticulos();
+    int revisarListaArticulos();
+    int largo();
+    bool encontrarArticuloRepetido(string _codigo);
 };
 
-//------------------------------------------THREADS--------------------------------------------------
+//------------------------------------------THREADS---------------------------------------------------
 struct threadPedidos {
     thread thread; 
     string nombreArchivo, _nombreArchivo;
@@ -169,34 +187,16 @@ struct threadPedidos {
     }
     // Función que será ejecutada por el thread
     void leerArchivosPedidos(); 
-
-    bool terminaEnTxt(string str) {
-        size_t tamano = str.length();
-        string extension = ".txt";
-        if (tamano < extension.length()) {
-            return false;
-        }
-        return (str.compare(tamano - extension.length(), extension.length(), extension) == 0);
-    }
-
-    void Pausar() {
-        pausado = true;
-    }
-
-    void Reanudar() {
-        pausado = false;
-    }
-
+    void Pausar() {pausado = true;}
+    void Reanudar() {pausado = false;}
     void Terminar() {
         terminar = true;
         if (thread.joinable()) {
             thread.join();
         }
     }
-
-    ~threadPedidos() {
-        Terminar();
-    }
+    //Destructor
+    ~threadPedidos() {Terminar();}
 };
 
 // {
@@ -208,3 +208,18 @@ struct threadPedidos {
 //                     lock.lock();
 //                 }
 //             }
+
+//BALANCEADOR ---------------------------------------------------------------------------------------
+struct ThreadBalanceador{
+    thread thread; 
+    atomic<bool> pausado; 
+    atomic<bool> terminar; 
+    ColaPedidos* cola;
+    ColaPedidosPrioridad *colaPrioridad;
+    ColaPedidosEspeciales *colaEspecial;
+    ListaDoble *listaArticulos;
+
+};
+
+
+

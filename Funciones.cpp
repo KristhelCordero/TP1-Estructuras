@@ -3,7 +3,7 @@
 string leerYEncolarPedidos(ColaPedidos* cola, ColaPedidosPrioridad* colaPrioridad,string _nombreArchivo,
 ListaClientes* listaClientes, ListaDoble* listaArticulos);
 
-//COLA PEDIDOS------------------------------------------------
+//COLA PEDIDOS-----------------------------------------------------------------------------------------------
 bool ColaPedidos::estaVacia(){
 	lock_guard<mutex> lock(mtx);
 	return primerPedido==0;
@@ -36,15 +36,12 @@ NodoPedido * ColaPedidos::desencolar(){
 void ColaPedidos::imprimir(){
 	lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
-	while(tmp!=ultimoPedido){
+	while(tmp!=NULL){
 		cout<<tmp->numeroPedido<<endl; 
 		cout<<tmp->codigoCliente<<endl;
 		cout<<"----------------------"<<endl;
 		tmp=tmp->siguiente;
     }
-	cout<<tmp->numeroPedido<<endl; 
-	cout<<tmp->codigoCliente<<endl;
-	cout<<"----------------------"<<endl; 
 }
 
 int ColaPedidos::largo(){
@@ -58,9 +55,9 @@ int ColaPedidos::largo(){
 	return contador;
 }
 
-///COLA PRIORIDAD --------------------------------------
+///COLA PRIORIDAD -------------------------------------------------------------------------------------------
 bool ColaPedidosPrioridad::estaVacia(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	return primerPedido==0;
 }
 
@@ -91,19 +88,16 @@ NodoPedido * ColaPedidosPrioridad::desencolar(){
 void ColaPedidosPrioridad::imprimir(){
 	lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
-	while(tmp!=ultimoPedido){
+	while(tmp!=NULL){
 		cout<<tmp->numeroPedido<<endl; 
 		cout<<tmp->codigoCliente<<endl;
 		cout<<"----------------------"<<endl; 
 		tmp=tmp->siguiente;
     }
-	cout<<tmp->numeroPedido<<endl; 
-	cout<<tmp->codigoCliente<<endl;
-	cout<<"----------------------"<<endl; 
 }
 
 int ColaPedidosPrioridad::largo(){
-    lock_guard<mutex> lock(mtx);
+    // lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
     int contador=0;
     while(tmp!=NULL){
@@ -113,7 +107,59 @@ int ColaPedidosPrioridad::largo(){
 	return contador;
 }
 
-//LISTA DOBLE ARTICULOS ----------------------------------------
+//COLA PEDIDOS ESPECIALES -----------------------------------------------------------------------------------
+bool ColaPedidosEspeciales::estaVacia(){
+	// lock_guard<mutex> lock(mtx);
+	return primerPedido==0;
+}
+
+void ColaPedidosEspeciales::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
+	// lock_guard<mutex> lock(mtx);
+	if(estaVacia())
+		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+	else{
+		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+		ultimoPedido->siguiente->anterior=ultimoPedido;
+		ultimoPedido=ultimoPedido->siguiente; 
+    }
+}
+
+NodoPedido * ColaPedidosEspeciales::desencolar(){
+	lock_guard<mutex> lock(mtx);
+	NodoPedido * borrado= primerPedido;
+	if(primerPedido==ultimoPedido){
+		primerPedido=ultimoPedido=NULL;
+	}else{
+		primerPedido=primerPedido->siguiente;
+		borrado->siguiente=NULL;
+		primerPedido->anterior=NULL;
+	}
+	return borrado;
+}
+
+void ColaPedidosEspeciales::imprimir(){
+	lock_guard<mutex> lock(mtx);
+	NodoPedido * tmp = primerPedido;
+	while(tmp!=NULL){
+		cout<<tmp->numeroPedido<<endl; 
+		cout<<tmp->codigoCliente<<endl;
+		cout<<"----------------------"<<endl; 
+		tmp=tmp->siguiente;
+    }
+}
+
+int ColaPedidosEspeciales::largo(){
+    // lock_guard<mutex> lock(mtx);
+	NodoPedido * tmp = primerPedido;
+    int contador=0;
+    while(tmp!=NULL){
+	    contador++;
+	    tmp=tmp->siguiente;
+    }
+	return contador;
+}
+
+//LISTA DOBLE ARTICULOS -------------------------------------------------------------------------------------
 void NodoArticulo::imprimir(){
 	cout<<codigo<<endl; 
 	cout<<cantidad<<endl; 
@@ -133,7 +179,7 @@ void ListaDoble::insertarInicio(int _cantidad, string _codigo, string _categoria
     }
 }
 
-void ListaDoble::insertarFinal (int _cantidad, string _codigo, string _categoria, string _ubicacion, int _tiempoFabricacion){
+void ListaDoble::insertarFinal(int _cantidad, string _codigo, string _categoria, string _ubicacion, int _tiempoFabricacion){
     if (primerArticulo==0)
 	    primerArticulo=ultimoArticulo=new NodoArticulo(_cantidad, _codigo, _categoria, _ubicacion, _tiempoFabricacion);
     else{
@@ -190,6 +236,7 @@ void ListaDoble::imprimir(){
 
 bool ListaDoble::encontrarArticulo(string _codigo){
 	NodoArticulo * tmp = primerArticulo;
+	int contador;
 	while(tmp!=NULL){
 		if(tmp->codigo==_codigo){
 			return true;
@@ -198,12 +245,69 @@ bool ListaDoble::encontrarArticulo(string _codigo){
     }
 	return false;
 }
-
+//Falta probar esta función
 void ListaDoble::actualizarArchivoArticulos(){
-	
+	ofstream archivo;
+	archivo.open("articulos.txt",ios::out); //Al ya existir lo va a sobreescribir
+	if (archivo.fail()){
+		cout<<"No escribí el archivo"<<endl;
+		exit(1);
+	}else{
+		NodoArticulo * tmp = primerArticulo;
+		while(tmp!=NULL){
+			archivo<<tmp->codigo<<"\t"<<tmp->cantidad<<"\t"<<tmp->tiempoFabricacion<<"\t"<<tmp->categoria<<"\t"<<tmp->ubicacion<<endl;
+			tmp=tmp->siguiente;
+    	}
+		archivo.close();
+	}
+
 }
 
-//LISTA PRODUCTOS -------------------------
+int ListaDoble::largo(){
+    // lock_guard<mutex> lock(mtx);
+	NodoArticulo * tmp = primerArticulo;
+    int contador=0;
+    while(tmp!=NULL){
+	    contador++;
+	    tmp=tmp->siguiente;
+    }
+	return contador;
+}
+
+bool ListaDoble::encontrarArticuloRepetido(string _codigo){
+	NodoArticulo * tmp = primerArticulo;
+	int contador=0;
+	while(tmp!=NULL){
+		if(tmp->codigo==_codigo){
+			contador++;
+		}
+		tmp=tmp->siguiente;
+    }
+	if (contador>1)
+		return true;
+	else
+		return false;
+}
+
+//Falta probar esta función
+int ListaDoble::revisarListaArticulos(){
+	//Si devuelve 0 todo está bien, si devuelve 1 algo está mal
+	string articulos[largo()];
+	NodoArticulo * tmp = primerArticulo;
+	while(tmp!=NULL){
+		if(tmp->cantidad<0){
+			return 1;
+		}else if (tmp->categoria!="A"&& tmp->categoria!="B" && tmp->categoria!="C"){
+			return 1;
+		}else if(encontrarArticuloRepetido(tmp->codigo)){
+			return 1;
+		}
+		tmp=tmp->siguiente;
+    }
+	return 0;
+}
+
+//LISTA PRODUCTOS ------------------------------------------------------------------------------------------
 void ListaProductos::insertarInicioProducto(string _codigoProducto, int _cantidad){
     if (primerProducto==NULL)
 	    primerProducto=ultimoProducto=new Producto(_codigoProducto, _cantidad);
@@ -238,7 +342,7 @@ Producto * ListaProductos::borrarAlFinal(){
     return borrado;
 }
 
-//LISTA CLIENTES --------------------------------------
+//LISTA CLIENTES -------------------------------------------------------------------------------------------
 void ListaClientes::insertarInicioCliente (string codigoCliente, string nombreCliente,int prioridad){
     if (primerCliente==NULL)
 	    primerCliente=new Cliente (codigoCliente, nombreCliente, prioridad);
@@ -309,7 +413,7 @@ void Cliente::imprimir(){
 	cout<<"------------"<<endl;
 }
 
-//-----------------------------------------------------------------------
+//--------------------------------------- FUNCIONES SIN ESTRUCTURA ------------------------------------------
 
 string leerYEncolarPedidos(ColaPedidos* cola, ColaPedidosPrioridad* colaPrioridad,string _nombreArchivo,
 ListaClientes* listaClientes, ListaDoble* listaArticulos){
@@ -354,7 +458,7 @@ ListaClientes* listaClientes, ListaDoble* listaArticulos){
 	}
 }
 
-// THREAD PEDIDOS--------------------------------------------------------
+// THREAD PEDIDOS--------------------------------------------------------------------------------------------
 void threadPedidos::leerArchivosPedidos() {
     while (!terminar) {
         while(pausado){
@@ -391,3 +495,7 @@ void threadPedidos::leerArchivosPedidos() {
         this_thread::sleep_for(chrono::seconds(1));
     }
 }
+
+
+
+
