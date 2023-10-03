@@ -145,6 +145,7 @@ struct ListaDoble {
     void leerArchivoArticulos();
     void imprimir();
     bool encontrarArticulo(string _codigo);
+    void actualizarArchivoArticulos();
 };
 
 //------------------------------------------THREADS--------------------------------------------------

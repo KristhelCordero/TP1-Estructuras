@@ -199,6 +199,10 @@ bool ListaDoble::encontrarArticulo(string _codigo){
 	return false;
 }
 
+void ListaDoble::actualizarArchivoArticulos(){
+	
+}
+
 //LISTA PRODUCTOS -------------------------
 void ListaProductos::insertarInicioProducto(string _codigoProducto, int _cantidad){
     if (primerProducto==NULL)
