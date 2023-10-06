@@ -13,7 +13,7 @@
 using namespace std;
 
 //LISTA BASE
-
+//NOTA PARA KRIS DE KRIS DEL PASADO: REVISAR LOS NEW DE LAS LISTAS QUE ESTÁN DENTRO DE NODOS
 
 //Lista de Clientes(Ordenar por Prioridad*) ------------------------------------------------------------
 struct Cliente{
@@ -67,6 +67,8 @@ struct ListaProductos{
     void insertarFinalProducto (string _codigoProducto, int _cantidad);
 	Producto * borrarAlFinal();
     Producto * revisarProductosFaltantes(ListaDoble *listaArticulos);
+    bool exists(string _codigoProducto);
+    int cantidadArticulosDistintos();
 };
 
 // Cola de Pedidos ------------------------------------------------------------------------------------
@@ -257,5 +259,10 @@ struct ThreadBalanceador{
     ~ThreadBalanceador() {Terminar();}
 };
 
-
-
+//ROBOTS ----------------------------------------------------------------------------------------------
+struct RobotFabricador{
+//Idea: crear un robot, con sus componentes y que vayan a una lista
+// operar desde el thread esa lista de robots
+// hacer una función que opere al robot correspondiente
+// Necesito: ver donde putas meto las validaciones :)
+};

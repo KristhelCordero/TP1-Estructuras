@@ -352,7 +352,7 @@ Producto * ListaProductos::borrarAlFinal(){
 	}
     return borrado;
 }
-
+//FALTA PROBAR ESTA FUNCION
 Producto * ListaProductos::revisarProductosFaltantes(ListaDoble *listaArticulos){
 	Producto *tmp=primerProducto;
 	while(tmp!=NULL){
@@ -361,6 +361,29 @@ Producto * ListaProductos::revisarProductosFaltantes(ListaDoble *listaArticulos)
 		}
 	}
 	return tmp; //si tmp es NULL no hay ningun producto faltante
+}
+//FALTA PROBAR ESTA FUNCION
+bool ListaProductos::exists(string _codigoProducto){
+	Producto * tmp = primerProducto;
+    while(tmp!=NULL){
+	    if (tmp->codigoProducto==_codigoProducto)
+			return true;
+	    tmp=tmp->siguienteProducto;
+    }
+	return false;
+}
+//FALTA PROBAR ESTA FUNCION
+int ListaProductos::cantidadArticulosDistintos(){
+	Producto * tmp = primerProducto;
+	ListaProductos * listaProvisional= new ListaProductos();
+    int contador=0;
+    while(tmp!=NULL){
+	    if (!listaProvisional->exists(tmp->codigoProducto)) //no se si realmente sea necesario
+			listaProvisional->insertarFinalProducto(tmp->codigoProducto,0); //porque puede ser que solo se ingresen productos diferentes
+			contador++;
+	    tmp=tmp->siguienteProducto;
+    }
+	return contador;
 }
 
 //LISTA CLIENTES -------------------------------------------------------------------------------------------
@@ -525,6 +548,7 @@ void threadPedidos::leerArchivosPedidos() {
 }
 
 // THREAD BALANCEADOR ---------------------------------------------------------------------------------------
+// No está probado
 void ThreadBalanceador::procesarPedidos(){
 	NodoPedido * pedidoProcesandose;
 	Producto * productoAElaborar;
