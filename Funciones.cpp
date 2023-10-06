@@ -3,6 +3,8 @@
 string leerYEncolarPedidos(ColaPedidos* cola, ColaPedidosPrioridad* colaPrioridad,string _nombreArchivo,
 ListaClientes* listaClientes, ListaDoble* listaArticulos);
 
+//hay que configurar todos los mutex porfiii
+
 //COLA PEDIDOS-----------------------------------------------------------------------------------------------
 bool ColaPedidos::estaVacia(){
 	lock_guard<mutex> lock(mtx);
@@ -351,6 +353,16 @@ Producto * ListaProductos::borrarAlFinal(){
     return borrado;
 }
 
+Producto * ListaProductos::revisarProductosFaltantes(ListaDoble *listaArticulos){
+	Producto *tmp=primerProducto;
+	while(tmp!=NULL){
+		if (tmp->cantidad>listaArticulos->cantidadArticuloBodega(tmp->codigoProducto)){
+			return tmp; // si devuelve un producto, hay que enviar ese producto a fabricar
+		}
+	}
+	return tmp; //si tmp es NULL no hay ningun producto faltante
+}
+
 //LISTA CLIENTES -------------------------------------------------------------------------------------------
 void ListaClientes::insertarInicioCliente (string codigoCliente, string nombreCliente,int prioridad){
     if (primerCliente==NULL)
@@ -514,7 +526,40 @@ void threadPedidos::leerArchivosPedidos() {
 
 // THREAD BALANCEADOR ---------------------------------------------------------------------------------------
 void ThreadBalanceador::procesarPedidos(){
-	//Esto es lo que estoy haciendo :v
+	NodoPedido * pedidoProcesandose;
+	Producto * productoAElaborar;
+	while (!terminar){
+		while(apagado){
+            this_thread::sleep_for(chrono::milliseconds(2000));
+        }
+		do{
+			if (colaEspecial->largo()>=1){
+				pedidoProcesandose=colaEspecial->desencolar();
+				procesando=true;
+			}
+			else if (colaPrioridad->largo()>=1){
+				pedidoProcesandose=colaPrioridad->desencolar();
+				procesando=true;
+			}
+			else if (cola->largo()>=1){
+				pedidoProcesandose=cola->desencolar();
+				procesando=true;
+			}
+			else
+				this_thread::sleep_for(chrono::seconds(3));
+		}while (!procesando);
+		productoAElaborar=pedidoProcesandose->productos->revisarProductosFaltantes(listaArticulos);
+		do{
+			if (productoAElaborar==NULL){//No hay ningún producto faltante
+				colaDeAlisto->encolar(pedidoProcesandose->numeroPedido,
+				pedidoProcesandose->codigoCliente,pedidoProcesandose->productos);
+				procesando=false;
+			}else{
+				//hay que mandar a elaborar un producto
+				//hay que hacer los robots por eso no he hecho esta parte XD
+			}
+		}while (procesando);
+	}
 }
 
 //--------------------------------------- FUNCIONES SIN ESTRUCTURA ------------------------------------------
@@ -561,15 +606,8 @@ ListaClientes* listaClientes, ListaDoble* listaArticulos){
 	}
 }
 
-Producto * ListaProductos::revisarProductosFaltantes(ListaDoble *listaArticulos){
-	Producto *tmp=primerProducto;
-	while(tmp!=NULL){
-		if (tmp->cantidad>listaArticulos->cantidadArticuloBodega(tmp->codigoProducto)){
-			return tmp; // si devuelve un producto, hay que enviar ese producto a fabricar
-		}
-	}
-	return tmp; //si tmp es NULL no hay ningun producto faltante
-}
+
+
 
 
 
