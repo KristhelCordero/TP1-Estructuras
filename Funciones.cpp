@@ -509,6 +509,54 @@ int ColaAlisto::largo(){
 	return contador;
 }
 
+// LISTA ROBOTS ---------------------------------------------------------------------------------------------
+void ListaRobots::insertarFinal(string _codigoRobot, string _articuloFabrica, bool _apagado, bool _esPrioridad){
+    if (primerRobot==0)
+	    primerRobot=ultimoRobot=new Robot(_codigoRobot, _articuloFabrica, _apagado, _esPrioridad);
+    else{
+	    ultimoRobot->siguiente= new Robot(_codigoRobot, _articuloFabrica, _apagado, _esPrioridad);
+	    ultimoRobot->siguiente->anterior=ultimoRobot;
+	    ultimoRobot=ultimoRobot->siguiente; 
+    }
+}
+
+void Robot::imprimir(){
+	cout<<codigoRobot<<endl; 
+	cout<<articuloFabrica<<endl; 
+	cout<<apagado<<endl;
+	cout<<esPrioridad<<endl; 
+	cout<<"------------"<<endl;
+}
+
+void ListaRobots::imprimir(){
+	Robot * tmp = primerRobot;
+	while(tmp!=NULL){
+		tmp->imprimir();
+		tmp=tmp->siguiente;
+    }
+}
+
+void ListaRobots::leerArchivoArticulos(){
+	ifstream archivo;
+	string texto;
+	string codigoRobot,articulo,apagado,esPrioridad;
+	archivo.open("robots.txt",ios::in);
+	
+	if (archivo.fail()){
+		cout<<"No lei el archivo"<<endl;
+		exit(1);
+	}else{
+		while(getline(archivo, texto)){
+			istringstream ss(texto);
+			getline(ss,codigoRobot,'\t');
+			getline(ss,articulo,'\t');
+			getline(ss,apagado,'\t');
+			getline(ss,esPrioridad,'\t');
+			insertarFinal();
+		}
+		archivo.close();
+	}
+}
 // THREAD PEDIDOS -------------------------------------------------------------------------------------------
 void threadPedidos::leerArchivosPedidos() {
     while (!terminar) {

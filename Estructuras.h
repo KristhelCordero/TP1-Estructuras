@@ -186,6 +186,40 @@ struct ColaAlisto{
     NodoPedido * desencolar();
 };
 
+// ROBOTS --------------------------------------------------------------------------------------------
+struct Robot{
+    string codigoRobot;
+    string articuloFabrica;
+    bool apagado;
+    bool esPrioridad;
+    Robot *siguiente;
+    Robot *anterior;
+
+    Robot(string _codigoRobot, string _articuloFabrica, bool _apagado, bool _esPrioridad){
+        codigoRobot=_codigoRobot;
+        articuloFabrica=_articuloFabrica;
+        apagado=_apagado;
+        esPrioridad=_esPrioridad;
+    }
+
+    void imprimir();
+};
+
+struct ListaRobots{
+    Robot * primerRobot;
+    Robot * ultimoRobot;
+
+    ListaRobots(){
+		primerRobot=ultimoRobot=NULL;
+    }
+
+    void insertarFinal (string _codigoRobot, string _articuloFabrica, bool _apagado, bool _esPrioridad);
+    void leerArchivoRobots();
+    void imprimir();
+
+};
+
+
 //------------------------------------------THREADS---------------------------------------------------
 struct threadPedidos {
     thread thread; 
@@ -261,7 +295,7 @@ struct ThreadBalanceador{
 
 //ROBOTS ----------------------------------------------------------------------------------------------
 struct RobotFabricador{
-//Idea: crear un robot, con sus componentes y que vayan a una lista
+// Idea: crear un robot, con sus componentes y que vayan a una lista
 // operar desde el thread esa lista de robots
 // hacer una función que opere al robot correspondiente
 // Necesito: ver donde putas meto las validaciones :)
