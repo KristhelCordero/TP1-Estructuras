@@ -236,7 +236,6 @@ void ListaDoble::imprimir(){
 
 bool ListaDoble::encontrarArticulo(string _codigo){
 	NodoArticulo * tmp = primerArticulo;
-	int contador;
 	while(tmp!=NULL){
 		if(tmp->codigo==_codigo){
 			return true;
@@ -244,6 +243,16 @@ bool ListaDoble::encontrarArticulo(string _codigo){
 		tmp=tmp->siguiente;
     }
 	return false;
+}
+
+int ListaDoble::cantidadArticuloBodega(string _codigo){
+	NodoArticulo * tmp = primerArticulo;
+	while(tmp!=NULL){
+		if(tmp->codigo==_codigo){
+			return tmp->cantidad;
+		}
+		tmp=tmp->siguiente;
+    }
 }
 //Falta probar esta función
 void ListaDoble::actualizarArchivoArticulos(){
@@ -413,6 +422,58 @@ void Cliente::imprimir(){
 	cout<<"------------"<<endl;
 }
 
+// COLA DE ALISTO ------------------------------------------------------------------------------------------
+bool ColaAlisto::estaVacia(){
+	lock_guard<mutex> lock(mtx);
+	return primerPedido==0;
+}
+
+void ColaAlisto::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
+	// lock_guard<mutex> lock(mtx);
+	if(estaVacia())
+		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+	else{
+		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+		ultimoPedido->siguiente->anterior=ultimoPedido;
+		ultimoPedido=ultimoPedido->anterior; 
+    }
+}
+
+NodoPedido * ColaAlisto::desencolar(){
+	lock_guard<mutex> lock(mtx);
+	NodoPedido * borrado= primerPedido;
+	if(primerPedido==ultimoPedido){
+		primerPedido=ultimoPedido=NULL;
+	}else{
+		primerPedido=primerPedido->siguiente;
+		borrado->siguiente=NULL;
+		primerPedido->anterior=NULL;
+	}
+	return borrado;
+}
+
+void ColaAlisto::imprimir(){
+	lock_guard<mutex> lock(mtx);
+	NodoPedido * tmp = primerPedido;
+	while(tmp!=NULL){
+		cout<<tmp->numeroPedido<<endl; 
+		cout<<tmp->codigoCliente<<endl;
+		cout<<"----------------------"<<endl;
+		tmp=tmp->siguiente;
+    }
+}
+
+int ColaAlisto::largo(){
+	lock_guard<mutex> lock(mtx);
+    NodoPedido * tmp = primerPedido;
+    int contador=0;
+    while(tmp!=NULL){
+	    contador++;
+	    tmp=tmp->siguiente;
+    }
+	return contador;
+}
+
 // THREAD PEDIDOS -------------------------------------------------------------------------------------------
 void threadPedidos::leerArchivosPedidos() {
     while (!terminar) {
@@ -500,10 +561,27 @@ ListaClientes* listaClientes, ListaDoble* listaArticulos){
 	}
 }
 
-string ListaProductos::revisarProductosFaltantes(ListaDoble *listaArticulos){
-	Producto *tmp=listaProductos->primerProducto;
-	while(){
-
+Producto * ListaProductos::revisarProductosFaltantes(ListaDoble *listaArticulos){
+	Producto *tmp=primerProducto;
+	while(tmp!=NULL){
+		if (tmp->cantidad>listaArticulos->cantidadArticuloBodega(tmp->codigoProducto)){
+			return tmp; // si devuelve un producto, hay que enviar ese producto a fabricar
+		}
 	}
-	
+	return tmp; //si tmp es NULL no hay ningun producto faltante
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

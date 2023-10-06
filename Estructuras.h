@@ -66,7 +66,7 @@ struct ListaProductos{
     void insertarInicioProducto(string _codigoProducto, int _cantidad);
     void insertarFinalProducto (string _codigoProducto, int _cantidad);
 	Producto * borrarAlFinal();
-    string revisarProductosFaltantes(ListaDoble *listaArticulos);
+    Producto * revisarProductosFaltantes(ListaDoble *listaArticulos);
 };
 
 // Cola de Pedidos ------------------------------------------------------------------------------------
@@ -165,6 +165,23 @@ struct ListaDoble {
     int revisarListaArticulos();
     int largo();
     bool encontrarArticuloRepetido(string _codigo);
+    int cantidadArticuloBodega(string _codigo);
+};
+
+// COLA DE ALISTO ------------------------------------------------------------------------------------
+struct ColaAlisto{
+    NodoPedido * primerPedido, * ultimoPedido;
+    mutex mtx;
+
+    ColaAlisto(){
+        primerPedido=ultimoPedido=NULL;
+    }
+
+    bool estaVacia();
+    void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos);
+    void imprimir();
+    int largo();
+    NodoPedido * desencolar();
 };
 
 //------------------------------------------THREADS---------------------------------------------------
