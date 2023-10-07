@@ -249,8 +249,13 @@ struct Movimiento{
         alistador=false;
     }
     //normal
-    Movimiento(string _queHace, string _fecha, string _hora, string faltantes){
-
+    Movimiento(string _queHace, string _fecha, string _hora, string _faltantes){
+        queHace=_queHace;
+        fecha=_fecha;
+        hora=_hora;
+        faltantes=_faltantes;
+        alistador=false;
+        robot=false;
     }
     //alistador
     Movimiento(string _numAlistador, string _articulo, string _ubicacion, string _tiempo){
@@ -261,7 +266,7 @@ struct Movimiento{
         alistador=true;
         robot=false;
     }
-
+    
 };
 
 
