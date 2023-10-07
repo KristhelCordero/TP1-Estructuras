@@ -246,10 +246,10 @@ struct Movimiento{
         fechaFinal=_fechaFinal;
         horaFinal=_horaFinal;
         robot=true;
-        queHace=fecha=hora=faltantes=numAlistador=ubicacion=tiempo=" ";
+        alistador=false;
     }
     //normal
-    Movimiento(){
+    Movimiento(string _queHace, string _fecha, string _hora, string faltantes){
 
     }
     //alistador
@@ -258,6 +258,8 @@ struct Movimiento{
         numAlistador=_numAlistador;
         ubicacion=_ubicacion;
         tiempo=_tiempo;
+        alistador=true;
+        robot=false;
     }
 
 };
