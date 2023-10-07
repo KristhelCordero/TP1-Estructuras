@@ -10,12 +10,16 @@
 #include <dirent.h>
 #include <cstdlib>
 #include <cstdio>
+#include <ctime>
 using namespace std;
 
 //LISTA BASE
 //NOTA PARA KRIS DE KRIS DEL PASADO: REVISAR LOS NEW DE LAS LISTAS QUE ESTÁN DENTRO DE NODOS
 
-//Lista de Clientes(Ordenar por Prioridad*) ------------------------------------------------------------
+struct ListaDoble;
+struct BitacoraMovimientos;
+
+//Lista de Clientes(Ordenar por Prioridad*) -----------------------------------------------------------
 struct Cliente{
     string codigoCliente, nombreCliente;
     int prioridad;
@@ -48,10 +52,12 @@ struct Producto{
     Producto * siguienteProducto, * productoAnterior;
     string codigoProducto;
     int cantidad;
+    bool elaborando;
 
     Producto(string _codigoProducto, int _cantidad){
         codigoProducto=_codigoProducto;
         cantidad=_cantidad;
+        elaborando=false;
         siguienteProducto=productoAnterior=NULL;
     }
 };
@@ -65,8 +71,8 @@ struct ListaProductos{
 
     void insertarInicioProducto(string _codigoProducto, int _cantidad);
     void insertarFinalProducto (string _codigoProducto, int _cantidad);
-	Producto * borrarAlFinal();
-    Producto * revisarProductosFaltantes(ListaDoble *listaArticulos);
+	Producto* borrarAlFinal();
+    Producto* revisarProductosFaltantes(ListaDoble* listaArticulos);
     bool exists(string _codigoProducto);
     int cantidadArticulosDistintos();
 };
@@ -170,7 +176,7 @@ struct ListaDoble {
     int cantidadArticuloBodega(string _codigo);
 };
 
-// COLA DE ALISTO ------------------------------------------------------------------------------------
+// COLA DE ALISTO -------------------------------------------------------------------------------------
 struct ColaAlisto{
     NodoPedido * primerPedido, * ultimoPedido;
     mutex mtx;
@@ -186,12 +192,13 @@ struct ColaAlisto{
     NodoPedido * desencolar();
 };
 
-// ROBOTS --------------------------------------------------------------------------------------------
+// ROBOTS ---------------------------------------------------------------------------------------------
 struct Robot{
     string codigoRobot;
     string articuloFabrica;
     bool apagado;
     bool esPrioridad;
+    bool disponible;
     Robot *siguiente;
     Robot *anterior;
 
@@ -200,6 +207,7 @@ struct Robot{
         articuloFabrica=_articuloFabrica;
         apagado=_apagado;
         esPrioridad=_esPrioridad;
+        disponible=true;
     }
 
     void imprimir();
@@ -219,8 +227,48 @@ struct ListaRobots{
 
 };
 
+// BITÁCORA DE MOVIMIENTOS ----------------------------------------------------------------------------
+struct Movimiento{
+    string queHace, fecha, hora, faltantes;//faltantes solo si pasó por un robot
+    bool robot; //Si esto es true el formato es diferente
+    string articulo, fabricadoEn, cantidad, 
+    fechaInicio, horaInicio, fechaFinal, horaFinal;
+    bool alistador; //Si esto cambia, su formato es diferente tambien
+    string numAlistador, ubicacion, tiempo; //artículo aquii también
+    //robot
+    Movimiento(string _articulo, string _fabricadoEn, string _cantidad, 
+    string _fechaInicio, string _horaInicio, string _fechaFinal, string _horaFinal){
+        articulo=_articulo;
+        fabricadoEn=_fabricadoEn;
+        cantidad=_cantidad;
+        fechaInicio=_fechaInicio;
+        horaInicio=_horaInicio;
+        fechaFinal=_fechaFinal;
+        horaFinal=_horaFinal;
+        robot=true;
+        queHace=fecha=hora=faltantes=numAlistador=ubicacion=tiempo=" ";
+    }
+    //normal
+    Movimiento(){
 
-//------------------------------------------THREADS---------------------------------------------------
+    }
+    //alistador
+    Movimiento(string _numAlistador, string _articulo, string _ubicacion, string _tiempo){
+        articulo=_articulo;
+        numAlistador=_numAlistador;
+        ubicacion=_ubicacion;
+        tiempo=_tiempo;
+    }
+
+};
+
+
+struct BitacoraMovimientos{
+    
+};
+
+
+//------------------------------------------THREADS----------------------------------------------------
 struct threadPedidos {
     thread thread; 
     string nombreArchivo, _nombreArchivo;
@@ -263,7 +311,7 @@ struct threadPedidos {
 //                 }
 //             }
 
-//BALANCEADOR ---------------------------------------------------------------------------------------
+//BALANCEADOR -----------------------------------------------------------------------------------------
 struct ThreadBalanceador{
     thread thread; 
     atomic<bool> apagado; 
@@ -295,8 +343,8 @@ struct ThreadBalanceador{
 
 //ROBOTS ----------------------------------------------------------------------------------------------
 struct RobotFabricador{
-// Idea: crear un robot, con sus componentes y que vayan a una lista
-// operar desde el thread esa lista de robots
+// operar desde el thread la lista de robots
 // hacer una función que opere al robot correspondiente
 // Necesito: ver donde putas meto las validaciones :)
+    void elaborarProducto(Producto * productoAElaborar);
 };

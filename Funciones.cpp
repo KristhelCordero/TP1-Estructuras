@@ -2,7 +2,8 @@
 
 string leerYEncolarPedidos(ColaPedidos* cola, ColaPedidosPrioridad* colaPrioridad,string _nombreArchivo,
 ListaClientes* listaClientes, ListaDoble* listaArticulos);
-
+string obtenerHoraActual();
+string obtenerFechaActual();
 //hay que configurar todos los mutex porfiii
 
 //COLA PEDIDOS-----------------------------------------------------------------------------------------------
@@ -246,7 +247,7 @@ bool ListaDoble::encontrarArticulo(string _codigo){
     }
 	return false;
 }
-
+//Falta probar esta función
 int ListaDoble::cantidadArticuloBodega(string _codigo){
 	NodoArticulo * tmp = primerArticulo;
 	while(tmp!=NULL){
@@ -255,6 +256,7 @@ int ListaDoble::cantidadArticuloBodega(string _codigo){
 		}
 		tmp=tmp->siguiente;
     }
+	return 0;
 }
 //Falta probar esta función
 void ListaDoble::actualizarArchivoArticulos(){
@@ -284,7 +286,7 @@ int ListaDoble::largo(){
     }
 	return contador;
 }
-
+//Falta probar esta función
 bool ListaDoble::encontrarArticuloRepetido(string _codigo){
 	NodoArticulo * tmp = primerArticulo;
 	int contador=0;
@@ -536,10 +538,10 @@ void ListaRobots::imprimir(){
     }
 }
 
-void ListaRobots::leerArchivoArticulos(){
+void ListaRobots::leerArchivoRobots(){
 	ifstream archivo;
-	string texto;
-	string codigoRobot,articulo,apagado,esPrioridad;
+	bool bApagado, bPrioridad;
+	string texto,codigoRobot,articulo,apagado,esPrioridad;
 	archivo.open("robots.txt",ios::in);
 	
 	if (archivo.fail()){
@@ -551,12 +553,23 @@ void ListaRobots::leerArchivoArticulos(){
 			getline(ss,codigoRobot,'\t');
 			getline(ss,articulo,'\t');
 			getline(ss,apagado,'\t');
+			if (apagado=="1")
+				bApagado=false;
+			else
+				bApagado=true;
 			getline(ss,esPrioridad,'\t');
-			insertarFinal();
+			if (esPrioridad=="1")
+				bPrioridad=true;
+			else
+				bApagado=false;
+			insertarFinal(codigoRobot,articulo,bApagado,bPrioridad);
 		}
 		archivo.close();
 	}
 }
+
+//BITACORA DE MOVIMIENTOS -----------------------------------------------------------------------------------
+
 // THREAD PEDIDOS -------------------------------------------------------------------------------------------
 void threadPedidos::leerArchivosPedidos() {
     while (!terminar) {
@@ -634,6 +647,11 @@ void ThreadBalanceador::procesarPedidos(){
 	}
 }
 
+//THREAD ROBOTS ---------------------------------------------------------------------------------------------
+void RobotFabricador::elaborarProducto(Producto * productoAElaborar){
+	//Todavía no sé muy bien como va a funcionar esto
+}
+
 //--------------------------------------- FUNCIONES SIN ESTRUCTURA ------------------------------------------
 string leerYEncolarPedidos(ColaPedidos* cola, ColaPedidosPrioridad* colaPrioridad,string _nombreArchivo,
 ListaClientes* listaClientes, ListaDoble* listaArticulos){
@@ -678,10 +696,25 @@ ListaClientes* listaClientes, ListaDoble* listaArticulos){
 	}
 }
 
+string obtenerHoraActual() {
+    auto ahora = chrono::system_clock::now();
+    time_t tiempoActual = chrono::system_clock::to_time_t(ahora);
+    tm tiempoLocal = *localtime(&tiempoActual);
+    char buffer[9];
+    sprintf(buffer, "%02d:%02d:%02d", tiempoLocal.tm_hour,
+	 tiempoLocal.tm_min, tiempoLocal.tm_sec);
+    return string(buffer);
+}
 
-
-
-
+string obtenerFechaActual() {
+    auto ahora = chrono::system_clock::now();
+    time_t tiempoActual = chrono::system_clock::to_time_t(ahora);
+    tm tiempoLocal = *localtime(&tiempoActual);
+    char buffer[11];
+    sprintf(buffer, "%02d/%02d/%04d", tiempoLocal.tm_mday,
+	 tiempoLocal.tm_mon + 1, tiempoLocal.tm_year + 1900);
+    return std::string(buffer);
+}
 
 
 
