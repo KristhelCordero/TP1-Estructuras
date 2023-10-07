@@ -269,11 +269,9 @@ struct Movimiento{
     
 };
 
-
 struct BitacoraMovimientos{
     
 };
-
 
 //------------------------------------------THREADS----------------------------------------------------
 struct threadPedidos {
