@@ -204,12 +204,28 @@ struct ColaAlisto{
     NodoPedido * desencolar();
 };
 
-// COLA PEDIDOS LISTOS --------------------------------------------------------------------------------
-struct ColaPedidosListos{
+// COLA ALISTADOS -------------------------------------------------------------------------------------
+struct ColaAlistadoos{
     NodoPedido * primerPedido, * ultimoPedido;
     mutex mtx;
 
-    ColaPedidosListos(){
+    ColaAlistadoos(){
+        primerPedido=ultimoPedido=NULL;
+    }
+
+    bool estaVacia();
+    void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos);
+    void imprimir();
+    int largo();
+    NodoPedido * desencolar();
+};
+
+// COLA FACTURACIÓN -----------------------------------------------------------------------------------
+struct ColaFacturacion{
+    NodoPedido * primerPedido, * ultimoPedido;
+    mutex mtx;
+
+    ColaFacturacion(){
         primerPedido=ultimoPedido=NULL;
     }
 
@@ -398,6 +414,11 @@ struct RobotFabricador{
 // hacer una función que opere al robot correspondiente
 // Necesito: ver donde putas meto las validaciones :)
     void elaborarProducto(Producto * productoAElaborar);
+};
+
+// EMPACADOR ------------------------------------------------------------------------------------------
+struct ThreadEmpacador{
+    
 };
 
 //FACTURADOR ------------------------------------------------------------------------------------------

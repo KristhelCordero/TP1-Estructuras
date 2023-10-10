@@ -523,13 +523,13 @@ int ColaAlisto::largo(){
 	return contador;
 }
 
-// COLA PEDIDOS LISTOS --------------------------------------------------------------------------------------
-bool ColaPedidosListos::estaVacia(){
+// COLA ALISTADOOS ---------------------------------------------------------------------------------------
+bool ColaAlistadoos::estaVacia(){
 	lock_guard<mutex> lock(mtx);
 	return primerPedido==0;
 }
 
-void ColaPedidosListos::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
+void ColaAlistadoos::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
 	// lock_guard<mutex> lock(mtx);
 	if(estaVacia())
 		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
@@ -539,10 +539,10 @@ void ColaPedidosListos::encolar(int _numeroPedido, string _codigoCliente,ListaPr
 		ultimoPedido=ultimoPedido->anterior; 
     }
 	//esto último no está probado
-	ultimoPedido->annadirMovimiento(new Movimiento("A empaque: ",obtenerFechaActual()+" "+obtenerHoraActual()));
+	ultimoPedido->annadirMovimiento(new Movimiento("En cola de alisto: ",obtenerFechaActual()+" "+obtenerHoraActual()));
 }
 
-NodoPedido * ColaPedidosListos::desencolar(){
+NodoPedido * ColaAlistadoos::desencolar(){
 	lock_guard<mutex> lock(mtx);
 	NodoPedido * borrado= primerPedido;
 	if(primerPedido==ultimoPedido){
@@ -555,7 +555,7 @@ NodoPedido * ColaPedidosListos::desencolar(){
 	return borrado;
 }
 
-void ColaPedidosListos::imprimir(){
+void ColaAlistadoos::imprimir(){
 	lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
 	while(tmp!=NULL){
@@ -566,7 +566,61 @@ void ColaPedidosListos::imprimir(){
     }
 }
 
-int ColaPedidosListos::largo(){
+int ColaAlistadoos::largo(){
+	lock_guard<mutex> lock(mtx);
+    NodoPedido * tmp = primerPedido;
+    int contador=0;
+    while(tmp!=NULL){
+	    contador++;
+	    tmp=tmp->siguiente;
+    }
+	return contador;
+}
+
+// COLA FACTURACION --------------------------------------------------------------------------------------
+bool ColaFacturacion::estaVacia(){
+	lock_guard<mutex> lock(mtx);
+	return primerPedido==0;
+}
+
+void ColaFacturacion::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
+	// lock_guard<mutex> lock(mtx);
+	if(estaVacia())
+		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+	else{
+		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+		ultimoPedido->siguiente->anterior=ultimoPedido;
+		ultimoPedido=ultimoPedido->anterior; 
+    }
+	//esto último no está probado
+	ultimoPedido->annadirMovimiento(new Movimiento("A empaque: ",obtenerFechaActual()+" "+obtenerHoraActual()));
+}
+
+NodoPedido * ColaFacturacion::desencolar(){
+	lock_guard<mutex> lock(mtx);
+	NodoPedido * borrado= primerPedido;
+	if(primerPedido==ultimoPedido){
+		primerPedido=ultimoPedido=NULL;
+	}else{
+		primerPedido=primerPedido->siguiente;
+		borrado->siguiente=NULL;
+		primerPedido->anterior=NULL;
+	}
+	return borrado;
+}
+
+void ColaFacturacion::imprimir(){
+	lock_guard<mutex> lock(mtx);
+	NodoPedido * tmp = primerPedido;
+	while(tmp!=NULL){
+		cout<<tmp->numeroPedido<<endl; 
+		cout<<tmp->codigoCliente<<endl;
+		cout<<"----------------------"<<endl;
+		tmp=tmp->siguiente;
+    }
+}
+
+int ColaFacturacion::largo(){
 	lock_guard<mutex> lock(mtx);
     NodoPedido * tmp = primerPedido;
     int contador=0;
@@ -783,7 +837,30 @@ string obtenerFechaActual() {
     return std::string(buffer);
 }
 
+string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
+	ofstream archivo;
+	archivo.open(_nombreArchivo,ios::out); //Al ya existir lo va a sobreescribir
+	if (archivo.fail()){
+		cout<<"No escribí el archivo"<<endl;
+		exit(1);
+	}else{
+		Movimiento * tmpMov=pedido->movimientos->primerMov;
+		archivo<<"Pedido: \t"<<pedido->numeroPedido;
+		archivo<<"Cliente: \t"<<pedido->codigoCliente;
+		while(!tmpMov->robot && !tmpMov->alistador){
+			archivo<<tmpMov->ubicacion<<"\t"<<tmpMov->info<<endl;
+			tmpMov=tmpMov->siguiente;
+    	}
+		archivo<<endl;
+		if(tmpMov->robot){ //robot
+			archivo<<"Robots Fábrica"<<endl;
+			
+		}else{ //alistador
 
+		}
+		archivo.close();
+	}
+}
 
 
 
