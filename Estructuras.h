@@ -15,7 +15,8 @@ using namespace std;
 
 //LISTA BASE
 //NOTA PARA KRIS DE KRIS DEL PASADO: REVISAR LOS NEW DE LAS LISTAS QUE ESTÁN DENTRO DE NODOS
-
+// hay que agregar los destructores a las structs que les faltan, los que están añadidos no están probados
+// puede que generen errores sin sentido 
 struct ListaDoble;
 struct BitacoraMovimientos;
 
@@ -75,6 +76,14 @@ struct ListaProductos{
     Producto* revisarProductosFaltantes(ListaDoble* listaArticulos);
     bool exists(string _codigoProducto);
     int cantidadArticulosDistintos();
+
+    ~ListaProductos(){
+        while(primerProducto != NULL){
+            Producto* temp = primerProducto;
+            primerProducto = primerProducto->siguienteProducto;
+            delete temp;
+        }
+    }
 };
 
 // Cola de Pedidos ------------------------------------------------------------------------------------
@@ -84,12 +93,15 @@ struct NodoPedido{
     int numeroPedido;
     string codigoCliente;
     ListaProductos * productos;
+    BitacoraMovimientos * movimientos;
 
     NodoPedido(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
         numeroPedido=_numeroPedido;
         codigoCliente=_codigoCliente;
         productos=_productos;
+        movimientos= new BitacoraMovimientos();
     }
+    void annadirMovimiento(Movimiento* nuevoMovimiento);
 };
 
 struct ColaPedidos{
@@ -192,6 +204,22 @@ struct ColaAlisto{
     NodoPedido * desencolar();
 };
 
+// COLA PEDIDOS LISTOS --------------------------------------------------------------------------------
+struct ColaPedidosListos{
+    NodoPedido * primerPedido, * ultimoPedido;
+    mutex mtx;
+
+    ColaPedidosListos(){
+        primerPedido=ultimoPedido=NULL;
+    }
+
+    bool estaVacia();
+    void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos);
+    void imprimir();
+    int largo();
+    NodoPedido * desencolar();
+};
+
 // ROBOTS ---------------------------------------------------------------------------------------------
 struct Robot{
     string codigoRobot;
@@ -229,33 +257,22 @@ struct ListaRobots{
 
 // BITÁCORA DE MOVIMIENTOS ----------------------------------------------------------------------------
 struct Movimiento{
-    string queHace, fecha, hora, faltantes;//faltantes solo si pasó por un robot
-    bool robot; //Si esto es true el formato es diferente
-    string articulo, fabricadoEn, cantidad, 
-    fechaInicio, horaInicio, fechaFinal, horaFinal;
-    bool alistador; //Si esto cambia, su formato es diferente tambien
-    string numAlistador, ubicacion, tiempo; //artículo aquii también
+    string ubicacion, info;//info= fecha, hora, faltantes en caso de haber
+    bool robot; 
+    string articulo, fabricadoEn, cantidad, fechaInicio, fechaFinal;
+    bool alistador;
+    string numAlistador, tiempo; //ubi y articulo aqui 2
+    Movimiento * siguiente, *anterior;
+
     //robot
-    Movimiento(string _articulo, string _fabricadoEn, string _cantidad, 
-    string _fechaInicio, string _horaInicio, string _fechaFinal, string _horaFinal){
+    Movimiento(string _articulo, string _fabricadoEn, string _cantidad, string _fechaFinal,string _fechaInicio){
         articulo=_articulo;
         fabricadoEn=_fabricadoEn;
         cantidad=_cantidad;
-        fechaInicio=_fechaInicio;
-        horaInicio=_horaInicio;
         fechaFinal=_fechaFinal;
-        horaFinal=_horaFinal;
+        fechaInicio=_fechaInicio;
         robot=true;
         alistador=false;
-    }
-    //normal
-    Movimiento(string _queHace, string _fecha, string _hora, string _faltantes){
-        queHace=_queHace;
-        fecha=_fecha;
-        hora=_hora;
-        faltantes=_faltantes;
-        alistador=false;
-        robot=false;
     }
     //alistador
     Movimiento(string _numAlistador, string _articulo, string _ubicacion, string _tiempo){
@@ -263,14 +280,43 @@ struct Movimiento{
         numAlistador=_numAlistador;
         ubicacion=_ubicacion;
         tiempo=_tiempo;
-        alistador=true;
         robot=false;
+        alistador=true;
     }
-    
+    //otros
+    Movimiento(string _ubicacion, string _info){
+        ubicacion=_ubicacion;
+        info=_info;
+    }
+
 };
 
 struct BitacoraMovimientos{
+    Movimiento * primerMov, *ultimoMov;
     
+    BitacoraMovimientos(){
+        primerMov=ultimoMov=NULL;
+    }
+
+    void agregarMovimiento(Movimiento* nuevoMovimiento) {
+        if (!primerMov) {
+            primerMov = nuevoMovimiento;
+            ultimoMov = nuevoMovimiento;
+        } else {
+            ultimoMov->siguiente = nuevoMovimiento;
+            nuevoMovimiento->anterior = ultimoMov;
+            ultimoMov = nuevoMovimiento;
+        }
+    }
+    //Destructor
+    ~BitacoraMovimientos() {
+        Movimiento* tmp = primerMov;
+        while (tmp) {
+            Movimiento* siguiente = tmp->siguiente;
+            delete tmp;
+            tmp = siguiente;
+        }
+    }
 };
 
 //------------------------------------------THREADS----------------------------------------------------
@@ -352,4 +398,9 @@ struct RobotFabricador{
 // hacer una función que opere al robot correspondiente
 // Necesito: ver donde putas meto las validaciones :)
     void elaborarProducto(Producto * productoAElaborar);
+};
+
+//FACTURADOR ------------------------------------------------------------------------------------------
+struct ThreadFacturador{
+    
 };

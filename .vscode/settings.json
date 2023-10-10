@@ -7,6 +7,7 @@
         "iosfwd": "cpp",
         "fstream": "cpp",
         "sstream": "cpp",
-        "cstdio": "cpp"
+        "cstdio": "cpp",
+        "ctime": "cpp"
     }
 }

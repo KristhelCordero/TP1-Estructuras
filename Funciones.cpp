@@ -7,6 +7,10 @@ string obtenerFechaActual();
 //hay que configurar todos los mutex porfiii
 
 //COLA PEDIDOS-----------------------------------------------------------------------------------------------
+void NodoPedido::annadirMovimiento(Movimiento* nuevoMovimiento){
+	movimientos->agregarMovimiento(nuevoMovimiento);
+}
+
 bool ColaPedidos::estaVacia(){
 	lock_guard<mutex> lock(mtx);
 	return primerPedido==0;
@@ -21,6 +25,8 @@ void ColaPedidos::encolar(int _numeroPedido, string _codigoCliente,ListaProducto
 		ultimoPedido->siguiente->anterior=ultimoPedido;
 		ultimoPedido=ultimoPedido->anterior; 
     }
+	//esto último no está probado
+	ultimoPedido->annadirMovimiento(new Movimiento("En cola: ",obtenerFechaActual()+" "+obtenerHoraActual()));
 }
 
 NodoPedido * ColaPedidos::desencolar(){
@@ -73,6 +79,8 @@ void ColaPedidosPrioridad::encolar(int _numeroPedido, string _codigoCliente,List
 		ultimoPedido->siguiente->anterior=ultimoPedido;
 		ultimoPedido=ultimoPedido->siguiente; 
     }
+	//esto último no está probado
+	ultimoPedido->annadirMovimiento(new Movimiento("En cola: ",obtenerFechaActual()+" "+obtenerHoraActual()));
 }
 
 NodoPedido * ColaPedidosPrioridad::desencolar(){
@@ -125,6 +133,8 @@ void ColaPedidosEspeciales::encolar(int _numeroPedido, string _codigoCliente,Lis
 		ultimoPedido->siguiente->anterior=ultimoPedido;
 		ultimoPedido=ultimoPedido->siguiente; 
     }
+	//esto último no está probado
+	ultimoPedido->annadirMovimiento(new Movimiento("En cola: ",obtenerFechaActual()+" "+obtenerHoraActual()));
 }
 
 NodoPedido * ColaPedidosEspeciales::desencolar(){
@@ -474,6 +484,8 @@ void ColaAlisto::encolar(int _numeroPedido, string _codigoCliente,ListaProductos
 		ultimoPedido->siguiente->anterior=ultimoPedido;
 		ultimoPedido=ultimoPedido->anterior; 
     }
+	//esto último no está probado
+	ultimoPedido->annadirMovimiento(new Movimiento("En cola de alisto: ",obtenerFechaActual()+" "+obtenerHoraActual()));
 }
 
 NodoPedido * ColaAlisto::desencolar(){
@@ -501,6 +513,60 @@ void ColaAlisto::imprimir(){
 }
 
 int ColaAlisto::largo(){
+	lock_guard<mutex> lock(mtx);
+    NodoPedido * tmp = primerPedido;
+    int contador=0;
+    while(tmp!=NULL){
+	    contador++;
+	    tmp=tmp->siguiente;
+    }
+	return contador;
+}
+
+// COLA PEDIDOS LISTOS --------------------------------------------------------------------------------------
+bool ColaPedidosListos::estaVacia(){
+	lock_guard<mutex> lock(mtx);
+	return primerPedido==0;
+}
+
+void ColaPedidosListos::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
+	// lock_guard<mutex> lock(mtx);
+	if(estaVacia())
+		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+	else{
+		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+		ultimoPedido->siguiente->anterior=ultimoPedido;
+		ultimoPedido=ultimoPedido->anterior; 
+    }
+	//esto último no está probado
+	ultimoPedido->annadirMovimiento(new Movimiento("A empaque: ",obtenerFechaActual()+" "+obtenerHoraActual()));
+}
+
+NodoPedido * ColaPedidosListos::desencolar(){
+	lock_guard<mutex> lock(mtx);
+	NodoPedido * borrado= primerPedido;
+	if(primerPedido==ultimoPedido){
+		primerPedido=ultimoPedido=NULL;
+	}else{
+		primerPedido=primerPedido->siguiente;
+		borrado->siguiente=NULL;
+		primerPedido->anterior=NULL;
+	}
+	return borrado;
+}
+
+void ColaPedidosListos::imprimir(){
+	lock_guard<mutex> lock(mtx);
+	NodoPedido * tmp = primerPedido;
+	while(tmp!=NULL){
+		cout<<tmp->numeroPedido<<endl; 
+		cout<<tmp->codigoCliente<<endl;
+		cout<<"----------------------"<<endl;
+		tmp=tmp->siguiente;
+    }
+}
+
+int ColaPedidosListos::largo(){
 	lock_guard<mutex> lock(mtx);
     NodoPedido * tmp = primerPedido;
     int contador=0;
@@ -632,6 +698,7 @@ void ThreadBalanceador::procesarPedidos(){
 			}
 			else
 				this_thread::sleep_for(chrono::seconds(3));
+			pedidoProcesandose->annadirMovimiento(new Movimiento("Balanceador: ",obtenerFechaActual()+" "+obtenerHoraActual()));
 		}while (!procesando);
 		productoAElaborar=pedidoProcesandose->productos->revisarProductosFaltantes(listaArticulos);
 		do{
