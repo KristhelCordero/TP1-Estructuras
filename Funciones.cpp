@@ -838,27 +838,42 @@ string obtenerFechaActual() {
 
 string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 	ofstream archivo;
+	short contador=0;
 	archivo.open(_nombreArchivo,ios::out); //Al ya existir lo va a sobreescribir
 	if (archivo.fail()){
 		cout<<"No escribí el archivo"<<endl;
 		exit(1);
-	}else{
-		Movimiento * tmpMov=pedido->movimientos->primerMov;
-		archivo<<"Pedido: \t"<<pedido->numeroPedido;
-		archivo<<"Cliente: \t"<<pedido->codigoCliente;
-		while(!tmpMov->robot && !tmpMov->alistador){
-			archivo<<tmpMov->ubicacion<<"\t"<<tmpMov->info<<endl;
-			tmpMov=tmpMov->siguiente;
-    	}
-		archivo<<endl;
-		if(tmpMov->robot){ //robot
-			archivo<<"Robots Fábrica"<<endl;
-			
-		}else{ //alistador
-
-		}
-		archivo.close();
 	}
+	archivo<<"Pedido: \t"<<pedido->numeroPedido;
+	archivo<<"Cliente: \t"<<pedido->codigoCliente;
+	
+	Movimiento * tmpMov=pedido->movimientos->primerMov;
+	while (tmpMov!=NULL){
+		if (!tmpMov->robot && !tmpMov->alistador){
+			archivo<<tmpMov->ubicacion<<"\t"<<tmpMov->info<<endl;
+		}
+		tmpMov=tmpMov->siguiente;
+	}
+	tmpMov=pedido->movimientos->primerMov;
+	while (tmpMov!=NULL){
+		if(tmpMov->robot){ //robot
+			archivo<<endl;
+			archivo<<"Robots Fábrica"<<endl;
+			archivo<<"ARTICULO " << tmpMov->articulo<< "\t Fabricado en "<< 
+			tmpMov->fabricadoEn << "/n"<< tmpMov->cantidad<< "unidades"<<
+			"\nincio: "<<tmpMov->fechaInicio <<"\nfinal: "<<tmpMov->fechaFinal<<endl;
+		}else{ //alistador
+			if(contador==0){
+				archivo<<endl;
+				archivo<<"Alisto "<< "\t Alistador "<< tmpMov->numAlistador <<endl;
+				contador++;
+			}
+			archivo<< tmpMov->articulo<< "\t Ubicación: "<<tmpMov->ubicacion <<
+			"\tfinal: "<<tmpMov->tiempo<< "s" << endl;
+		}
+		tmpMov=tmpMov->siguiente;
+	}
+	archivo.close();
 }
 
 
