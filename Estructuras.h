@@ -35,7 +35,7 @@ struct Cliente{
     void imprimir();
 };
 
-struct ListaClientes{
+struct ListaClientes{ //Lista simple
     Cliente * primerCliente;
 
     ListaClientes(){
