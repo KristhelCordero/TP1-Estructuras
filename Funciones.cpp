@@ -311,7 +311,6 @@ bool ListaDoble::encontrarArticuloRepetido(string _codigo){
 	else
 		return false;
 }
-
 //Falta probar esta función
 int ListaDoble::revisarListaArticulos(){
 	//Si devuelve 0 todo está bien, si devuelve 1 algo está mal
