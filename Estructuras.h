@@ -423,5 +423,26 @@ struct ThreadEmpacador{
 
 //FACTURADOR ------------------------------------------------------------------------------------------
 struct ThreadFacturador{
-    
+    thread thread; 
+    atomic<bool> apagado; 
+    atomic<bool> terminar; 
+    ColaFacturacion* colaFacturacion;
+    bool procesando=false;
+    // Constructor
+    ThreadFacturador(ColaFacturacion *_colaFacturacion):
+    apagado(false), terminar(false), colaFacturacion(_colaFacturacion){
+        thread = std::thread(ThreadFacturador::facturarPedidos, this);
+    }
+    // Función que será ejecutada por el thread
+    void facturarPedidos(); 
+    void Pausar() {apagado = true;}
+    void Reanudar() {apagado = false;}
+    void Terminar() {
+        terminar = true;
+        if (thread.joinable()) {
+            thread.join();
+        }
+    }
+    //Destructor
+    ~ThreadFacturador() {Terminar();}
 };

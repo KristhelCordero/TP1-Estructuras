@@ -4,6 +4,7 @@ string leerYEncolarPedidos(ColaPedidos* cola, ColaPedidosPrioridad* colaPriorida
 ListaClientes* listaClientes, ListaDoble* listaArticulos);
 string obtenerHoraActual();
 string obtenerFechaActual();
+string facturarPedido(NodoPedido *pedido, string _nombreArchivo);
 //hay que configurar todos los mutex porfiii
 
 //COLA PEDIDOS-----------------------------------------------------------------------------------------------
@@ -64,7 +65,7 @@ int ColaPedidos::largo(){
 	return contador;
 }
 
-///COLA PRIORIDAD -------------------------------------------------------------------------------------------
+//COLA PRIORIDAD -------------------------------------------------------------------------------------------
 bool ColaPedidosPrioridad::estaVacia(){
 	// lock_guard<mutex> lock(mtx);
 	return primerPedido==0;
@@ -772,6 +773,22 @@ void RobotFabricador::elaborarProducto(Producto * productoAElaborar){
 	//Todavía no sé muy bien como va a funcionar esto
 }
 
+//THREAD FABRICADOR -----------------------------------------------------------------------------------------
+void ThreadFacturador::facturarPedidos(){
+	NodoPedido * pedidoEmpacado;
+	Producto * productoAElaborar;
+	while (!terminar){
+		while(apagado){
+            this_thread::sleep_for(chrono::seconds(10));
+        }
+		pedidoEmpacado=colaFacturacion->desencolar();
+		pedidoEmpacado->annadirMovimiento(new Movimiento("Finalizado: ",obtenerFechaActual()+" "+obtenerHoraActual()));
+		facturarPedido(pedidoEmpacado,pedidoEmpacado->numeroPedido+"_"+
+		pedidoEmpacado->codigoCliente+"_"+obtenerFechaActual()+obtenerHoraActual());
+		this_thread::sleep_for(chrono::seconds(1));
+	}
+}
+
 //--------------------------------------- FUNCIONES SIN ESTRUCTURA ------------------------------------------
 string leerYEncolarPedidos(ColaPedidos* cola, ColaPedidosPrioridad* colaPrioridad,string _nombreArchivo,
 ListaClientes* listaClientes, ListaDoble* listaArticulos){
@@ -875,14 +892,4 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 	}
 	archivo.close();
 }
-
-
-
-
-
-
-
-
-
-
 

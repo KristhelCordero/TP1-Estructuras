@@ -24,6 +24,8 @@ int main(int argc, char const *argv[])
     // cola->imprimir();
     // ListaRobots *lista= new ListaRobots();
     // lista->leerArchivoRobots();
+    // PRUEBA FACTURADOR 
+    
 
     return 0;
 }
