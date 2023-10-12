@@ -179,7 +179,7 @@ struct NodoPedido{
 
 struct ColaPedidos{
     NodoPedido * primerPedido, * ultimoPedido;
-    mutex mtx;
+    // mutex mtx;
 
     ColaPedidos(){
         primerPedido=ultimoPedido=NULL;
@@ -296,7 +296,7 @@ struct ColaAlistadoos{
 // COLA FACTURACIÓN -----------------------------------------------------------------------------------
 struct ColaFacturacion{
     NodoPedido * primerPedido, * ultimoPedido;
-    mutex mtx;
+    // mutex mtx;
 
     ColaFacturacion(){
         primerPedido=ultimoPedido=NULL;

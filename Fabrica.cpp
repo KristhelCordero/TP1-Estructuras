@@ -2,21 +2,21 @@
 
 int main(int argc, char const *argv[])
 {
-    // ColaPedidos *cola=new ColaPedidos();
-    // ColaPedidosPrioridad *colaPrioridad= new ColaPedidosPrioridad();
-    // cout<<"---------------------------- CLIENTES -------------------------------------"<<endl;
-    // ListaClientes *listaClientes=new ListaClientes();
-    // listaClientes->leerArchivoClientes();
-    // listaClientes->imprimir();
-    // cout<<"---------------------------- ARTÍCULOS ------------------------------------"<<endl;
-    // ListaDoble * listaArticulos=new ListaDoble();
-    // listaArticulos->leerArchivoArticulos();
-    // listaArticulos->imprimir();
+    ColaPedidos *cola=new ColaPedidos();
+    ColaPedidosPrioridad *colaPrioridad= new ColaPedidosPrioridad();
+    cout<<"---------------------------- CLIENTES -------------------------------------"<<endl;
+    ListaClientes *listaClientes=new ListaClientes();
+    listaClientes->leerArchivoClientes();
+    listaClientes->imprimir();
+    cout<<"---------------------------- ARTÍCULOS ------------------------------------"<<endl;
+    ListaDoble * listaArticulos=new ListaDoble();
+    listaArticulos->leerArchivoArticulos();
+    listaArticulos->imprimir();
     
-    // threadPedidos threadPed(cola, colaPrioridad, listaClientes,listaArticulos);
+    threadPedidos threadPed(cola, colaPrioridad, listaClientes, listaArticulos);
     
-    // this_thread::sleep_for(chrono::seconds(9));
-    // threadPed.Terminar();
+    this_thread::sleep_for(chrono::seconds(9));
+    threadPed.Terminar();
 
     // // cout<<"---------------------------- COLAS ------------------------------------"<<endl;
     // // colaPrioridad->imprimir();
@@ -24,6 +24,14 @@ int main(int argc, char const *argv[])
     // // cola->imprimir();
     // // ListaRobots *lista= new ListaRobots();
     // // lista->leerArchivoRobots();
+    ColaFacturacion *colaFacturacion;
+    NodoPedido *pedido;
+    pedido=cola->desencolar();
+    colaFacturacion->encolar(pedido);
+
+    ThreadFacturador threadFacturas(colaFacturacion);
+    this_thread::sleep_for(chrono::seconds(9));
+    threadFacturas.Terminar();
 
     return 0;
 }

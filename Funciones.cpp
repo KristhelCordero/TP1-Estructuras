@@ -14,7 +14,7 @@ void NodoPedido::annadirMovimiento(Movimiento* nuevoMovimiento){
 }
 
 bool ColaPedidos::estaVacia(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	return primerPedido==0;
 }
 
@@ -25,10 +25,10 @@ void ColaPedidos::encolar(int _numeroPedido, string _codigoCliente,ListaProducto
 	else{
 		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos);
 		ultimoPedido->siguiente->anterior=ultimoPedido;
-		ultimoPedido=ultimoPedido->anterior; 
+		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
-	ultimoPedido->annadirMovimiento(new Movimiento("En cola: ",obtenerFechaActual()+" "+obtenerHoraActual()));
+	//ultimoPedido->annadirMovimiento(new Movimiento("En cola: ",obtenerFechaActual()+" "+obtenerHoraActual()));
 }
 
 NodoPedido * ColaPedidos::desencolar(){
@@ -52,7 +52,7 @@ NodoPedido * ColaPedidos::desencolar(){
 }
 
 void ColaPedidos::imprimir(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
 	while(tmp!=NULL){
 		cout<<tmp->numeroPedido<<endl; 
@@ -63,7 +63,7 @@ void ColaPedidos::imprimir(){
 }
 
 int ColaPedidos::largo(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
     NodoPedido * tmp = primerPedido;
     int contador=0;
     while(tmp!=NULL){
@@ -587,29 +587,31 @@ int ColaAlistadoos::largo(){
 
 // COLA FACTURACION --------------------------------------------------------------------------------------
 bool ColaFacturacion::estaVacia(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	return primerPedido==0;
 }
 
 void ColaFacturacion::encolar(NodoPedido *pedido){
 	// lock_guard<mutex> lock(mtx);
 	cout<<"Estoy en encolar"<<endl;
-	if(estaVacia()){
+	if(estaVacia()){ // se cae aqui
 		primerPedido=ultimoPedido=pedido;
+		cout<<"ehhhh"<<endl;
 	}else{
 		ultimoPedido->siguiente= pedido;
 		ultimoPedido->siguiente->anterior=ultimoPedido;
-		ultimoPedido=ultimoPedido->anterior; 
+		ultimoPedido=ultimoPedido->siguiente; 
+		cout<<"ehhhh22"<<endl;
     }
 	//esto último no está probado
 	cout<<"AHHHHH"<<endl;
-	Movimiento *nuevo=new Movimiento("A empaque: ", obtenerFechaActual()+" "+obtenerHoraActual());
-	ultimoPedido->annadirMovimiento(nuevo);
-	cout<<"ehhhh"<<endl;
+	// Movimiento *nuevo=new Movimiento("A empaque: ", obtenerFechaActual()+" "+obtenerHoraActual());
+	// ultimoPedido->annadirMovimiento(nuevo);
+	
 }
 
 NodoPedido * ColaFacturacion::desencolar(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * borrado= primerPedido;
 	if(primerPedido==ultimoPedido){
 		primerPedido=ultimoPedido=NULL;
@@ -622,7 +624,7 @@ NodoPedido * ColaFacturacion::desencolar(){
 }
 
 void ColaFacturacion::imprimir(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
 	while(tmp!=NULL){
 		cout<<tmp->numeroPedido<<endl; 
@@ -633,7 +635,7 @@ void ColaFacturacion::imprimir(){
 }
 
 int ColaFacturacion::largo(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
     NodoPedido * tmp = primerPedido;
     int contador=0;
     while(tmp!=NULL){
@@ -800,15 +802,14 @@ void ThreadEmpacador::empacarPedidos(){
 //THREAD FABRICADOR -----------------------------------------------------------------------------------------
 void ThreadFacturador::facturarPedidos(){
 	NodoPedido * pedidoEmpacado;
-	Producto * productoAElaborar;
 	while (!terminar){
 		while(apagado){
             this_thread::sleep_for(chrono::seconds(10));
         }
 		pedidoEmpacado=colaFacturacion->desencolar();
-		cout<<"Desenccolé"<<endl;
-		pedidoEmpacado->annadirMovimiento(new Movimiento("Finalizado: ",obtenerFechaActual()+" "+obtenerHoraActual()));
-		cout<<"Añadí el movimiento"<<endl;
+		cout<<"Desencolé"<<endl;
+		// pedidoEmpacado->annadirMovimiento(new Movimiento("Finalizado: ",obtenerFechaActual()+" "+obtenerHoraActual()));
+		// cout<<"Añadí el movimiento"<<endl;
 		facturarPedido(pedidoEmpacado,pedidoEmpacado->numeroPedido+"_"+
 		pedidoEmpacado->codigoCliente+"_"+obtenerFechaActual()+obtenerHoraActual());
 		cout<<"Facturé"<<endl;
