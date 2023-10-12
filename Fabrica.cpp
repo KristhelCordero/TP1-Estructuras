@@ -4,34 +4,63 @@ int main(int argc, char const *argv[])
 {
     ColaPedidos *cola=new ColaPedidos();
     ColaPedidosPrioridad *colaPrioridad= new ColaPedidosPrioridad();
-    cout<<"---------------------------- CLIENTES -------------------------------------"<<endl;
+    ColaPedidosEspeciales *colaEspecial= new ColaPedidosEspeciales();
+    // cout<<"---------------------------- CLIENTES -------------------------------------"<<endl;
     ListaClientes *listaClientes=new ListaClientes();
     listaClientes->leerArchivoClientes();
-    listaClientes->imprimir();
-    cout<<"---------------------------- ARTÍCULOS ------------------------------------"<<endl;
+    // cout<<"---------------------------- ARTÍCULOS ------------------------------------"<<endl;
     ListaDoble * listaArticulos=new ListaDoble();
     listaArticulos->leerArchivoArticulos();
-    listaArticulos->imprimir();
     
     threadPedidos threadPed(cola, colaPrioridad, listaClientes, listaArticulos);
     
-    this_thread::sleep_for(chrono::seconds(9));
-    threadPed.Terminar();
+    // this_thread::sleep_for(chrono::seconds(9));
+    // threadPed.Terminar();
+    ListaRobots *lista= new ListaRobots();
+    lista->leerArchivoRobots();
+    ColaFacturacion *colaFacturacion=new ColaFacturacion();
+    ColaAlistadoos *colaAlistados=new ColaAlistadoos();
 
-    // // cout<<"---------------------------- COLAS ------------------------------------"<<endl;
-    // // colaPrioridad->imprimir();
-    // // cout<<"---------------------------- COLAS ------------------------------------"<<endl;
-    // // cola->imprimir();
-    // // ListaRobots *lista= new ListaRobots();
-    // // lista->leerArchivoRobots();
-    ColaFacturacion *colaFacturacion;
-    NodoPedido *pedido;
-    pedido=cola->desencolar();
-    colaFacturacion->encolar(pedido);
+    // ;
+    // this_thread::sleep_for(chrono::seconds(12));
+    // threadEmpacador.Terminar();
 
-    ThreadFacturador threadFacturas(colaFacturacion);
-    this_thread::sleep_for(chrono::seconds(9));
-    threadFacturas.Terminar();
+    // colaFacturacion->imprimir();
+    ThreadBalanceador balanceador(cola,colaPrioridad,listaArticulos,colaEspecial);
+    ThreadEmpacador threadEmpacador(colaFacturacion,colaAlistados);
+    ThreadFacturador ThreadFacturador(colaFacturacion);
+    int opcion=1;
+    do{
+        opcion=menuPrincipal();
+        switch (opcion){
+        case 1:
+            
+            break;
+        case 2:
+            
+            break;
+        case 3:
+            
+            break;
+        case 4:
+            
+            break;
+        case 5:
+            
+            break;
+        case 6:
+            menuRobots();
+            break;
+        case 7:
+            
+            break;
+        default:
+            cout<<"La opción escogida no existe."<<endl;
+            break;
+        }
+    } while (opcion!=0);
+    
+
 
     return 0;
 }

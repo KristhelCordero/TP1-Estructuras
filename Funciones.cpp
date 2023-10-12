@@ -28,7 +28,8 @@ void ColaPedidos::encolar(int _numeroPedido, string _codigoCliente,ListaProducto
 		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
-	//ultimoPedido->annadirMovimiento(new Movimiento("En cola: ",obtenerFechaActual()+" "+obtenerHoraActual()));
+	Movimiento *nuevo= new Movimiento("En cola: "," AAAh ");
+	ultimoPedido->annadirMovimiento(nuevo);
 }
 
 NodoPedido * ColaPedidos::desencolar(){
@@ -89,7 +90,7 @@ void ColaPedidosPrioridad::encolar(int _numeroPedido, string _codigoCliente,List
 		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
-	ultimoPedido->annadirMovimiento(new Movimiento("En cola: ",obtenerFechaActual()+" "+obtenerHoraActual()));
+	ultimoPedido->annadirMovimiento(new Movimiento("En cola: "," AAAh "));
 }
 
 NodoPedido * ColaPedidosPrioridad::desencolar(){
@@ -143,7 +144,7 @@ void ColaPedidosEspeciales::encolar(int _numeroPedido, string _codigoCliente,Lis
 		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
-	ultimoPedido->annadirMovimiento(new Movimiento("En cola: ",obtenerFechaActual()+" "+obtenerHoraActual()));
+	ultimoPedido->annadirMovimiento(new Movimiento("En cola: "," AAAh "));
 }
 
 NodoPedido * ColaPedidosEspeciales::desencolar(){
@@ -350,12 +351,17 @@ void ListaProductos::insertarInicioProducto(string _codigoProducto, int _cantida
 }
 
 void ListaProductos::insertarFinalProducto (string _codigoProducto, int _cantidad){
-    if (primerProducto==NULL)
+    cout<<"Entré..."<<endl;
+	if (primerProducto==NULL){ //se cae aqui
+		cout<<"Entré..y."<<endl;
 	    primerProducto=ultimoProducto=new Producto(_codigoProducto, _cantidad);
-    else{
+    	cout<<"Entré..y."<<endl;
+	}else{
+    	cout<<"Entré..x."<<endl;
 	    ultimoProducto->siguienteProducto= new Producto(_codigoProducto, _cantidad);
 	    ultimoProducto->siguienteProducto->productoAnterior=ultimoProducto;
 	    ultimoProducto=ultimoProducto->siguienteProducto; 
+    	cout<<"Entré..z."<<endl;
     }
 }
 
@@ -493,7 +499,8 @@ void ColaAlisto::encolar(NodoPedido *pedido){
 		ultimoPedido=ultimoPedido->anterior; 
     }
 	//esto último no está probado
-	ultimoPedido->annadirMovimiento(new Movimiento("En cola de alisto: ",obtenerFechaActual()+" "+obtenerHoraActual()));
+	Movimiento *nuevo=new Movimiento("En cola de alisto: "," AAAh ");
+	ultimoPedido->annadirMovimiento(nuevo);
 }
 
 NodoPedido * ColaAlisto::desencolar(){
@@ -533,8 +540,8 @@ int ColaAlisto::largo(){
 
 // COLA ALISTADOOS ---------------------------------------------------------------------------------------
 bool ColaAlistadoos::estaVacia(){
-	lock_guard<mutex> lock(mtx);
-	return primerPedido==0;
+	// lock_guard<mutex> lock(mtx);
+	return primerPedido==NULL;
 }
 
 void ColaAlistadoos::encolar(NodoPedido *pedido){
@@ -544,14 +551,14 @@ void ColaAlistadoos::encolar(NodoPedido *pedido){
 	else{
 		ultimoPedido->siguiente= pedido;
 		ultimoPedido->siguiente->anterior=ultimoPedido;
-		ultimoPedido=ultimoPedido->anterior; 
+		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
-	ultimoPedido->annadirMovimiento(new Movimiento("En cola de alisto: ",obtenerFechaActual()+" "+obtenerHoraActual()));
+	ultimoPedido->annadirMovimiento(new Movimiento("En cola de alisto: "," AAAh "));
 }
 
 NodoPedido * ColaAlistadoos::desencolar(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * borrado= primerPedido;
 	if(primerPedido==ultimoPedido){
 		primerPedido=ultimoPedido=NULL;
@@ -564,7 +571,7 @@ NodoPedido * ColaAlistadoos::desencolar(){
 }
 
 void ColaAlistadoos::imprimir(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
 	while(tmp!=NULL){
 		cout<<tmp->numeroPedido<<endl; 
@@ -575,7 +582,7 @@ void ColaAlistadoos::imprimir(){
 }
 
 int ColaAlistadoos::largo(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
     NodoPedido * tmp = primerPedido;
     int contador=0;
     while(tmp!=NULL){
@@ -588,25 +595,27 @@ int ColaAlistadoos::largo(){
 // COLA FACTURACION --------------------------------------------------------------------------------------
 bool ColaFacturacion::estaVacia(){
 	// lock_guard<mutex> lock(mtx);
-	return primerPedido==0;
+	return primerPedido==NULL;
 }
 
-void ColaFacturacion::encolar(NodoPedido *pedido){
+void ColaFacturacion::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
 	// lock_guard<mutex> lock(mtx);
 	cout<<"Estoy en encolar"<<endl;
 	if(estaVacia()){ // se cae aqui
-		primerPedido=ultimoPedido=pedido;
+		cout<<"ehhhh--"<<endl;
+		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
 		cout<<"ehhhh"<<endl;
 	}else{
-		ultimoPedido->siguiente= pedido;
+    	cout<<"Entré..."<<endl;
+		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos);
 		ultimoPedido->siguiente->anterior=ultimoPedido;
 		ultimoPedido=ultimoPedido->siguiente; 
 		cout<<"ehhhh22"<<endl;
     }
 	//esto último no está probado
 	cout<<"AHHHHH"<<endl;
-	// Movimiento *nuevo=new Movimiento("A empaque: ", obtenerFechaActual()+" "+obtenerHoraActual());
-	// ultimoPedido->annadirMovimiento(nuevo);
+	Movimiento *nuevo=new Movimiento("A empaque: ", " AAAh ");
+	ultimoPedido->annadirMovimiento(nuevo);
 	
 }
 
@@ -766,7 +775,7 @@ void ThreadBalanceador::procesarPedidos(){
 			}
 			else
 				this_thread::sleep_for(chrono::seconds(3));
-			pedidoProcesandose->annadirMovimiento(new Movimiento("Balanceador: ",obtenerFechaActual()+" "+obtenerHoraActual()));
+			pedidoProcesandose->annadirMovimiento(new Movimiento("Balanceador: "," AAAh "));
 		}while (!procesando);
 		productoAElaborar=pedidoProcesandose->productos->revisarProductosFaltantes(listaArticulos);
 		do{
@@ -792,10 +801,14 @@ void ThreadEmpacador::empacarPedidos(){
 		while(apagado){
             this_thread::sleep_for(chrono::seconds(10));
         }
-		NodoPedido *pedido= colaAlistados->desencolar();
-		int cantidadSegundos= pedido->productos->cantidadArticulosDistintos();
-		this_thread::sleep_for(chrono::seconds(cantidadSegundos));
-		colaFacturacion->encolar(pedido);
+		if (!colaAlistados->estaVacia()){
+			NodoPedido *pedido= colaAlistados->desencolar();
+			int cantidadSegundos= pedido->productos->cantidadArticulosDistintos();
+			this_thread::sleep_for(chrono::seconds(cantidadSegundos));
+			colaFacturacion->encolar(pedido->numeroPedido,pedido->codigoCliente,pedido->productos);
+		}else{
+			this_thread::sleep_for(chrono::seconds(2));
+		}
 	}
 }
 
@@ -806,14 +819,20 @@ void ThreadFacturador::facturarPedidos(){
 		while(apagado){
             this_thread::sleep_for(chrono::seconds(10));
         }
-		pedidoEmpacado=colaFacturacion->desencolar();
-		cout<<"Desencolé"<<endl;
-		// pedidoEmpacado->annadirMovimiento(new Movimiento("Finalizado: ",obtenerFechaActual()+" "+obtenerHoraActual()));
-		// cout<<"Añadí el movimiento"<<endl;
-		facturarPedido(pedidoEmpacado,pedidoEmpacado->numeroPedido+"_"+
-		pedidoEmpacado->codigoCliente+"_"+obtenerFechaActual()+obtenerHoraActual());
-		cout<<"Facturé"<<endl;
-		this_thread::sleep_for(chrono::seconds(1));
+		if (!colaFacturacion->estaVacia()){
+			pedidoEmpacado=colaFacturacion->desencolar();
+			cout<<"Desencolé"<<endl;
+			
+		pedidoEmpacado->annadirMovimiento(new Movimiento("Finalizado: "," AAAh "));
+		cout<<"Añadí el movimiento"<<endl;
+			facturarPedido(pedidoEmpacado, to_string(pedidoEmpacado->numeroPedido)+"_"+
+			pedidoEmpacado->codigoCliente+"_"); //+"_"+obtenerFechaActual()+obtenerHoraActual()
+			cout<<"Facturé"<<endl;
+			this_thread::sleep_for(chrono::seconds(1));
+		}else{
+			this_thread::sleep_for(chrono::seconds(1));
+		}
+		
 	}
 }
 
@@ -868,7 +887,7 @@ string obtenerHoraActual() {
     char buffer[9];
     sprintf(buffer, "%02d:%02d:%02d", tiempoLocal.tm_hour,
 	 tiempoLocal.tm_min, tiempoLocal.tm_sec);
-    return string(buffer);
+    return std::string(buffer);
 }
 
 string obtenerFechaActual() {
@@ -889,8 +908,8 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 		cout<<"No escribí el archivo"<<endl;
 		exit(1);
 	}
-	archivo<<"Pedido: \t"<<pedido->numeroPedido;
-	archivo<<"Cliente: \t"<<pedido->codigoCliente;
+	archivo<<"Pedido: \t"<<pedido->numeroPedido<<endl;
+	archivo<<"Cliente: \t"<<pedido->codigoCliente<<endl;
 	cout<<"Llegué aqui"<<endl;
 	Movimiento * tmpMov=pedido->movimientos->primerMov;
 	while (tmpMov!=NULL){
@@ -908,7 +927,7 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 			archivo<<"ARTICULO " << tmpMov->articulo<< "\t Fabricado en "<< 
 			tmpMov->fabricadoEn << "/n"<< tmpMov->cantidad<< "unidades"<<
 			"\nincio: "<<tmpMov->fechaInicio <<"\nfinal: "<<tmpMov->fechaFinal<<endl;
-		}else{ //alistador
+		}else if (tmpMov->alistador){ //alistador
 			if(contador==0){
 				archivo<<endl;
 				archivo<<"Alisto "<< "\t Alistador "<< tmpMov->numAlistador <<endl;
@@ -924,3 +943,26 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 	return "Listo";
 }
 
+int menuRobots(){
+
+}
+
+int menuPrincipal(){
+	string opcion;
+	cout<<"------------------------------- MENÚ -------------------------------"<<endl;
+	cout<<"1: Agregar Pedido"<<endl;
+	cout<<"2: Apagar/Encender Balanceador"<<endl;
+	cout<<"3: Agregar Cliente"<<endl;
+	cout<<"4: Modificar Alistadores"<<endl;
+	cout<<"5: Modificar Robots Fabricadores"<<endl;
+	cout<<"6: Apagar/Encender Empacador"<<endl;
+	cout<<"7: Apagar/Encender Facturador"<<endl;
+	cout<<"0: Terminar la simulación"<<endl;
+	getline(cin,opcion);//validaciones varias
+	if (opcion=="0"){
+		return 0;
+	}else{
+		return 1;
+	}
+
+}

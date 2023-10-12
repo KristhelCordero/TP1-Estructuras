@@ -303,7 +303,7 @@ struct ColaFacturacion{
     }
 
     bool estaVacia();
-    void encolar(NodoPedido *pedido);
+    void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos);
     void imprimir();
     int largo();
     NodoPedido * desencolar();
