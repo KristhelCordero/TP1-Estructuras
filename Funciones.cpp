@@ -34,19 +34,20 @@ void ColaPedidos::encolar(int _numeroPedido, string _codigoCliente,ListaProducto
 NodoPedido * ColaPedidos::desencolar(){
 	// lock_guard<mutex> lock(mtx);
 	cout<<"Estoy en desencolar cola pedidos"<<endl;
-	if (primerPedido == nullptr)
+	if (primerPedido == NULL){
 		cout<<"Entré aqui"<<endl;
-        return nullptr;  
+        return NULL;  
+	}
     NodoPedido* borrado = primerPedido;
     primerPedido = primerPedido->siguiente;
-    if (primerPedido != nullptr) {
+    if (primerPedido != NULL) {
 		cout<<"Entré aqui2"<<endl;
-        primerPedido->anterior = nullptr;
-	}else {
+        primerPedido->anterior = NULL;
+	}else{
 		cout<<"Entré aqui3"<<endl;
-        ultimoPedido = nullptr;
+        ultimoPedido = NULL;
 	}
-    borrado->siguiente = nullptr;
+    borrado->siguiente = NULL;
     return borrado;
 }
 
@@ -592,15 +593,19 @@ bool ColaFacturacion::estaVacia(){
 
 void ColaFacturacion::encolar(NodoPedido *pedido){
 	// lock_guard<mutex> lock(mtx);
-	if(estaVacia())
+	cout<<"Estoy en encolar"<<endl;
+	if(estaVacia()){
 		primerPedido=ultimoPedido=pedido;
-	else{
+	}else{
 		ultimoPedido->siguiente= pedido;
 		ultimoPedido->siguiente->anterior=ultimoPedido;
 		ultimoPedido=ultimoPedido->anterior; 
     }
 	//esto último no está probado
-	ultimoPedido->annadirMovimiento(new Movimiento("A empaque: ", obtenerFechaActual()+" "+obtenerHoraActual()));
+	cout<<"AHHHHH"<<endl;
+	Movimiento *nuevo=new Movimiento("A empaque: ", obtenerFechaActual()+" "+obtenerHoraActual());
+	ultimoPedido->annadirMovimiento(nuevo);
+	cout<<"ehhhh"<<endl;
 }
 
 NodoPedido * ColaFacturacion::desencolar(){
@@ -777,6 +782,19 @@ void ThreadBalanceador::procesarPedidos(){
 //THREAD ROBOTS ---------------------------------------------------------------------------------------------
 void RobotFabricador::elaborarProducto(Producto * productoAElaborar){
 	//Todavía no sé muy bien como va a funcionar esto
+}
+
+//THREAD EMPACADOR ------------------------------------------------------------------------------------------
+void ThreadEmpacador::empacarPedidos(){
+	while (!terminar){
+		while(apagado){
+            this_thread::sleep_for(chrono::seconds(10));
+        }
+		NodoPedido *pedido= colaAlistados->desencolar();
+		int cantidadSegundos= pedido->productos->cantidadArticulosDistintos();
+		this_thread::sleep_for(chrono::seconds(cantidadSegundos));
+		colaFacturacion->encolar(pedido);
+	}
 }
 
 //THREAD FABRICADOR -----------------------------------------------------------------------------------------

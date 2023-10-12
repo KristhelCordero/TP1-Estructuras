@@ -105,6 +105,7 @@ struct Movimiento{
         fechaInicio=_fechaInicio;
         robot=true;
         alistador=false;
+        siguiente=anterior=NULL;
     }
     //alistador
     Movimiento(string _numAlistador, string _articulo, string _ubicacion, string _tiempo){
@@ -114,11 +115,15 @@ struct Movimiento{
         tiempo=_tiempo;
         robot=false;
         alistador=true;
+        siguiente=anterior=NULL;
     }
     //otros
     Movimiento(string _ubicacion, string _info){
         ubicacion=_ubicacion;
         info=_info;
+        robot=false;
+        alistador=false;
+        siguiente=anterior=NULL;
     }
 
 };
@@ -131,9 +136,12 @@ struct BitacoraMovimientos{
     }
 
     void agregarMovimiento(Movimiento* nuevoMovimiento) {
-        if (!primerMov) {
+        cout <<"Agregar Movimiento"<<endl;
+        if (primerMov==NULL) {
+            cout <<"Caso 1"<<endl;
             primerMov = ultimoMov =nuevoMovimiento;
         } else {
+            cout <<"Caso 2"<<endl;
             ultimoMov->siguiente = nuevoMovimiento;
             ultimoMov->siguiente->anterior = ultimoMov;
             ultimoMov = ultimoMov->siguiente;
@@ -419,7 +427,29 @@ struct RobotFabricador{
 
 // EMPACADOR ------------------------------------------------------------------------------------------
 struct ThreadEmpacador{
-    
+    thread thread; 
+    atomic<bool> apagado; 
+    atomic<bool> terminar; 
+    ColaAlistadoos *colaAlistados;
+    ColaFacturacion* colaFacturacion;
+    bool procesando=false;
+    // Constructor
+    ThreadEmpacador(ColaFacturacion *_colaFacturacion, ColaAlistadoos *_colaAlistados):
+    apagado(false), terminar(false), colaFacturacion(_colaFacturacion), colaAlistados(_colaAlistados){
+        thread = std::thread(ThreadEmpacador::empacarPedidos, this);
+    }
+    // Función que será ejecutada por el thread
+    void empacarPedidos(); 
+    void Pausar() {apagado = true;}
+    void Reanudar() {apagado = false;}
+    void Terminar() {
+        terminar = true;
+        if (thread.joinable()) {
+            thread.join();
+        }
+    }
+    //Destructor
+    ~ThreadEmpacador() {Terminar();}
 };
 
 //FACTURADOR ------------------------------------------------------------------------------------------
