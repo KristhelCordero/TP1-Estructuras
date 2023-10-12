@@ -19,6 +19,7 @@ using namespace std;
 // puede que generen errores sin sentido 
 struct ListaDoble;
 struct BitacoraMovimientos;
+struct Movimiento;
 
 //Lista de Clientes(Ordenar por Prioridad*) -----------------------------------------------------------
 struct Cliente{
@@ -86,6 +87,69 @@ struct ListaProductos{
     }
 };
 
+// BITÁCORA DE MOVIMIENTOS ----------------------------------------------------------------------------
+struct Movimiento{
+    string ubicacion, info;//info= fecha, hora, faltantes en caso de haber
+    bool robot; 
+    string articulo, fabricadoEn, cantidad, fechaInicio, fechaFinal;
+    bool alistador;
+    string numAlistador, tiempo; //ubi y articulo aqui 2
+    Movimiento * siguiente, *anterior;
+
+    //robot
+    Movimiento(string _articulo, string _fabricadoEn, string _cantidad, string _fechaFinal,string _fechaInicio){
+        articulo=_articulo;
+        fabricadoEn=_fabricadoEn;
+        cantidad=_cantidad;
+        fechaFinal=_fechaFinal;
+        fechaInicio=_fechaInicio;
+        robot=true;
+        alistador=false;
+    }
+    //alistador
+    Movimiento(string _numAlistador, string _articulo, string _ubicacion, string _tiempo){
+        articulo=_articulo;
+        numAlistador=_numAlistador;
+        ubicacion=_ubicacion;
+        tiempo=_tiempo;
+        robot=false;
+        alistador=true;
+    }
+    //otros
+    Movimiento(string _ubicacion, string _info){
+        ubicacion=_ubicacion;
+        info=_info;
+    }
+
+};
+
+struct BitacoraMovimientos{
+    Movimiento * primerMov, *ultimoMov;
+    
+    BitacoraMovimientos(){
+        primerMov=ultimoMov=NULL;
+    }
+
+    void agregarMovimiento(Movimiento* nuevoMovimiento) {
+        if (!primerMov) {
+            primerMov = ultimoMov =nuevoMovimiento;
+        } else {
+            ultimoMov->siguiente = nuevoMovimiento;
+            ultimoMov->siguiente->anterior = ultimoMov;
+            ultimoMov = ultimoMov->siguiente;
+        }
+    }
+    //Destructor
+    ~BitacoraMovimientos() {
+        Movimiento* tmp = primerMov;
+        while (tmp) {
+            Movimiento* siguiente = tmp->siguiente;
+            delete tmp;
+            tmp = siguiente;
+        }
+    }
+};
+
 // Cola de Pedidos ------------------------------------------------------------------------------------
 struct NodoPedido{
     NodoPedido * siguiente;
@@ -101,6 +165,7 @@ struct NodoPedido{
         productos=_productos;
         movimientos= new BitacoraMovimientos();
     }
+
     void annadirMovimiento(Movimiento* nuevoMovimiento);
 };
 
@@ -198,7 +263,7 @@ struct ColaAlisto{
     }
 
     bool estaVacia();
-    void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos);
+    void encolar(NodoPedido *pedido);
     void imprimir();
     int largo();
     NodoPedido * desencolar();
@@ -214,7 +279,7 @@ struct ColaAlistadoos{
     }
 
     bool estaVacia();
-    void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos);
+    void encolar(NodoPedido *pedido);
     void imprimir();
     int largo();
     NodoPedido * desencolar();
@@ -230,7 +295,7 @@ struct ColaFacturacion{
     }
 
     bool estaVacia();
-    void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos);
+    void encolar(NodoPedido *pedido);
     void imprimir();
     int largo();
     NodoPedido * desencolar();
@@ -269,70 +334,6 @@ struct ListaRobots{
     void leerArchivoRobots();
     void imprimir();
 
-};
-
-// BITÁCORA DE MOVIMIENTOS ----------------------------------------------------------------------------
-struct Movimiento{
-    string ubicacion, info;//info= fecha, hora, faltantes en caso de haber
-    bool robot; 
-    string articulo, fabricadoEn, cantidad, fechaInicio, fechaFinal;
-    bool alistador;
-    string numAlistador, tiempo; //ubi y articulo aqui 2
-    Movimiento * siguiente, *anterior;
-
-    //robot
-    Movimiento(string _articulo, string _fabricadoEn, string _cantidad, string _fechaFinal,string _fechaInicio){
-        articulo=_articulo;
-        fabricadoEn=_fabricadoEn;
-        cantidad=_cantidad;
-        fechaFinal=_fechaFinal;
-        fechaInicio=_fechaInicio;
-        robot=true;
-        alistador=false;
-    }
-    //alistador
-    Movimiento(string _numAlistador, string _articulo, string _ubicacion, string _tiempo){
-        articulo=_articulo;
-        numAlistador=_numAlistador;
-        ubicacion=_ubicacion;
-        tiempo=_tiempo;
-        robot=false;
-        alistador=true;
-    }
-    //otros
-    Movimiento(string _ubicacion, string _info){
-        ubicacion=_ubicacion;
-        info=_info;
-    }
-
-};
-
-struct BitacoraMovimientos{
-    Movimiento * primerMov, *ultimoMov;
-    
-    BitacoraMovimientos(){
-        primerMov=ultimoMov=NULL;
-    }
-
-    void agregarMovimiento(Movimiento* nuevoMovimiento) {
-        if (!primerMov) {
-            primerMov = nuevoMovimiento;
-            ultimoMov = nuevoMovimiento;
-        } else {
-            ultimoMov->siguiente = nuevoMovimiento;
-            nuevoMovimiento->anterior = ultimoMov;
-            ultimoMov = nuevoMovimiento;
-        }
-    }
-    //Destructor
-    ~BitacoraMovimientos() {
-        Movimiento* tmp = primerMov;
-        while (tmp) {
-            Movimiento* siguiente = tmp->siguiente;
-            delete tmp;
-            tmp = siguiente;
-        }
-    }
 };
 
 //------------------------------------------THREADS----------------------------------------------------
