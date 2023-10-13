@@ -194,7 +194,7 @@ struct ColaPedidos{
 
 struct ColaPedidosPrioridad{
     NodoPedido * primerPedido, * ultimoPedido;
-    mutex mtx;
+    // mutex mtx;
 
     ColaPedidosPrioridad(){
         primerPedido=ultimoPedido=NULL;
@@ -209,7 +209,7 @@ struct ColaPedidosPrioridad{
 
 struct ColaPedidosEspeciales{
     NodoPedido * primerPedido, * ultimoPedido;
-    mutex mtx;
+    // mutex mtx;
 
     ColaPedidosEspeciales(){
         primerPedido=ultimoPedido=NULL;
@@ -264,7 +264,7 @@ struct ListaDoble {
 // COLA DE ALISTO -------------------------------------------------------------------------------------
 struct ColaAlisto{
     NodoPedido * primerPedido, * ultimoPedido;
-    mutex mtx;
+    // mutex mtx;
 
     ColaAlisto(){
         primerPedido=ultimoPedido=NULL;
@@ -280,7 +280,7 @@ struct ColaAlisto{
 // COLA ALISTADOS -------------------------------------------------------------------------------------
 struct ColaAlistadoos{
     NodoPedido * primerPedido, * ultimoPedido;
-    mutex mtx;
+    // mutex mtx;
 
     ColaAlistadoos(){
         primerPedido=ultimoPedido=NULL;
@@ -357,7 +357,7 @@ struct threadPedidos {
     ColaPedidosPrioridad *colaPrioridad;
     ListaClientes *listaClientes;
     ListaDoble *listaArticulos;
-    mutex mutex;
+    // mutex mutex;
     // Constructor
     threadPedidos(ColaPedidos *_cola, ColaPedidosPrioridad *_colaPrioridad, ListaClientes *_listaClientes, ListaDoble *_listaArticulos):
     pausado(false), terminar(false), cola(_cola), colaPrioridad(_colaPrioridad), listaClientes(_listaClientes), listaArticulos(_listaArticulos){

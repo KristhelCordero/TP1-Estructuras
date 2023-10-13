@@ -11,24 +11,19 @@ int main(int argc, char const *argv[])
     // cout<<"---------------------------- ARTÍCULOS ------------------------------------"<<endl;
     ListaDoble * listaArticulos=new ListaDoble();
     listaArticulos->leerArchivoArticulos();
-    
     threadPedidos threadPed(cola, colaPrioridad, listaClientes, listaArticulos);
-    
     // this_thread::sleep_for(chrono::seconds(9));
     // threadPed.Terminar();
     ListaRobots *listaRobots= new ListaRobots();
     listaRobots->leerArchivoRobots();
     ColaFacturacion *colaFacturacion=new ColaFacturacion();
     ColaAlistadoos *colaAlistados=new ColaAlistadoos();
-
-    // ;
     // this_thread::sleep_for(chrono::seconds(12));
     // threadEmpacador.Terminar();
-
     // colaFacturacion->imprimir();
     ThreadBalanceador balanceador(cola,colaPrioridad,listaArticulos,colaEspecial);
     ThreadEmpacador threadEmpacador(colaFacturacion,colaAlistados);
-    ThreadFacturador ThreadFacturador(colaFacturacion);
+    ThreadFacturador threadFacturador(colaFacturacion);
     // cout<<"1: Agregar Pedido"<<endl;
 	// cout<<"2: Apagar/Encender Balanceador"<<endl;
 	// cout<<"3: Agregar Cliente"<<endl;
@@ -63,18 +58,36 @@ int main(int argc, char const *argv[])
             menuRobots(listaRobots);
             break;
         case 6:
-            
+            if (threadEmpacador.apagado){
+                threadEmpacador.Reanudar();
+                cout<<"El empacador ha sido encendido"<<endl;
+            }else{
+                threadEmpacador.Pausar();
+                cout<<"El empacador ha sido apagado"<<endl;
+            }
             break;
         case 7:
-            
+            if (threadFacturador.apagado){
+                threadFacturador.Reanudar();
+                cout<<"El facturador ha sido encendido"<<endl;
+            }else{
+                threadFacturador.Pausar();
+                cout<<"El facturador ha sido apagado"<<endl;
+            }
             break;
         default:
             cout<<"La opción escogida no existe."<<endl;
             break;
         }
     } while (opcion!=0);
-    
-
-
+    cout<<"Apagando Componentes..."<<endl;
+    //Todos los terminar aqui(creo que para que todo termine tiene que estar todo encendido)
+    threadPed.Terminar();
+    balanceador.Terminar();
+    threadEmpacador.Terminar();
+    threadFacturador.Terminar();
+    this_thread::sleep_for(chrono::seconds(5));
+    cout<<"Componentes Apagados..."<<endl;
+    cout<<"Simulación terminada..."<<endl;
     return 0;
 }

@@ -94,7 +94,7 @@ void ColaPedidosPrioridad::encolar(int _numeroPedido, string _codigoCliente,List
 }
 
 NodoPedido * ColaPedidosPrioridad::desencolar(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * borrado= primerPedido;
 	if(primerPedido==ultimoPedido){
 		primerPedido=ultimoPedido=NULL;
@@ -107,7 +107,7 @@ NodoPedido * ColaPedidosPrioridad::desencolar(){
 }
 
 void ColaPedidosPrioridad::imprimir(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
 	while(tmp!=NULL){
 		cout<<tmp->numeroPedido<<endl; 
@@ -148,7 +148,7 @@ void ColaPedidosEspeciales::encolar(int _numeroPedido, string _codigoCliente,Lis
 }
 
 NodoPedido * ColaPedidosEspeciales::desencolar(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * borrado= primerPedido;
 	if(primerPedido==ultimoPedido){
 		primerPedido=ultimoPedido=NULL;
@@ -161,7 +161,7 @@ NodoPedido * ColaPedidosEspeciales::desencolar(){
 }
 
 void ColaPedidosEspeciales::imprimir(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
 	while(tmp!=NULL){
 		cout<<tmp->numeroPedido<<endl; 
@@ -486,7 +486,7 @@ void Cliente::imprimir(){
 
 // COLA DE ALISTO ------------------------------------------------------------------------------------------
 bool ColaAlisto::estaVacia(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	return primerPedido==0;
 }
 
@@ -505,7 +505,7 @@ void ColaAlisto::encolar(NodoPedido *pedido){
 }
 
 NodoPedido * ColaAlisto::desencolar(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * borrado= primerPedido;
 	if(primerPedido==ultimoPedido){
 		primerPedido=ultimoPedido=NULL;
@@ -518,7 +518,7 @@ NodoPedido * ColaAlisto::desencolar(){
 }
 
 void ColaAlisto::imprimir(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
 	while(tmp!=NULL){
 		cout<<tmp->numeroPedido<<endl; 
@@ -529,7 +529,7 @@ void ColaAlisto::imprimir(){
 }
 
 int ColaAlisto::largo(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
     NodoPedido * tmp = primerPedido;
     int contador=0;
     while(tmp!=NULL){
