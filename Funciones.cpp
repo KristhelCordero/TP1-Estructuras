@@ -725,6 +725,16 @@ int ListaRobots::largo(){
 	return contador;
 }
 
+Robot * ListaRobots::buscarRobot(string _codigoRobot){
+	Robot * tmp= primerRobot;
+	while (tmp!=NULL){
+		if(tmp->codigoRobot==_codigoRobot)
+			return tmp;
+		tmp=tmp->siguiente;
+	}
+	return NULL;
+}
+
 bool ListaRobots::existsRobot(string _numRobot){
 	Robot * tmp= primerRobot;
 	while (tmp!=NULL){
@@ -736,13 +746,29 @@ bool ListaRobots::existsRobot(string _numRobot){
 }
 
 void ListaRobots::modificarRobot(string _codigo, int opcion){
-	switch (opcion)
-	{
+	// cout<<"1. Modificar Categoría"<<endl;
+	// cout<<"2. Apagar Robot"<<endl;
+	// cout<<"3. Encender Robot"<<endl;
+	// cout<<"4. Cambiar Prioridad"<<endl;
+	// cout<<"5. Imprimir lista de Robots"<<endl;
+	switch (opcion){
 	case 1:
 		
 		break;
-	
+	case 2:
+		
+		break;
+	case 3:
+		
+		break;
+	case 4:
+		
+		break;
+	case 5:
+		
+		break;
 	default:
+	
 		break;
 	}
 }

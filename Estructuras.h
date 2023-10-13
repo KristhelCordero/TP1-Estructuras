@@ -344,6 +344,7 @@ struct ListaRobots{
     int largo();
     bool existsRobot(string _numRobot);
     void modificarRobot(string _codigo, int opcion);
+    Robot * buscarRobot(string _codigoRobot);
 };
 
 //------------------------------------------THREADS----------------------------------------------------
