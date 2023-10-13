@@ -343,6 +343,7 @@ struct ListaRobots{
     void imprimir();
     int largo();
     bool existsRobot(string _numRobot);
+    void modificarRobot(string _codigo, int opcion);
 };
 
 //------------------------------------------THREADS----------------------------------------------------

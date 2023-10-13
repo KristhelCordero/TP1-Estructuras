@@ -5,6 +5,8 @@ ListaClientes* listaClientes, ListaDoble* listaArticulos);
 string obtenerHoraActual();
 string obtenerFechaActual();
 string facturarPedido(NodoPedido *pedido, string _nombreArchivo);
+bool esInt();
+bool esIntRango();
 //hay que configurar todos los mutex porfiii
 // Hay que cambiar los desencolar por el desencolar que está en colaPedidos
 
@@ -732,6 +734,18 @@ bool ListaRobots::existsRobot(string _numRobot){
 	}
 	return false;
 }
+
+void ListaRobots::modificarRobot(string _codigo, int opcion){
+	switch (opcion)
+	{
+	case 1:
+		
+		break;
+	
+	default:
+		break;
+	}
+}
 //BITACORA DE MOVIMIENTOS -----------------------------------------------------------------------------------
 
 // THREAD PEDIDOS -------------------------------------------------------------------------------------------
@@ -972,10 +986,11 @@ void menuRobots(ListaRobots *robots){ //Esto lo maneja Jota
     	cout<<"1. Modificar Categoría"<<endl;
 		cout<<"2. Apagar Robot"<<endl;
 		cout<<"3. Encender Robot"<<endl;
-		cout<<"4. Cambiar Prioridad "<<endl;
+		cout<<"4. Cambiar Prioridad"<<endl;
+		cout<<"5. Imprimir lista de Robots"<<endl;
 		cout<<"Digite la opción que desea: "<<endl;
 		getline(cin,opcion);//validaciones
-		if (esInt(opcion)){
+		if (esIntRango(opcion,6,0)){
 			aceptado=true;
 			cout<<"Ingrese el número del robot: "<<endl;
 			getline(cin,numRobot);
@@ -983,27 +998,14 @@ void menuRobots(ListaRobots *robots){ //Esto lo maneja Jota
 				aceptado=true;
 			}else{
 				aceptado=false;
+				cout<<"El robot que digitó no existe inténtelo de nuevo"<<endl;
 			}
 		}else{
-
+			cout<<"Ingrese un número entero que se encuentre entre las opciones"<<endl;
+			aceptado=false;
 		}
 	} while (!aceptado);
-	switch (stoi(opcion)){
-	case 1:
-
-		break;
-	case 2:
-		
-		break;
-	case 3:
-		
-		break;
-	case 4:
-		
-		break;
-	default:
-		break;
-	}
+	robots->modificarRobot(numRobot,stoi(opcion));
 }
 
 int menuPrincipal(){
@@ -1056,13 +1058,19 @@ void menuNuevoCliente(ListaClientes * listaClientes){
 }
 
 void menuAlistadores(){
-
+// colocas aqui lo que ocupes, para hacer lo que dice la especificacion de la tp
 }
 
-bool esInt(string str) {
-    for (char c : str) {
+// Validaciones ----------------------------------------------------------------------------------------------
+// FALTA PROBAR ESTA FUNCION
+bool esInt(string numero) {
+    for (char c : numero) {
         if (!isdigit(c)) 
             return false;
 	}
     return true;
+}
+//FALTA PROBAR ESTA FUNCION
+bool esIntRango(string numero, int menorQue, int mayorQue){
+	return (esInt(numero)&& stoi(numero)<menorQue && stoi(numero)>mayorQue);
 }
