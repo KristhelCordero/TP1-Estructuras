@@ -455,6 +455,7 @@ void ListaClientes::leerArchivoClientes(){
 }
 //Falta probar esta función
 void ListaClientes::annadirClienteAlArchivo(string codigoCliente, string nombreCliente,int prioridad){
+	insertarInicioCliente(codigoCliente,nombreCliente,prioridad);
 	ofstream archivo;
 	archivo.open("clientes.txt",ios::app);
 	if (archivo.fail()){
@@ -954,15 +955,33 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 	return "Listo";
 }
 
-int menuRobots(ListaRobots *robots){
-	string opcion;
+void menuRobots(ListaRobots *robots){ //Esto lo maneja Jota
+	string opcion,numRobot;
 	cout<<"------------------------------- MENÚ -------------------------------"<<endl;
-	for (int i=0; i<robots->largo(); i++){
-		cout<<i<<". Modificar Robot "<<i<<endl;
+    cout<<"1. Modificar Categoría"<<endl;
+	cout<<"2. Apagar Robot"<<endl;
+	cout<<"3. Encender Robot"<<endl;
+	cout<<"4. Cambiar Prioridad "<<endl;
+	cout<<"Digite la opción que desea: "<<endl;
+	getline(cin,opcion);//validaciones
+	cout<<"Ingrese el número del robot: "<<endl;
+	getline(cin,numRobot);
+	switch (stoi(opcion)){
+	case 1:
+
+		break;
+	case 2:
+		
+		break;
+	case 3:
+		
+		break;
+	case 4:
+		
+		break;
+	default:
+		break;
 	}
-	cout<<"0: Salir"<<endl;
-	getline(cin,opcion);//validaciones varias
-	return stoi(opcion);
 }
 
 int menuPrincipal(){
@@ -984,18 +1003,6 @@ int menuPrincipal(){
 	}
 }
 
-// void ColaPedidosEspeciales::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
-// 	// lock_guard<mutex> lock(mtx);
-// 	if(estaVacia())
-// 		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
-// 	else{
-// 		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos);
-// 		ultimoPedido->siguiente->anterior=ultimoPedido;
-// 		ultimoPedido=ultimoPedido->siguiente; 
-//     }
-// 	//esto último no está probado
-// 	ultimoPedido->annadirMovimiento(new Movimiento("En cola: "," AAAh "));
-// }
 void menuPedidosEspeciales(ColaPedidosEspeciales * colaEspecial){
 	string cantidad, IDcliente, numPedido, producto, cantProducto;
 	ListaProductos *productos= new ListaProductos();
@@ -1015,6 +1022,17 @@ void menuPedidosEspeciales(ColaPedidosEspeciales * colaEspecial){
 	colaEspecial->encolar(stoi(numPedido),IDcliente,productos);
 }
 
-void annadirCliente(){
+void menuNuevoCliente(ListaClientes * listaClientes){
+	string prioridad, codigoCliente, nombre;
+	cout<< "Ingrese el código del nuevo cliente: "<<endl; //validar que exista
+	getline(cin,codigoCliente);
+	cout<< "Ingrese el número de pedido: "<<endl;
+	getline(cin,nombre);
+	cout<< "Ingrese la prioridad del cliente: "<<endl;
+	getline(cin,prioridad);
+	listaClientes->annadirClienteAlArchivo(codigoCliente,nombre,stoi(prioridad));
+}
+
+void menuAlistadores(){
 
 }

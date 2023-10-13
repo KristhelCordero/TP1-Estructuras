@@ -29,6 +29,14 @@ int main(int argc, char const *argv[])
     ThreadBalanceador balanceador(cola,colaPrioridad,listaArticulos,colaEspecial);
     ThreadEmpacador threadEmpacador(colaFacturacion,colaAlistados);
     ThreadFacturador ThreadFacturador(colaFacturacion);
+    // cout<<"1: Agregar Pedido"<<endl;
+	// cout<<"2: Apagar/Encender Balanceador"<<endl;
+	// cout<<"3: Agregar Cliente"<<endl;
+	// cout<<"4: Modificar Alistadores"<<endl;
+	// cout<<"5: Modificar Robots Fabricadores"<<endl;
+	// cout<<"6: Apagar/Encender Empacador"<<endl;
+	// cout<<"7: Apagar/Encender Facturador"<<endl;
+	// cout<<"0: Terminar la simulación"<<endl;
     int opcion=1;
     do{
         opcion=menuPrincipal();
@@ -37,19 +45,25 @@ int main(int argc, char const *argv[])
             menuPedidosEspeciales(colaEspecial);
             break;
         case 2:
-            
+            if (balanceador.apagado){
+                balanceador.Reanudar();
+                cout<<"El balanceador ha sido encendido"<<endl;
+            }else{
+                balanceador.Pausar();
+                cout<<"El balanceador ha sido apagado"<<endl;
+            }
             break;
         case 3:
-            
+            menuNuevoCliente(listaClientes);
             break;
         case 4:
-            
+            menuAlistadores(); //Aqui lo que ocupes 
             break;
         case 5:
-            
+            menuRobots(listaRobots);
             break;
         case 6:
-            menuRobots(listaRobots);
+            
             break;
         case 7:
             
