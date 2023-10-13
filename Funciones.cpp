@@ -723,6 +723,15 @@ int ListaRobots::largo(){
 	return contador;
 }
 
+bool ListaRobots::existsRobot(string _numRobot){
+	Robot * tmp= primerRobot;
+	while (tmp!=NULL){
+		if(tmp->codigoRobot==_numRobot)
+			return true;
+		tmp=tmp->siguiente;
+	}
+	return false;
+}
 //BITACORA DE MOVIMIENTOS -----------------------------------------------------------------------------------
 
 // THREAD PEDIDOS -------------------------------------------------------------------------------------------
@@ -957,15 +966,28 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 
 void menuRobots(ListaRobots *robots){ //Esto lo maneja Jota
 	string opcion,numRobot;
-	cout<<"------------------------------- MENÚ -------------------------------"<<endl;
-    cout<<"1. Modificar Categoría"<<endl;
-	cout<<"2. Apagar Robot"<<endl;
-	cout<<"3. Encender Robot"<<endl;
-	cout<<"4. Cambiar Prioridad "<<endl;
-	cout<<"Digite la opción que desea: "<<endl;
-	getline(cin,opcion);//validaciones
-	cout<<"Ingrese el número del robot: "<<endl;
-	getline(cin,numRobot);
+	bool aceptado=false;
+	do{
+		cout<<"------------------------------- MENÚ -------------------------------"<<endl;
+    	cout<<"1. Modificar Categoría"<<endl;
+		cout<<"2. Apagar Robot"<<endl;
+		cout<<"3. Encender Robot"<<endl;
+		cout<<"4. Cambiar Prioridad "<<endl;
+		cout<<"Digite la opción que desea: "<<endl;
+		getline(cin,opcion);//validaciones
+		if (esInt(opcion)){
+			aceptado=true;
+			cout<<"Ingrese el número del robot: "<<endl;
+			getline(cin,numRobot);
+			if (robots->existsRobot(numRobot)){
+				aceptado=true;
+			}else{
+				aceptado=false;
+			}
+		}else{
+
+		}
+	} while (!aceptado);
 	switch (stoi(opcion)){
 	case 1:
 
@@ -1035,4 +1057,12 @@ void menuNuevoCliente(ListaClientes * listaClientes){
 
 void menuAlistadores(){
 
+}
+
+bool esInt(string str) {
+    for (char c : str) {
+        if (!isdigit(c)) 
+            return false;
+	}
+    return true;
 }
