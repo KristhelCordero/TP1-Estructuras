@@ -711,6 +711,17 @@ void ListaRobots::leerArchivoRobots(){
 	}
 }
 
+int ListaRobots::largo(){
+	// lock_guard<mutex> lock(mtx);
+    Robot * tmp = primerRobot;
+    int contador=0;
+    while(tmp!=NULL){
+	    contador++;
+	    tmp=tmp->siguiente;
+    }
+	return contador;
+}
+
 //BITACORA DE MOVIMIENTOS -----------------------------------------------------------------------------------
 
 // THREAD PEDIDOS -------------------------------------------------------------------------------------------
@@ -943,8 +954,15 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 	return "Listo";
 }
 
-int menuRobots(){
-
+int menuRobots(ListaRobots *robots){
+	string opcion;
+	cout<<"------------------------------- MENÚ -------------------------------"<<endl;
+	for (int i=0; i<robots->largo(); i++){
+		cout<<i<<". Modificar Robot "<<i<<endl;
+	}
+	cout<<"0: Salir"<<endl;
+	getline(cin,opcion);//validaciones varias
+	return stoi(opcion);
 }
 
 int menuPrincipal(){
@@ -964,5 +982,39 @@ int menuPrincipal(){
 	}else{
 		return 1;
 	}
+}
+
+// void ColaPedidosEspeciales::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
+// 	// lock_guard<mutex> lock(mtx);
+// 	if(estaVacia())
+// 		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+// 	else{
+// 		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+// 		ultimoPedido->siguiente->anterior=ultimoPedido;
+// 		ultimoPedido=ultimoPedido->siguiente; 
+//     }
+// 	//esto último no está probado
+// 	ultimoPedido->annadirMovimiento(new Movimiento("En cola: "," AAAh "));
+// }
+void menuPedidosEspeciales(ColaPedidosEspeciales * colaEspecial){
+	string cantidad, IDcliente, numPedido, producto, cantProducto;
+	ListaProductos *productos= new ListaProductos();
+	cout<< "Ingrese el ID de cliente: "<<endl; //validar que exista
+	getline(cin,IDcliente);
+	cout<< "Ingrese el número de pedido: "<<endl;
+	getline(cin,numPedido);
+	cout<< "¿Cuántos productos desea agregar al pedido? "<<endl;
+	getline(cin,cantidad);
+	for (size_t i = 0; i < stoi(cantidad); i++){
+		cout<< "Ingrese el código del producto: "<<endl;
+		getline(cin,producto);
+		cout<< "Ingrese la cantidad de producto: "<<endl;
+		getline(cin,cantProducto);
+		productos->insertarFinalProducto(producto,stoi(cantProducto));
+	}
+	colaEspecial->encolar(stoi(numPedido),IDcliente,productos);
+}
+
+void annadirCliente(){
 
 }

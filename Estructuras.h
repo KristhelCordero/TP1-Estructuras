@@ -341,7 +341,7 @@ struct ListaRobots{
     void insertarFinal (string _codigoRobot, string _articuloFabrica, bool _apagado, bool _esPrioridad);
     void leerArchivoRobots();
     void imprimir();
-
+    int largo();
 };
 
 //------------------------------------------THREADS----------------------------------------------------

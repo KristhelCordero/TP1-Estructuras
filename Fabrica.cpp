@@ -16,8 +16,8 @@ int main(int argc, char const *argv[])
     
     // this_thread::sleep_for(chrono::seconds(9));
     // threadPed.Terminar();
-    ListaRobots *lista= new ListaRobots();
-    lista->leerArchivoRobots();
+    ListaRobots *listaRobots= new ListaRobots();
+    listaRobots->leerArchivoRobots();
     ColaFacturacion *colaFacturacion=new ColaFacturacion();
     ColaAlistadoos *colaAlistados=new ColaAlistadoos();
 
@@ -34,7 +34,7 @@ int main(int argc, char const *argv[])
         opcion=menuPrincipal();
         switch (opcion){
         case 1:
-            
+            menuPedidosEspeciales(colaEspecial);
             break;
         case 2:
             
@@ -49,7 +49,7 @@ int main(int argc, char const *argv[])
             
             break;
         case 6:
-            menuRobots();
+            menuRobots(listaRobots);
             break;
         case 7:
             
