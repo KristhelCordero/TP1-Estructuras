@@ -7,7 +7,6 @@ string obtenerFechaActual();
 string facturarPedido(NodoPedido *pedido, string _nombreArchivo);
 bool esInt();
 bool esIntRango();
-//hay que configurar todos los mutex porfiii
 // Hay que cambiar los desencolar por el desencolar que está en colaPedidos
 
 //COLA PEDIDOS-----------------------------------------------------------------------------------------------
@@ -751,6 +750,10 @@ void ListaRobots::modificarRobot(string _codigo, int opcion){
 	// cout<<"3. Encender Robot"<<endl;
 	// cout<<"4. Cambiar Prioridad"<<endl;
 	// cout<<"5. Imprimir lista de Robots"<<endl;
+	Robot * tmp= primerRobot;
+	while (tmp->codigoRobot!=_codigo){
+		tmp=tmp->siguiente;
+	}
 	switch (opcion){
 	case 1:
 		
