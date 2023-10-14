@@ -177,12 +177,14 @@ struct NodoPedido{
     ListaProductos * productos;
     BitacoraMovimientos * movimientos;
     int numeroPedido;
+    bool alistado;
 
     NodoPedido(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
         numeroPedido=_numeroPedido;
         codigoCliente=_codigoCliente;
         productos=_productos;
         movimientos= new BitacoraMovimientos();
+        alistado=false;
     }
 
     void annadirMovimiento(Movimiento* nuevoMovimiento);
@@ -581,27 +583,28 @@ struct ColaAlistados{
 //     }
 // };
 
-// struct ListaAlistadores{
-//     ThreadAlistador * primerAlistador;
-//     ThreadAlistador * ultimoAlistador;
+struct ListaAlistadores{
+    Alistador * primerAlistador;
+    Alistador * ultimoAlistador;
 
-//     ListaAlistadores(){
-// 		primerAlistador=ultimoAlistador=NULL;
-//     }
+    ListaAlistadores(){
+		primerAlistador=ultimoAlistador=NULL;
+    }
 
-//     void insertarFinal ( bool _apagado, int ID);
+    void insertarFinal ( bool _apagado, int ID);
+    void ordenarListaPorTiempo();
+    int largo();
+    //Destructor
+    ~ListaAlistadores() {
+        Alistador* tmp = primerAlistador;
+        while (tmp) {
+            Alistador* siguiente = tmp->siguiente;
+            delete tmp;
+            tmp = siguiente;
+        }
+    }
 
-//     //Destructor
-//     ~ListaAlistadores() {
-//         ThreadAlistador* tmp = primerAlistador;
-//         while (tmp) {
-//             ThreadAlistador* siguiente = tmp->siguiente;
-//             delete tmp;
-//             tmp = siguiente;
-//         }
-//     }
-
-// };
+};
 
 
 
@@ -615,6 +618,7 @@ struct ColaAlistados{
      Alistador(bool _apagado, int _ID){
          apagado=_apagado;
          ID=_ID;
+         tiempo= 0;
      }
      void alistar(NodoPedido*pedido, ColaAlistados *alistados, ListaDoble * articulos);
  };
@@ -646,8 +650,8 @@ struct ThreadPicking
     ColaAlisto *paraAlisto; //ingreso
     ColaAlistados *alistados;
     ListaDoble *articulos;
-    ColaAlistadores * alistadores;
-    ColaAlistadores * alistadoresApagados;
+    ListaAlistadores * alistadores;
+    ListaAlistadores * alistadoresApagados;
 
 
     ThreadPicking (ColaAlisto* _paraAlisto, ColaAlistados * _alistados, ListaDoble * _articulos):

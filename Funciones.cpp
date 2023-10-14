@@ -914,18 +914,76 @@ if (!colaFacturacion->estaVacia()){
 
 
 //LISTA ALISTADORES
-// void ListaAlistadores::insertarFinal( bool _apagado, int ID){
-//     if (primerAlistador==NULL)
-// 	    primerAlistador=ultimoAlistador=new Alistador(_apagado, ID);
-//     else{
-// 	    ultimoAlistador->siguiente= new Alistador(_apagado, ID);
-// 	    ultimoAlistador->siguiente->anterior=ultimoAlistador;
-// 	    ultimoAlistador=ultimoAlistador->siguiente; 
-//     }
-// }
-int calcularTiempoIda(NodoPedido * pedido);
+int ListaAlistadores::largo(){
+	int largo=0;
+	Alistador* nodo=primerAlistador;
+	while(nodo!=NULL){
+		largo++;
+		nodo=nodo->siguiente;
+	}
+	return largo;
+}
+
+void ListaAlistadores::insertarFinal( bool _apagado, int ID){
+    if (primerAlistador==NULL)
+	    primerAlistador=ultimoAlistador=new Alistador(_apagado, ID);
+    else{
+	    ultimoAlistador->siguiente= new Alistador(_apagado, ID);
+	    ultimoAlistador->siguiente->anterior=ultimoAlistador;
+	    ultimoAlistador=ultimoAlistador->siguiente; 
+    }
+}
+
+void ListaAlistadores::ordenarListaPorTiempo() {
+    int largo = this->largo();
+    for (int i = 0; i < largo - 1; i++) {
+        Alistador* temp = primerAlistador;
+        Alistador* siguiente = temp->siguiente;
+
+        for (int j = 0; j < largo - i - 1; j++) {
+            if (temp->tiempo < siguiente->tiempo) {
+                if (temp->anterior) {
+                    temp->anterior->siguiente = siguiente;
+                } else {
+                    primerAlistador = siguiente;
+                }
+
+                if (siguiente->siguiente) {
+                    siguiente->siguiente->anterior = temp;
+                } else {
+                    ultimoAlistador = temp;
+                }
+
+                temp->siguiente = siguiente->siguiente;
+                siguiente->anterior = temp->anterior;
+
+                temp->anterior = siguiente;
+                siguiente->siguiente = temp;
+
+                if (temp->anterior) {
+                    temp->anterior->siguiente = siguiente;
+                } else {
+                    primerAlistador = siguiente;
+                }
+
+                if (siguiente->siguiente) {
+                    siguiente->siguiente->anterior = temp;
+                } else {
+                    ultimoAlistador = temp;
+                }
+            }
+
+            temp = siguiente;
+            siguiente = temp->siguiente;
+        }
+    }
+}
+
+
+int calcularTiempoIda(NodoPedido * pedido,ListaDoble * articulos);
+
 void Alistador::alistar(NodoPedido * pedido, ColaAlistados * alistados, ListaDoble * articulos){
-	int tiempo = calucularTiempoIda(pedido, articulos);
+	int tiempo = calcularTiempoIda(pedido, articulos);
 
 	std::this_thread::sleep_for(std::chrono::seconds(tiempo));
 	alistados->encolar( pedido->numeroPedido, pedido->codigoCliente, pedido->productos);
@@ -938,19 +996,29 @@ void ThreadPicking::picking(){
 	while (!terminar)
 			{
 			Alistador* alistador;
-			NodoPedido*pedido;
+			NodoPedido*pedido=NULL;
 			Producto * producto;
+			
 		while (!paraAlisto->estaVacia())
 		{
-			pedido= paraAlisto->desencolar();
-			producto = pedido->productos->primerProducto;
-			while (producto!=NULL)//
+			alistador=alistadores->primerAlistador;
+			if(pedido==NULL||pedido->alistado){ //alistado empieza com NULL en todos los pedidos
+				pedido= paraAlisto->desencolar();
+				producto = pedido->productos->primerProducto;
+			}
+			while (producto!=NULL&&alistador!=NULL)//
+			//listaordenada por tiempo
 			{
-				alistador=alistadores->desencolar();
 				alistador->tiempo=calcularTiempoIda(producto,articulos);
 				//alistador->alistar(pedido,alistados, articulos);//
 				producto=producto->siguienteProducto;
+				alistador=alistador->siguiente;
 			}
+			if (producto!=NULL){ pedido->alistado=true;}
+			//acomodar lista
+			//calcular duracion maxima (y durarla)
+			//resetear tiempos
+			//encolar producto
 			
 			this_thread::sleep_for(std::chrono::seconds(1));
 			
@@ -1118,9 +1186,14 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 	return "Listo";
 }
 
+
+
 int calcularTiempoIda(Producto * producto, ListaDoble * articulos){
 	string ubicacion=articulos->encontrarUbicacionArticulo(producto->codigoProducto);
-	
+	int columna=ubicacion[0]-'A';
+	int fila = ubicacion[1]*10+ubicacion[2];
+	return columna+fila;
+
 }
 
 void menuRobots(ListaRobots *robots){ //Esto lo maneja Jota
