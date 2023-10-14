@@ -367,13 +367,13 @@ void ListaProductos::insertarFinalProducto (string _codigoProducto, int _cantida
 	if (primerProducto==NULL){ //se cae aqui
 		cout<<"Entré..y."<<endl;
 	    primerProducto=ultimoProducto=new Producto(_codigoProducto, _cantidad);
-    	cout<<"Entré..y."<<endl;
+    cout<<"Entré..y."<<endl;
 	}else{
-    	cout<<"Entré..x."<<endl;
+cout<<"Entré..x."<<endl;
 	    ultimoProducto->siguienteProducto= new Producto(_codigoProducto, _cantidad);
 	    ultimoProducto->siguienteProducto->productoAnterior=ultimoProducto;
 	    ultimoProducto=ultimoProducto->siguienteProducto; 
-    	cout<<"Entré..z."<<endl;
+cout<<"Entré..z."<<endl;
     }
 }
 
@@ -467,7 +467,7 @@ void ListaClientes::leerArchivoClientes(){
 }
 //Falta probar esta función
 void ListaClientes::annadirClienteAlArchivo(string codigoCliente, string nombreCliente,int prioridad){
-	insertarInicioCliente(codigoCliente,nombreCliente,prioridad);
+insertarInicioCliente(codigoCliente,nombreCliente,prioridad);
 	ofstream archivo;
 	archivo.open("clientes.txt",ios::app);
 	if (archivo.fail()){
@@ -619,7 +619,7 @@ void ColaFacturacion::encolar(int _numeroPedido, string _codigoCliente,ListaProd
 		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
 		cout<<"ehhhh"<<endl;
 	}else{
-    	cout<<"Entré..."<<endl;
+		cout<<"Entré..."<<endl;
 		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos);
 		ultimoPedido->siguiente->anterior=ultimoPedido;
 		ultimoPedido=ultimoPedido->siguiente; 
@@ -876,11 +876,11 @@ void ThreadEmpacador::empacarPedidos(){
 		while(apagado){
             this_thread::sleep_for(chrono::seconds(10));
         }
-		if (!colaAlistados->estaVacia()){
-			NodoPedido *pedido= colaAlistados->desencolar();
-			int cantidadSegundos= pedido->productos->cantidadArticulosDistintos();
-			this_thread::sleep_for(chrono::seconds(cantidadSegundos));
-			colaFacturacion->encolar(pedido->numeroPedido,pedido->codigoCliente,pedido->productos);
+if (!colaAlistados->estaVacia()){
+		NodoPedido *pedido= colaAlistados->desencolar();
+		int cantidadSegundos= pedido->productos->cantidadArticulosDistintos();
+		this_thread::sleep_for(chrono::seconds(cantidadSegundos));
+		colaFacturacion->encolar(pedido->numeroPedido,pedido->codigoCliente,pedido->productos);
 		}else{
 			this_thread::sleep_for(chrono::seconds(2));
 		}
@@ -894,20 +894,20 @@ void ThreadFacturador::facturarPedidos(){
 		while(apagado){
             this_thread::sleep_for(chrono::seconds(10));
         }
-		if (!colaFacturacion->estaVacia()){
-			pedidoEmpacado=colaFacturacion->desencolar();
-			cout<<"Desencolé"<<endl;
-			
+if (!colaFacturacion->estaVacia()){
+		pedidoEmpacado=colaFacturacion->desencolar();
+		cout<<"Desencolé"<<endl;
+		
 		pedidoEmpacado->annadirMovimiento(new Movimiento("Finalizado: "," AAAh "));
 		cout<<"Añadí el movimiento"<<endl;
-			facturarPedido(pedidoEmpacado, to_string(pedidoEmpacado->numeroPedido)+"_"+
-			pedidoEmpacado->codigoCliente+"_"); //+"_"+obtenerFechaActual()+obtenerHoraActual()
-			cout<<"Facturé"<<endl;
+		facturarPedido(pedidoEmpacado, to_string(pedidoEmpacado->numeroPedido)+"_"+
+		pedidoEmpacado->codigoCliente+"_"); //+"_"+obtenerFechaActual()+obtenerHoraActual()
+		cout<<"Facturé"<<endl;
+		this_thread::sleep_for(chrono::seconds(1));
+}else{
 			this_thread::sleep_for(chrono::seconds(1));
-		}else{
-			this_thread::sleep_for(chrono::seconds(1));
-		}
-		
+	}
+
 	}
 }
 
@@ -936,10 +936,10 @@ void Alistador::alistar(NodoPedido * pedido, ColaAlistados * alistados, ListaDob
 
 void ThreadPicking::picking(){
 	while (!terminar)
-	{
-		Alistador* alistador;
-		NodoPedido*pedido;
-		Producto * producto;
+			{
+			Alistador* alistador;
+			NodoPedido*pedido;
+			Producto * producto;
 		while (!paraAlisto->estaVacia())
 		{
 			pedido= paraAlisto->desencolar();
@@ -1213,7 +1213,7 @@ bool esInt(string numero) {
         if (!isdigit(c)) 
             return false;
 	}
-    return true;
+	return true;
 }
 //FALTA PROBAR ESTA FUNCION
 bool esIntRango(string numero, int menorQue, int mayorQue){
