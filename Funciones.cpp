@@ -5,7 +5,8 @@ ListaClientes* listaClientes, ListaDoble* listaArticulos);
 string obtenerHoraActual();
 string obtenerFechaActual();
 string facturarPedido(NodoPedido *pedido, string _nombreArchivo);
-//hay que configurar todos los mutex porfiii
+bool esInt();
+bool esIntRango();
 // Hay que cambiar los desencolar por el desencolar que está en colaPedidos
 
 //COLA PEDIDOS-----------------------------------------------------------------------------------------------
@@ -28,7 +29,8 @@ void ColaPedidos::encolar(int _numeroPedido, string _codigoCliente,ListaProducto
 		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
-	//ultimoPedido->annadirMovimiento(new Movimiento("En cola: ",obtenerFechaActual()+" "+obtenerHoraActual()));
+	Movimiento *nuevo= new Movimiento("En cola: "," AAAh ");
+	ultimoPedido->annadirMovimiento(nuevo);
 }
 
 NodoPedido * ColaPedidos::desencolar(){
@@ -89,11 +91,11 @@ void ColaPedidosPrioridad::encolar(int _numeroPedido, string _codigoCliente,List
 		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
-	ultimoPedido->annadirMovimiento(new Movimiento("En cola: ",obtenerFechaActual()+" "+obtenerHoraActual()));
+	ultimoPedido->annadirMovimiento(new Movimiento("En cola: "," AAAh "));
 }
 
 NodoPedido * ColaPedidosPrioridad::desencolar(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * borrado= primerPedido;
 	if(primerPedido==ultimoPedido){
 		primerPedido=ultimoPedido=NULL;
@@ -106,7 +108,7 @@ NodoPedido * ColaPedidosPrioridad::desencolar(){
 }
 
 void ColaPedidosPrioridad::imprimir(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
 	while(tmp!=NULL){
 		cout<<tmp->numeroPedido<<endl; 
@@ -143,11 +145,11 @@ void ColaPedidosEspeciales::encolar(int _numeroPedido, string _codigoCliente,Lis
 		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
-	ultimoPedido->annadirMovimiento(new Movimiento("En cola: ",obtenerFechaActual()+" "+obtenerHoraActual()));
+	ultimoPedido->annadirMovimiento(new Movimiento("En cola: "," AAAh "));
 }
 
 NodoPedido * ColaPedidosEspeciales::desencolar(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * borrado= primerPedido;
 	if(primerPedido==ultimoPedido){
 		primerPedido=ultimoPedido=NULL;
@@ -160,7 +162,7 @@ NodoPedido * ColaPedidosEspeciales::desencolar(){
 }
 
 void ColaPedidosEspeciales::imprimir(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
 	while(tmp!=NULL){
 		cout<<tmp->numeroPedido<<endl; 
@@ -277,6 +279,17 @@ int ListaDoble::cantidadArticuloBodega(string _codigo){
     }
 	return 0;
 }
+
+string ListaDoble::encontrarUbicacionArticulo(string _codigo){
+	NodoArticulo * tmp = primerArticulo;
+	while(tmp!=NULL){
+		if(tmp->codigo==_codigo){
+			return tmp->ubicacion;
+		}
+		tmp=tmp->siguiente;
+    }
+	return NULL;
+}
 //Falta probar esta función
 void ListaDoble::actualizarArchivoArticulos(){
 	ofstream archivo;
@@ -350,12 +363,17 @@ void ListaProductos::insertarInicioProducto(string _codigoProducto, int _cantida
 }
 
 void ListaProductos::insertarFinalProducto (string _codigoProducto, int _cantidad){
-    if (primerProducto==NULL)
+    cout<<"Entré..."<<endl;
+	if (primerProducto==NULL){ //se cae aqui
+		cout<<"Entré..y."<<endl;
 	    primerProducto=ultimoProducto=new Producto(_codigoProducto, _cantidad);
-    else{
+    	cout<<"Entré..y."<<endl;
+	}else{
+    	cout<<"Entré..x."<<endl;
 	    ultimoProducto->siguienteProducto= new Producto(_codigoProducto, _cantidad);
 	    ultimoProducto->siguienteProducto->productoAnterior=ultimoProducto;
 	    ultimoProducto=ultimoProducto->siguienteProducto; 
+    	cout<<"Entré..z."<<endl;
     }
 }
 
@@ -449,6 +467,7 @@ void ListaClientes::leerArchivoClientes(){
 }
 //Falta probar esta función
 void ListaClientes::annadirClienteAlArchivo(string codigoCliente, string nombreCliente,int prioridad){
+	insertarInicioCliente(codigoCliente,nombreCliente,prioridad);
 	ofstream archivo;
 	archivo.open("clientes.txt",ios::app);
 	if (archivo.fail()){
@@ -479,7 +498,7 @@ void Cliente::imprimir(){
 
 // COLA DE ALISTO ------------------------------------------------------------------------------------------
 bool ColaAlisto::estaVacia(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	return primerPedido==0;
 }
 
@@ -493,11 +512,12 @@ void ColaAlisto::encolar(NodoPedido *pedido){
 		ultimoPedido=ultimoPedido->anterior; 
     }
 	//esto último no está probado
-	ultimoPedido->annadirMovimiento(new Movimiento("En cola de alisto: ",obtenerFechaActual()+" "+obtenerHoraActual()));
+	Movimiento *nuevo=new Movimiento("En cola de alisto: "," AAAh ");
+	ultimoPedido->annadirMovimiento(nuevo);
 }
 
 NodoPedido * ColaAlisto::desencolar(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * borrado= primerPedido;
 	if(primerPedido==ultimoPedido){
 		primerPedido=ultimoPedido=NULL;
@@ -510,7 +530,7 @@ NodoPedido * ColaAlisto::desencolar(){
 }
 
 void ColaAlisto::imprimir(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
 	while(tmp!=NULL){
 		cout<<tmp->numeroPedido<<endl; 
@@ -521,7 +541,7 @@ void ColaAlisto::imprimir(){
 }
 
 int ColaAlisto::largo(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
     NodoPedido * tmp = primerPedido;
     int contador=0;
     while(tmp!=NULL){
@@ -533,8 +553,8 @@ int ColaAlisto::largo(){
 
 // COLA ALISTADOOS ---------------------------------------------------------------------------------------
 bool ColaAlistadoos::estaVacia(){
-	lock_guard<mutex> lock(mtx);
-	return primerPedido==0;
+	// lock_guard<mutex> lock(mtx);
+	return primerPedido==NULL;
 }
 
 void ColaAlistadoos::encolar(NodoPedido *pedido){
@@ -544,14 +564,14 @@ void ColaAlistadoos::encolar(NodoPedido *pedido){
 	else{
 		ultimoPedido->siguiente= pedido;
 		ultimoPedido->siguiente->anterior=ultimoPedido;
-		ultimoPedido=ultimoPedido->anterior; 
+		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
-	ultimoPedido->annadirMovimiento(new Movimiento("En cola de alisto: ",obtenerFechaActual()+" "+obtenerHoraActual()));
+	ultimoPedido->annadirMovimiento(new Movimiento("En cola de alisto: "," AAAh "));
 }
 
 NodoPedido * ColaAlistadoos::desencolar(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * borrado= primerPedido;
 	if(primerPedido==ultimoPedido){
 		primerPedido=ultimoPedido=NULL;
@@ -564,7 +584,7 @@ NodoPedido * ColaAlistadoos::desencolar(){
 }
 
 void ColaAlistadoos::imprimir(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
 	while(tmp!=NULL){
 		cout<<tmp->numeroPedido<<endl; 
@@ -575,7 +595,7 @@ void ColaAlistadoos::imprimir(){
 }
 
 int ColaAlistadoos::largo(){
-	lock_guard<mutex> lock(mtx);
+	// lock_guard<mutex> lock(mtx);
     NodoPedido * tmp = primerPedido;
     int contador=0;
     while(tmp!=NULL){
@@ -588,25 +608,27 @@ int ColaAlistadoos::largo(){
 // COLA FACTURACION --------------------------------------------------------------------------------------
 bool ColaFacturacion::estaVacia(){
 	// lock_guard<mutex> lock(mtx);
-	return primerPedido==0;
+	return primerPedido==NULL;
 }
 
-void ColaFacturacion::encolar(NodoPedido *pedido){
+void ColaFacturacion::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
 	// lock_guard<mutex> lock(mtx);
 	cout<<"Estoy en encolar"<<endl;
 	if(estaVacia()){ // se cae aqui
-		primerPedido=ultimoPedido=pedido;
+		cout<<"ehhhh--"<<endl;
+		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
 		cout<<"ehhhh"<<endl;
 	}else{
-		ultimoPedido->siguiente= pedido;
+    	cout<<"Entré..."<<endl;
+		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos);
 		ultimoPedido->siguiente->anterior=ultimoPedido;
 		ultimoPedido=ultimoPedido->siguiente; 
 		cout<<"ehhhh22"<<endl;
     }
 	//esto último no está probado
 	cout<<"AHHHHH"<<endl;
-	// Movimiento *nuevo=new Movimiento("A empaque: ", obtenerFechaActual()+" "+obtenerHoraActual());
-	// ultimoPedido->annadirMovimiento(nuevo);
+	Movimiento *nuevo=new Movimiento("A empaque: ", " AAAh ");
+	ultimoPedido->annadirMovimiento(nuevo);
 	
 }
 
@@ -702,6 +724,68 @@ void ListaRobots::leerArchivoRobots(){
 	}
 }
 
+int ListaRobots::largo(){
+	// lock_guard<mutex> lock(mtx);
+    Robot * tmp = primerRobot;
+    int contador=0;
+    while(tmp!=NULL){
+	    contador++;
+	    tmp=tmp->siguiente;
+    }
+	return contador;
+}
+
+Robot * ListaRobots::buscarRobot(string _codigoRobot){
+	Robot * tmp= primerRobot;
+	while (tmp!=NULL){
+		if(tmp->codigoRobot==_codigoRobot)
+			return tmp;
+		tmp=tmp->siguiente;
+	}
+	return NULL;
+}
+
+bool ListaRobots::existsRobot(string _numRobot){
+	Robot * tmp= primerRobot;
+	while (tmp!=NULL){
+		if(tmp->codigoRobot==_numRobot)
+			return true;
+		tmp=tmp->siguiente;
+	}
+	return false;
+}
+
+void ListaRobots::modificarRobot(string _codigo, int opcion){
+	// cout<<"1. Modificar Categoría"<<endl;
+	// cout<<"2. Apagar Robot"<<endl;
+	// cout<<"3. Encender Robot"<<endl;
+	// cout<<"4. Cambiar Prioridad"<<endl;
+	// cout<<"5. Imprimir lista de Robots"<<endl;
+	Robot * tmp= primerRobot;
+	while (tmp->codigoRobot!=_codigo){
+		tmp=tmp->siguiente;
+	}
+	switch (opcion){
+	case 1:
+		
+		break;
+	case 2:
+		
+		break;
+	case 3:
+		
+		break;
+	case 4:
+		
+		break;
+	case 5:
+		
+		break;
+	default:
+	
+		break;
+	}
+}
 //BITACORA DE MOVIMIENTOS -----------------------------------------------------------------------------------
 
 // THREAD PEDIDOS -------------------------------------------------------------------------------------------
@@ -766,7 +850,7 @@ void ThreadBalanceador::procesarPedidos(){
 			}
 			else
 				this_thread::sleep_for(chrono::seconds(3));
-			pedidoProcesandose->annadirMovimiento(new Movimiento("Balanceador: ",obtenerFechaActual()+" "+obtenerHoraActual()));
+			pedidoProcesandose->annadirMovimiento(new Movimiento("Balanceador: "," AAAh "));
 		}while (!procesando);
 		productoAElaborar=pedidoProcesandose->productos->revisarProductosFaltantes(listaArticulos);
 		do{
@@ -792,10 +876,14 @@ void ThreadEmpacador::empacarPedidos(){
 		while(apagado){
             this_thread::sleep_for(chrono::seconds(10));
         }
-		NodoPedido *pedido= colaAlistados->desencolar();
-		int cantidadSegundos= pedido->productos->cantidadArticulosDistintos();
-		this_thread::sleep_for(chrono::seconds(cantidadSegundos));
-		colaFacturacion->encolar(pedido);
+		if (!colaAlistados->estaVacia()){
+			NodoPedido *pedido= colaAlistados->desencolar();
+			int cantidadSegundos= pedido->productos->cantidadArticulosDistintos();
+			this_thread::sleep_for(chrono::seconds(cantidadSegundos));
+			colaFacturacion->encolar(pedido->numeroPedido,pedido->codigoCliente,pedido->productos);
+		}else{
+			this_thread::sleep_for(chrono::seconds(2));
+		}
 	}
 }
 
@@ -806,14 +894,20 @@ void ThreadFacturador::facturarPedidos(){
 		while(apagado){
             this_thread::sleep_for(chrono::seconds(10));
         }
-		pedidoEmpacado=colaFacturacion->desencolar();
-		cout<<"Desencolé"<<endl;
-		// pedidoEmpacado->annadirMovimiento(new Movimiento("Finalizado: ",obtenerFechaActual()+" "+obtenerHoraActual()));
-		// cout<<"Añadí el movimiento"<<endl;
-		facturarPedido(pedidoEmpacado,pedidoEmpacado->numeroPedido+"_"+
-		pedidoEmpacado->codigoCliente+"_"+obtenerFechaActual()+obtenerHoraActual());
-		cout<<"Facturé"<<endl;
-		this_thread::sleep_for(chrono::seconds(1));
+		if (!colaFacturacion->estaVacia()){
+			pedidoEmpacado=colaFacturacion->desencolar();
+			cout<<"Desencolé"<<endl;
+			
+		pedidoEmpacado->annadirMovimiento(new Movimiento("Finalizado: "," AAAh "));
+		cout<<"Añadí el movimiento"<<endl;
+			facturarPedido(pedidoEmpacado, to_string(pedidoEmpacado->numeroPedido)+"_"+
+			pedidoEmpacado->codigoCliente+"_"); //+"_"+obtenerFechaActual()+obtenerHoraActual()
+			cout<<"Facturé"<<endl;
+			this_thread::sleep_for(chrono::seconds(1));
+		}else{
+			this_thread::sleep_for(chrono::seconds(1));
+		}
+		
 	}
 }
 
@@ -966,7 +1060,7 @@ string obtenerHoraActual() {
     char buffer[9];
     sprintf(buffer, "%02d:%02d:%02d", tiempoLocal.tm_hour,
 	 tiempoLocal.tm_min, tiempoLocal.tm_sec);
-    return string(buffer);
+    return std::string(buffer);
 }
 
 string obtenerFechaActual() {
@@ -987,8 +1081,8 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 		cout<<"No escribí el archivo"<<endl;
 		exit(1);
 	}
-	archivo<<"Pedido: \t"<<pedido->numeroPedido;
-	archivo<<"Cliente: \t"<<pedido->codigoCliente;
+	archivo<<"Pedido: \t"<<pedido->numeroPedido<<endl;
+	archivo<<"Cliente: \t"<<pedido->codigoCliente<<endl;
 	cout<<"Llegué aqui"<<endl;
 	Movimiento * tmpMov=pedido->movimientos->primerMov;
 	while (tmpMov!=NULL){
@@ -1006,7 +1100,7 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 			archivo<<"ARTICULO " << tmpMov->articulo<< "\t Fabricado en "<< 
 			tmpMov->fabricadoEn << "/n"<< tmpMov->cantidad<< "unidades"<<
 			"\nincio: "<<tmpMov->fechaInicio <<"\nfinal: "<<tmpMov->fechaFinal<<endl;
-		}else{ //alistador
+		}else if (tmpMov->alistador){ //alistador
 			if(contador==0){
 				archivo<<endl;
 				archivo<<"Alisto "<< "\t Alistador "<< tmpMov->numAlistador <<endl;
@@ -1032,3 +1126,99 @@ int calcularTiempoIda(NodoPedido * pedido){
 	
 }
 
+void menuRobots(ListaRobots *robots){ //Esto lo maneja Jota
+	string opcion,numRobot;
+	bool aceptado=false;
+	do{
+		cout<<"------------------------------- MENÚ -------------------------------"<<endl;
+    	cout<<"1. Modificar Categoría"<<endl;
+		cout<<"2. Apagar Robot"<<endl;
+		cout<<"3. Encender Robot"<<endl;
+		cout<<"4. Cambiar Prioridad"<<endl;
+		cout<<"5. Imprimir lista de Robots"<<endl;
+		cout<<"Digite la opción que desea: "<<endl;
+		getline(cin,opcion);//validaciones
+		if (esIntRango(opcion,6,0)){
+			aceptado=true;
+			cout<<"Ingrese el número del robot: "<<endl;
+			getline(cin,numRobot);
+			if (robots->existsRobot(numRobot)){
+				aceptado=true;
+			}else{
+				aceptado=false;
+				cout<<"El robot que digitó no existe inténtelo de nuevo"<<endl;
+			}
+		}else{
+			cout<<"Ingrese un número entero que se encuentre entre las opciones"<<endl;
+			aceptado=false;
+		}
+	} while (!aceptado);
+	robots->modificarRobot(numRobot,stoi(opcion));
+}
+
+int menuPrincipal(){
+	string opcion;
+	cout<<"------------------------------- MENÚ -------------------------------"<<endl;
+	cout<<"1: Agregar Pedido"<<endl;
+	cout<<"2: Apagar/Encender Balanceador"<<endl;
+	cout<<"3: Agregar Cliente"<<endl;
+	cout<<"4: Modificar Alistadores"<<endl;
+	cout<<"5: Modificar Robots Fabricadores"<<endl;
+	cout<<"6: Apagar/Encender Empacador"<<endl;
+	cout<<"7: Apagar/Encender Facturador"<<endl;
+	cout<<"0: Terminar la simulación"<<endl;
+	getline(cin,opcion);//validaciones varias
+	if (opcion=="0"){
+		return 0;
+	}else{
+		return 1;
+	}
+}
+
+void menuPedidosEspeciales(ColaPedidosEspeciales * colaEspecial){
+	string cantidad, IDcliente, numPedido, producto, cantProducto;
+	ListaProductos *productos= new ListaProductos();
+	cout<< "Ingrese el ID de cliente: "<<endl; //validar que exista
+	getline(cin,IDcliente);
+	cout<< "Ingrese el número de pedido: "<<endl;
+	getline(cin,numPedido);
+	cout<< "¿Cuántos productos desea agregar al pedido? "<<endl;
+	getline(cin,cantidad);
+	for (size_t i = 0; i < stoi(cantidad); i++){
+		cout<< "Ingrese el código del producto: "<<endl;
+		getline(cin,producto);
+		cout<< "Ingrese la cantidad de producto: "<<endl;
+		getline(cin,cantProducto);
+		productos->insertarFinalProducto(producto,stoi(cantProducto));
+	}
+	colaEspecial->encolar(stoi(numPedido),IDcliente,productos);
+}
+
+void menuNuevoCliente(ListaClientes * listaClientes){
+	string prioridad, codigoCliente, nombre;
+	cout<< "Ingrese el código del nuevo cliente: "<<endl; //validar que exista
+	getline(cin,codigoCliente);
+	cout<< "Ingrese el número de pedido: "<<endl;
+	getline(cin,nombre);
+	cout<< "Ingrese la prioridad del cliente: "<<endl;
+	getline(cin,prioridad);
+	listaClientes->annadirClienteAlArchivo(codigoCliente,nombre,stoi(prioridad));
+}
+
+void menuAlistadores(){
+// colocas aqui lo que ocupes, para hacer lo que dice la especificacion de la tp
+}
+
+// Validaciones ----------------------------------------------------------------------------------------------
+// FALTA PROBAR ESTA FUNCION
+bool esInt(string numero) {
+    for (char c : numero) {
+        if (!isdigit(c)) 
+            return false;
+	}
+    return true;
+}
+//FALTA PROBAR ESTA FUNCION
+bool esIntRango(string numero, int menorQue, int mayorQue){
+	return (esInt(numero)&& stoi(numero)<menorQue && stoi(numero)>mayorQue);
+}

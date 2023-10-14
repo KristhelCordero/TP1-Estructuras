@@ -4,34 +4,90 @@ int main(int argc, char const *argv[])
 {
     ColaPedidos *cola=new ColaPedidos();
     ColaPedidosPrioridad *colaPrioridad= new ColaPedidosPrioridad();
-    cout<<"---------------------------- CLIENTES -------------------------------------"<<endl;
+    ColaPedidosEspeciales *colaEspecial= new ColaPedidosEspeciales();
+    // cout<<"---------------------------- CLIENTES -------------------------------------"<<endl;
     ListaClientes *listaClientes=new ListaClientes();
     listaClientes->leerArchivoClientes();
-    listaClientes->imprimir();
-    cout<<"---------------------------- ARTÍCULOS ------------------------------------"<<endl;
+    // cout<<"---------------------------- ARTÍCULOS ------------------------------------"<<endl;
     ListaDoble * listaArticulos=new ListaDoble();
     listaArticulos->leerArchivoArticulos();
-    listaArticulos->imprimir();
-    
     threadPedidos threadPed(cola, colaPrioridad, listaClientes, listaArticulos);
-    
-    this_thread::sleep_for(chrono::seconds(9));
+    // this_thread::sleep_for(chrono::seconds(9));
+    // threadPed.Terminar();
+    ListaRobots *listaRobots= new ListaRobots();
+    listaRobots->leerArchivoRobots();
+    ColaFacturacion *colaFacturacion=new ColaFacturacion();
+    ColaAlistadoos *colaAlistados=new ColaAlistadoos();
+    // this_thread::sleep_for(chrono::seconds(12));
+    // threadEmpacador.Terminar();
+    // colaFacturacion->imprimir();
+    ThreadBalanceador balanceador(cola,colaPrioridad,listaArticulos,colaEspecial);
+    ThreadEmpacador threadEmpacador(colaFacturacion,colaAlistados);
+    ThreadFacturador threadFacturador(colaFacturacion);
+    // cout<<"1: Agregar Pedido"<<endl;
+	// cout<<"2: Apagar/Encender Balanceador"<<endl;
+	// cout<<"3: Agregar Cliente"<<endl;
+	// cout<<"4: Modificar Alistadores"<<endl;
+	// cout<<"5: Modificar Robots Fabricadores"<<endl;
+	// cout<<"6: Apagar/Encender Empacador"<<endl;
+	// cout<<"7: Apagar/Encender Facturador"<<endl;
+	// cout<<"0: Terminar la simulación"<<endl;
+    int opcion=1;
+    do{
+        opcion=menuPrincipal();
+        switch (opcion){
+        case 1:
+            menuPedidosEspeciales(colaEspecial);
+            break;
+        case 2:
+            if (balanceador.apagado){
+                balanceador.Reanudar();
+                cout<<"El balanceador ha sido encendido"<<endl;
+            }else{
+                balanceador.Pausar();
+                cout<<"El balanceador ha sido apagado"<<endl;
+            }
+            break;
+        case 3:
+            menuNuevoCliente(listaClientes);
+            break;
+        case 4:
+            menuAlistadores(); //Aqui lo que ocupes 
+            break;
+        case 5:
+            menuRobots(listaRobots);
+            break;
+        case 6:
+            if (threadEmpacador.apagado){
+                threadEmpacador.Reanudar();
+                cout<<"El empacador ha sido encendido"<<endl;
+            }else{
+                threadEmpacador.Pausar();
+                cout<<"El empacador ha sido apagado"<<endl;
+            }
+            break;
+        case 7:
+            if (threadFacturador.apagado){
+                threadFacturador.Reanudar();
+                cout<<"El facturador ha sido encendido"<<endl;
+            }else{
+                threadFacturador.Pausar();
+                cout<<"El facturador ha sido apagado"<<endl;
+            }
+            break;
+        default:
+            cout<<"La opción escogida no existe."<<endl;
+            break;
+        }
+    } while (opcion!=0);
+    cout<<"Apagando Componentes..."<<endl;
+    //Todos los terminar aqui(creo que para que todo termine tiene que estar todo encendido)
     threadPed.Terminar();
-
-    // // cout<<"---------------------------- COLAS ------------------------------------"<<endl;
-    // // colaPrioridad->imprimir();
-    // // cout<<"---------------------------- COLAS ------------------------------------"<<endl;
-    // // cola->imprimir();
-    // // ListaRobots *lista= new ListaRobots();
-    // // lista->leerArchivoRobots();
-    ColaFacturacion *colaFacturacion;
-    NodoPedido *pedido;
-    pedido=cola->desencolar();
-    colaFacturacion->encolar(pedido);
-
-    ThreadFacturador threadFacturas(colaFacturacion);
-    this_thread::sleep_for(chrono::seconds(9));
-    threadFacturas.Terminar();
-
+    balanceador.Terminar();
+    threadEmpacador.Terminar();
+    threadFacturador.Terminar();
+    this_thread::sleep_for(chrono::seconds(5));
+    cout<<"Componentes Apagados..."<<endl;
+    cout<<"Simulación terminada..."<<endl;
     return 0;
 }

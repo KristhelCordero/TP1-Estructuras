@@ -205,7 +205,7 @@ struct ColaPedidos{
 
 struct ColaPedidosPrioridad{
     NodoPedido * primerPedido, * ultimoPedido;
-    mutex mtx;
+    // mutex mtx;
 
     ColaPedidosPrioridad(){
         primerPedido=ultimoPedido=NULL;
@@ -220,7 +220,7 @@ struct ColaPedidosPrioridad{
 
 struct ColaPedidosEspeciales{
     NodoPedido * primerPedido, * ultimoPedido;
-    mutex mtx;
+    // mutex mtx;
 
     ColaPedidosEspeciales(){
         primerPedido=ultimoPedido=NULL;
@@ -280,12 +280,13 @@ struct ListaDoble {
             tmp = siguiente;
         }
     }
+    string encontrarUbicacionArticulo(string _codigo);
 };
 
 // COLA DE ALISTO -------------------------------------------------------------------------------------
 struct ColaAlisto{
     NodoPedido * primerPedido, * ultimoPedido;
-    mutex mtx;
+    // mutex mtx;
 
     ColaAlisto(){
         primerPedido=ultimoPedido=NULL;
@@ -301,7 +302,7 @@ struct ColaAlisto{
 // COLA ALISTADOS -------------------------------------------------------------------------------------
 struct ColaAlistadoos{
     NodoPedido * primerPedido, * ultimoPedido;
-    mutex mtx;
+    // mutex mtx;
 
     ColaAlistadoos(){
         primerPedido=ultimoPedido=NULL;
@@ -324,7 +325,7 @@ struct ColaFacturacion{
     }
 
     bool estaVacia();
-    void encolar(NodoPedido *pedido);
+    void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos);
     void imprimir();
     int largo();
     NodoPedido * desencolar();
@@ -373,6 +374,10 @@ struct ListaRobots{
         }
     }
 
+    int largo();
+    bool existsRobot(string _numRobot);
+    void modificarRobot(string _codigo, int opcion);
+    Robot * buscarRobot(string _codigoRobot);
 };
 
 //COLA DE PICKING
@@ -391,7 +396,7 @@ struct threadPedidos {
     ColaPedidosPrioridad *colaPrioridad;
     ListaClientes *listaClientes;
     ListaDoble *listaArticulos;
-    mutex mutex;
+    // mutex mutex;
     // Constructor
     threadPedidos(ColaPedidos *_cola, ColaPedidosPrioridad *_colaPrioridad, ListaClientes *_listaClientes, ListaDoble *_listaArticulos):
     pausado(false), terminar(false), cola(_cola), colaPrioridad(_colaPrioridad), listaClientes(_listaClientes), listaArticulos(_listaArticulos){
