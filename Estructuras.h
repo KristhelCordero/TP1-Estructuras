@@ -47,6 +47,16 @@ struct ListaClientes{ //Lista simple
     void leerArchivoClientes();
     void annadirClienteAlArchivo(string codigoCliente, string nombreCliente,int prioridad);
     int buscarPrioridadCliente(string codigoCliente);
+
+        //Destructor
+    ~ListaClientes() {
+        Cliente* tmp = primerCliente;
+        while (tmp) {
+            Cliente* siguiente = tmp->siguiente;
+            delete tmp;
+            tmp = siguiente;
+        }
+    }
 };
 
 //Lista de Productos ----------------------------------------------------------------------------------
@@ -62,6 +72,7 @@ struct Producto{
         elaborando=false;
         siguienteProducto=productoAnterior=NULL;
     }
+    
 };
 
 struct ListaProductos{
@@ -162,10 +173,10 @@ struct BitacoraMovimientos{
 struct NodoPedido{
     NodoPedido * siguiente;
     NodoPedido * anterior;
-    int numeroPedido;
     string codigoCliente;
     ListaProductos * productos;
     BitacoraMovimientos * movimientos;
+    int numeroPedido;
 
     NodoPedido(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
         numeroPedido=_numeroPedido;
@@ -259,6 +270,16 @@ struct ListaDoble {
     int largo();
     bool encontrarArticuloRepetido(string _codigo);
     int cantidadArticuloBodega(string _codigo);
+
+        //Destructor
+    ~ListaDoble() {
+        NodoArticulo* tmp = primerArticulo;
+        while (tmp) {
+            NodoArticulo* siguiente = tmp->siguiente;
+            delete tmp;
+            tmp = siguiente;
+        }
+    }
 };
 
 // COLA DE ALISTO -------------------------------------------------------------------------------------
@@ -342,7 +363,20 @@ struct ListaRobots{
     void leerArchivoRobots();
     void imprimir();
 
+    //Destructor
+    ~ListaRobots() {
+        Robot* tmp = primerRobot;
+        while (tmp) {
+            Robot* siguiente = tmp->siguiente;
+            delete tmp;
+            tmp = siguiente;
+        }
+    }
+
 };
+
+//COLA DE PICKING
+
 
 //------------------------------------------THREADS----------------------------------------------------
 struct threadPedidos {
@@ -477,3 +511,156 @@ struct ThreadFacturador{
     //Destructor
     ~ThreadFacturador() {Terminar();}
 };
+
+
+//PIKIN -----------------------------------------------------------------------------------------------
+
+
+struct ColaPicking{
+       
+    NodoPedido * primerPedido, * ultimoPedido;
+    //mutex mtx;
+
+    ColaPicking(){
+        primerPedido=ultimoPedido=NULL;
+    }
+
+    bool estaVacia();
+    void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos);
+    void imprimir();
+    int largo();
+    NodoPedido * desencolar();
+};
+
+struct ColaAlistados{
+       
+    NodoPedido * primerPedido, * ultimoPedido;
+    //mutex mtx;
+
+    ColaAlistados(){
+        primerPedido=ultimoPedido=NULL;
+    }
+
+    bool estaVacia();
+    void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos);
+    void imprimir();
+    int largo();
+    NodoPedido * desencolar();
+};
+
+
+// struct ThreadAlistador
+// {
+//     int ID;
+//     ThreadAlistador * siguiente;
+//     ThreadAlistador *anterior;
+//     thread thread;
+//     mutex mtx;
+//     atomic<bool> terminar;
+//     atomic<bool> apagado;
+    
+
+
+//     ThreadAlistador (ColaPedidos* _colaPicking):
+//     apagado(false), terminar(false), colaPicking(_colaPicking){
+//         thread = std::thread(ThreadAlistador::alistar, this);
+//     }
+//     void alistar();
+//     void Pausar() {apagado = true;}
+//     void Reanudar() {apagado = false;}
+//     void Terminar() {
+//         terminar = true;
+//         if (thread.joinable()) {
+//             thread.join();
+//         }
+//     }
+// };
+
+// struct ListaAlistadores{
+//     ThreadAlistador * primerAlistador;
+//     ThreadAlistador * ultimoAlistador;
+
+//     ListaAlistadores(){
+// 		primerAlistador=ultimoAlistador=NULL;
+//     }
+
+//     void insertarFinal ( bool _apagado, int ID);
+
+//     //Destructor
+//     ~ListaAlistadores() {
+//         ThreadAlistador* tmp = primerAlistador;
+//         while (tmp) {
+//             ThreadAlistador* siguiente = tmp->siguiente;
+//             delete tmp;
+//             tmp = siguiente;
+//         }
+//     }
+
+// };
+
+
+
+ struct Alistador
+ {
+     Alistador *siguiente;
+     Alistador *anterior;
+     bool apagado;
+     int ID;
+     Alistador(bool _apagado, int _ID){
+         apagado=_apagado;
+         ID=_ID;
+     }
+     void alistar(NodoPedido*pedido, ColaAlistados *alistados);
+ };
+
+
+struct ColaAlistadores{
+       
+    Alistador * primerAlistador, * ultimoAlistador;
+    //mutex mtx;
+
+    ColaAlistadores(){
+        primerAlistador=ultimoAlistador=NULL;
+        //generara 6 alistadores automatico
+    }
+
+    bool estaVacia();
+    void encolar(Alistador * alistador);
+    void imprimir();
+    int largo();
+    Alistador * desencolar();
+};
+
+struct ThreadPicking
+{
+    thread thread;
+    //mutex mtx;
+    atomic<bool> terminar;
+    atomic<bool> apagado;
+    ColaAlisto *paraAlisto; //ingreso
+    ColaAlistados *alistados;
+    ListaDoble *articulos;
+    ColaAlistadores * alistadores;
+    ColaAlistadores * alistadoresApagados;
+
+
+    ThreadPicking (ColaAlisto* _paraAlisto, ColaAlistados * _alistados, ListaDoble * _articulos):
+    apagado(false), terminar(false), paraAlisto(_paraAlisto), alistados(_alistados),
+    alistadores(new ColaAlistadores()),articulos(_articulos){
+        thread = std::thread(ThreadPicking::picking, this);
+
+    }
+    void picking();
+    void Pausar() {apagado = true;}
+    void Reanudar() {apagado = false;}
+    void Terminar() {
+        terminar = true;
+        if (thread.joinable()) {
+            thread.join();
+        }
+    }
+};
+
+
+
+

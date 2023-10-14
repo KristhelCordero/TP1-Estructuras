@@ -720,7 +720,7 @@ void threadPedidos::leerArchivosPedidos() {
                 	nombreArchivo=leerYEncolarPedidos(cola, colaPrioridad,_nombreArchivo, listaClientes, listaArticulos);
                 	if(nombreArchivo=="Error"){
 						cout<<"Llegué1"<<endl;
-                	    nombreArchivo=".\\Errores\\"+_nombreArchivo.erase(0,19);;
+                	    nombreArchivo=".\\Errores\\"+_nombreArchivo.erase(0,19);
 						cout<<nombreArchivo<<endl;
 						_nombreArchivo=".\\Pedidos-Clientes\\"+_nombreArchivo;
 						cout<<_nombreArchivo<<endl;
@@ -816,6 +816,104 @@ void ThreadFacturador::facturarPedidos(){
 		this_thread::sleep_for(chrono::seconds(1));
 	}
 }
+
+
+
+//LISTA ALISTADORES
+// void ListaAlistadores::insertarFinal( bool _apagado, int ID){
+//     if (primerAlistador==NULL)
+// 	    primerAlistador=ultimoAlistador=new Alistador(_apagado, ID);
+//     else{
+// 	    ultimoAlistador->siguiente= new Alistador(_apagado, ID);
+// 	    ultimoAlistador->siguiente->anterior=ultimoAlistador;
+// 	    ultimoAlistador=ultimoAlistador->siguiente; 
+//     }
+// }
+int calcularTiempoIda(NodoPedido * pedido);
+void Alistador::alistar(NodoPedido * pedido, ColaPedidos * alistados){
+	int tiempo= calucularTiempoIda(pedido);
+	std::this_thread::sleep_for(std::chrono::seconds(5));
+	alistados->encolar( pedido->numeroPedido, pedido->codigoCliente,
+	pedido->productos);
+	cout<<"Pedido "<< pedido->numeroPedido <<" alistado. \n"<<
+	"Alistador: "<<ID<<endl;
+	std::this_thread::sleep_for(std::chrono::seconds(5));
+}
+
+void ThreadPicking::picking(){
+	while (!terminar)
+	{
+		while (apagado)
+		{
+			Alistador* alistador;
+			NodoPedido*pedido;
+			while (!alistadores->estaVacia())
+			{
+				alistador= alistadores->desencolar();
+				pedido = paraAlisto->desencolar();
+				alistador->alistar(pedido,alistados);
+
+
+			}
+			
+			this_thread::sleep_for(std::chrono::seconds(1));
+			
+
+		}
+		
+	}
+	
+}
+
+bool ColaAlistadores::estaVacia(){
+	// lock_guard<mutex> lock(mtx);
+	return primerAlistador==0;
+}
+
+void ColaAlistadores::encolar(Alistador *alistador){
+	// lock_guard<mutex> lock(mtx);
+	cout<<"Estoy en encolar"<<endl;
+	if(estaVacia()){ // se cae aqui
+		primerAlistador=ultimoAlistador=alistador;
+		cout<<"ehhhh"<<endl;
+	}else{
+		ultimoAlistador->siguiente= alistador;
+		ultimoAlistador->siguiente->anterior=ultimoAlistador;
+		ultimoAlistador=ultimoAlistador->siguiente; 
+		cout<<"ehhhh22"<<endl;
+    }
+	//esto último no está probado
+	cout<<"AHHHHH"<<endl;
+	// Movimiento *nuevo=new Movimiento("A empaque: ", obtenerFechaActual()+" "+obtenerHoraActual());
+	// ultimoPedido->annadirMovimiento(nuevo);
+	
+}
+
+Alistador * ColaAlistadores::desencolar(){
+	// lock_guard<mutex> lock(mtx);
+	Alistador * borrado= primerAlistador;
+	if(primerAlistador==ultimoAlistador){
+		primerAlistador=ultimoAlistador=NULL;
+	}else{
+		primerAlistador=primerAlistador->siguiente;
+		borrado->siguiente=NULL;
+		primerAlistador->anterior=NULL;
+	}
+	return borrado;
+}
+
+void ColaAlistadores::imprimir(){
+	// lock_guard<mutex> lock(mtx);
+	Alistador * tmp = primerAlistador;
+	while(tmp!=NULL){
+		cout<<tmp->ID<<endl; 
+		cout<<"----------------------"<<endl;
+		tmp=tmp->siguiente;
+    }
+}
+
+
+
 
 //--------------------------------------- FUNCIONES SIN ESTRUCTURA ------------------------------------------
 string leerYEncolarPedidos(ColaPedidos* cola, ColaPedidosPrioridad* colaPrioridad,string _nombreArchivo,
@@ -922,5 +1020,15 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 	cout<<"Aqui también llegué"<<endl;
 	archivo.close();
 	return "Listo";
+}
+
+int calcularTiempoIda(NodoPedido * pedido){
+	Producto* temp= pedido->productos->primerProducto;
+	while (temp=NULL)
+	{
+		
+		temp=temp->siguienteProducto
+	}
+	
 }
 
