@@ -259,6 +259,7 @@ struct ListaDoble {
     int largo();
     bool encontrarArticuloRepetido(string _codigo);
     int cantidadArticuloBodega(string _codigo);
+    string encontrarUbicacionArticulo(string _codigo);
 };
 
 // COLA DE ALISTO -------------------------------------------------------------------------------------

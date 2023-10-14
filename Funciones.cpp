@@ -279,6 +279,17 @@ int ListaDoble::cantidadArticuloBodega(string _codigo){
     }
 	return 0;
 }
+
+string ListaDoble::encontrarUbicacionArticulo(string _codigo){
+	NodoArticulo * tmp = primerArticulo;
+	while(tmp!=NULL){
+		if(tmp->codigo==_codigo){
+			return tmp->ubicacion;
+		}
+		tmp=tmp->siguiente;
+    }
+	return NULL;
+}
 //Falta probar esta función
 void ListaDoble::actualizarArchivoArticulos(){
 	ofstream archivo;
