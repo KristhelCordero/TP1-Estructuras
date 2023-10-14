@@ -941,7 +941,7 @@ void ListaAlistadores::ordenarListaPorTiempo() {
         Alistador* siguiente = temp->siguiente;
 
         for (int j = 0; j < largo - i - 1; j++) {
-            if (temp->tiempo < siguiente->tiempo) {
+            if (temp->tiempo > siguiente->tiempo) {
                 if (temp->anterior) {
                     temp->anterior->siguiente = siguiente;
                 } else {
@@ -973,12 +973,45 @@ void ListaAlistadores::ordenarListaPorTiempo() {
                 }
             }
 
+
             temp = siguiente;
             siguiente = temp->siguiente;
         }
     }
 }
 
+void ListaAlistadores::mostrarAlistadores() {
+    // Ordena la lista por tiempo
+    // Recorre la lista ordenada y muestra los alistadores
+    Alistador* temp = primerAlistador;
+    int orden = 1;
+	string estado;
+
+    while (temp!=NULL) {
+		if (temp->apagado){estado= "Apagado";}else{estado= "Encendido";}
+        std::cout << "Alistador " << orden << ": ID = " << temp->ID <<"\nEstado: "<<estado<<endl;
+        temp = temp->siguiente;
+        orden++;
+    }
+}
+int ListaAlistadores::tiempoMaximo(){
+	Alistador * temp= primerAlistador;
+	int tiempoMaximo=0;
+	while (temp!=NULL){
+		if (temp->tiempo>tiempoMaximo){
+			tiempoMaximo=temp->tiempo;
+		}
+		temp=temp->siguiente;
+	}
+	return tiempoMaximo;
+}
+void ListaAlistadores::resetearTiempos(){
+	Alistador * temp= primerAlistador;
+	while (temp!=NULL){
+		temp->tiempo=0;
+		temp= temp->siguiente;
+	}
+}
 
 int calcularTiempoIda(NodoPedido * pedido,ListaDoble * articulos);
 
@@ -992,12 +1025,64 @@ void Alistador::alistar(NodoPedido * pedido, ColaAlistados * alistados, ListaDob
 	std::this_thread::sleep_for(std::chrono::seconds(5));
 }
 
+void ThreadPicking::apagarAlistador(int ID){
+	Alistador * temp=alistadores->primerAlistador;
+	while (temp!=NULL)
+	{
+		if (temp->ID==ID){
+			//pasar alistador con ID igual a la lista alistadoresApagados
+			alistadoresApagados->insertarFinal(true, temp->ID);
+
+            if (temp->anterior!=NULL) {
+                temp->anterior->siguiente = temp->siguiente;
+            } else {
+                alistadores->primerAlistador = temp->siguiente;
+            }
+            if (temp->siguiente!=NULL) {
+                temp->siguiente->anterior = temp->anterior;
+            } else {
+                alistadores->ultimoAlistador = temp->anterior;
+            }
+            delete temp;
+
+			break;
+		}
+		temp= temp->siguiente;
+	}
+	
+}
+void ThreadPicking::encenderAlistador(int ID) {
+    Alistador* temp = alistadoresApagados->primerAlistador;
+    while (temp != NULL) {
+        if (temp->ID == ID) {
+            // Pasar el alistador con ID igual a la lista de alistadores
+            alistadores->insertarFinal(false, temp->ID);
+
+            if (temp->anterior != NULL) {
+                temp->anterior->siguiente = temp->siguiente;
+            } else {
+                alistadoresApagados->primerAlistador = temp->siguiente;
+            }
+            if (temp->siguiente != NULL) {
+                temp->siguiente->anterior = temp->anterior;
+            } else {
+                alistadoresApagados->ultimoAlistador = temp->anterior;
+            }
+            delete temp;
+
+            break;
+        }
+        temp = temp->siguiente;
+    }
+}
+
 void ThreadPicking::picking(){
 	while (!terminar)
 			{
 			Alistador* alistador;
 			NodoPedido*pedido=NULL;
 			Producto * producto;
+			int tiempo=0;
 			
 		while (!paraAlisto->estaVacia())
 		{
@@ -1015,13 +1100,28 @@ void ThreadPicking::picking(){
 				alistador=alistador->siguiente;
 			}
 			if (producto!=NULL){ pedido->alistado=true;}
-			//acomodar lista
 			//calcular duracion maxima (y durarla)
-			//resetear tiempos
+			tiempo=alistadores->tiempoMaximo();
+			cout<<"Alistadores desplegados\nProductos listos en: "<<tiempo<<endl;
+			std::this_thread::sleep_for(std::chrono::seconds(tiempo));
 			//encolar producto
-			
-			this_thread::sleep_for(std::chrono::seconds(1));
-			
+			if (pedido->alistado){
+				alistados->encolar(pedido->numeroPedido,
+				 pedido->codigoCliente, pedido->productos);
+				cout<<"Pedido "<<pedido->numeroPedido<< " alistado."<<endl;
+				//movimientos??
+			}
+			cout<<"Alistadores regresando..."<<endl;
+			std::this_thread::sleep_for(std::chrono::seconds(tiempo));
+			//tiempo
+			alistadores->ordenarListaPorTiempo();
+			//resetear tiempos
+			alistadores->resetearTiempos();
+			this_thread::sleep_for(std::chrono::seconds(tiempo));
+			alistadores->mostrarAlistadores();
+			alistadoresApagados->mostrarAlistadores();
+
+
 
 		}
 		
@@ -1141,6 +1241,11 @@ string obtenerFechaActual() {
     sprintf(buffer, "%02d/%02d/%04d", tiempoLocal.tm_mday,
 	 tiempoLocal.tm_mon + 1, tiempoLocal.tm_year + 1900);
     return std::string(buffer);
+}
+string obtenerFechaYHoraActual() {
+    string fecha = obtenerFechaActual();
+    string hora = obtenerHoraActual();
+    return fecha + " " + hora;
 }
 
 string facturarPedido(NodoPedido *pedido, string _nombreArchivo){

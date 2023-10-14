@@ -589,11 +589,17 @@ struct ListaAlistadores{
 
     ListaAlistadores(){
 		primerAlistador=ultimoAlistador=NULL;
+        for(int i; i<=6, i++){
+            insertarFinal(false,i+1);
+        }
     }
 
     void insertarFinal ( bool _apagado, int ID);
     void ordenarListaPorTiempo();
     int largo();
+    int tiempoMaximo();
+    void resetearTiempos();
+    void mostrarAlistadores();
     //Destructor
     ~ListaAlistadores() {
         Alistador* tmp = primerAlistador;
@@ -654,13 +660,16 @@ struct ThreadPicking
     ListaAlistadores * alistadoresApagados;
 
 
-    ThreadPicking (ColaAlisto* _paraAlisto, ColaAlistados * _alistados, ListaDoble * _articulos):
+    ThreadPicking (ColaAlisto* _paraAlisto, ColaAlistados * _alistados,
+     ListaDoble * _articulos, ListaAlistadores * _alistadores):
     apagado(false), terminar(false), paraAlisto(_paraAlisto), alistados(_alistados),
-    alistadores(new ColaAlistadores()),articulos(_articulos){
+    alistadores( _alistadores),articulos(_articulos){
         thread = std::thread(ThreadPicking::picking, this);
 
     }
     void picking();
+    void apagarAlistador(int ID);//
+    void encenderAlistador(int ID);//
     void Pausar() {apagado = true;}
     void Reanudar() {apagado = false;}
     void Terminar() {
