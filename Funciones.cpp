@@ -924,11 +924,11 @@ void ThreadFacturador::facturarPedidos(){
 //     }
 // }
 int calcularTiempoIda(NodoPedido * pedido);
-void Alistador::alistar(NodoPedido * pedido, ColaPedidos * alistados){
-	int tiempo= calucularTiempoIda(pedido);
-	std::this_thread::sleep_for(std::chrono::seconds(5));
-	alistados->encolar( pedido->numeroPedido, pedido->codigoCliente,
-	pedido->productos);
+void Alistador::alistar(NodoPedido * pedido, ColaAlistados * alistados, ListaDoble * articulos){
+	int tiempo = calucularTiempoIda(pedido, articulos);
+
+	std::this_thread::sleep_for(std::chrono::seconds(tiempo));
+	alistados->encolar( pedido->numeroPedido, pedido->codigoCliente, pedido->productos);
 	cout<<"Pedido "<< pedido->numeroPedido <<" alistado. \n"<<
 	"Alistador: "<<ID<<endl;
 	std::this_thread::sleep_for(std::chrono::seconds(5));
@@ -937,17 +937,19 @@ void Alistador::alistar(NodoPedido * pedido, ColaPedidos * alistados){
 void ThreadPicking::picking(){
 	while (!terminar)
 	{
-		while (apagado)
+		Alistador* alistador;
+		NodoPedido*pedido;
+		Producto * producto;
+		while (!paraAlisto->estaVacia())
 		{
-			Alistador* alistador;
-			NodoPedido*pedido;
-			while (!alistadores->estaVacia())
+			pedido= paraAlisto->desencolar();
+			producto = pedido->productos->primerProducto;
+			while (producto!=NULL)//
 			{
-				alistador= alistadores->desencolar();
-				pedido = paraAlisto->desencolar();
-				alistador->alistar(pedido,alistados);
-
-
+				alistador=alistadores->desencolar();
+				alistador->tiempo=calcularTiempoIda(producto,articulos);
+				//alistador->alistar(pedido,alistados, articulos);//
+				producto=producto->siguienteProducto;
 			}
 			
 			this_thread::sleep_for(std::chrono::seconds(1));
@@ -1116,13 +1118,8 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 	return "Listo";
 }
 
-int calcularTiempoIda(NodoPedido * pedido){
-	Producto* temp= pedido->productos->primerProducto;
-	while (temp=NULL)
-	{
-		
-		temp=temp->siguienteProducto
-	}
+int calcularTiempoIda(Producto * producto, ListaDoble * articulos){
+	string ubicacion=articulos->encontrarUbicacionArticulo(producto->codigoProducto);
 	
 }
 

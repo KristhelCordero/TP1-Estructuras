@@ -611,11 +611,12 @@ struct ColaAlistados{
      Alistador *anterior;
      bool apagado;
      int ID;
+     int tiempo;
      Alistador(bool _apagado, int _ID){
          apagado=_apagado;
          ID=_ID;
      }
-     void alistar(NodoPedido*pedido, ColaAlistados *alistados);
+     void alistar(NodoPedido*pedido, ColaAlistados *alistados, ListaDoble * articulos);
  };
 
 
