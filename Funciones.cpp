@@ -6,7 +6,9 @@ string obtenerHoraActual();
 string obtenerFechaActual();
 string facturarPedido(NodoPedido *pedido, string _nombreArchivo);
 bool esInt();
-bool esIntRango();
+bool esIntRango(string numero, int menorQue, int mayorQue);
+int calcularTiempoIda(Producto * producto,ListaDoble * articulos);
+
 // Hay que cambiar los desencolar por el desencolar que está en colaPedidos
 
 //COLA PEDIDOS-----------------------------------------------------------------------------------------------
@@ -605,6 +607,18 @@ int ColaAlistadoos::largo(){
 	return contador;
 }
 
+// void ColaAlistados::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
+// 	if(estaVacia())
+// 		primerPedido=ultimoPedido=pedido;
+// 	else{
+// 		ultimoPedido->siguiente= pedido;
+// 		ultimoPedido->siguiente->anterior=ultimoPedido;
+// 		ultimoPedido=ultimoPedido->siguiente; 
+//     }
+// 	//esto último no está probado
+// 	ultimoPedido->annadirMovimiento(new Movimiento("En cola de alisto: "," AAAh "));
+// }
+
 // COLA FACTURACION --------------------------------------------------------------------------------------
 bool ColaFacturacion::estaVacia(){
 	// lock_guard<mutex> lock(mtx);
@@ -1013,17 +1027,16 @@ void ListaAlistadores::resetearTiempos(){
 	}
 }
 
-int calcularTiempoIda(NodoPedido * pedido,ListaDoble * articulos);
 
-void Alistador::alistar(NodoPedido * pedido, ColaAlistados * alistados, ListaDoble * articulos){
-	int tiempo = calcularTiempoIda(pedido, articulos);
+// void Alistador::alistar(NodoPedido * pedido, ColaAlistados * alistados, ListaDoble * articulos){
+// 	int tiempo = calcularTiempoIda(pedido, articulos);
 
-	std::this_thread::sleep_for(std::chrono::seconds(tiempo));
-	alistados->encolar( pedido->numeroPedido, pedido->codigoCliente, pedido->productos);
-	cout<<"Pedido "<< pedido->numeroPedido <<" alistado. \n"<<
-	"Alistador: "<<ID<<endl;
-	std::this_thread::sleep_for(std::chrono::seconds(5));
-}
+// 	std::this_thread::sleep_for(std::chrono::seconds(tiempo));
+// 	alistados->encolar( pedido->numeroPedido, pedido->codigoCliente, pedido->productos);
+// 	cout<<"Pedido "<< pedido->numeroPedido <<" alistado. \n"<<
+// 	"Alistador: "<<ID<<endl;
+// 	std::this_thread::sleep_for(std::chrono::seconds(5));
+// }
 
 void ThreadPicking::apagarAlistador(int ID){
 	Alistador * temp=alistadores->primerAlistador;
@@ -1106,18 +1119,17 @@ void ThreadPicking::picking(){
 			std::this_thread::sleep_for(std::chrono::seconds(tiempo));
 			//encolar producto
 			if (pedido->alistado){
-				alistados->encolar(pedido->numeroPedido,
-				 pedido->codigoCliente, pedido->productos);
+				alistados->encolar(pedido);
 				cout<<"Pedido "<<pedido->numeroPedido<< " alistado."<<endl;
 				//movimientos??
 			}
 			cout<<"Alistadores regresando..."<<endl;
-			std::this_thread::sleep_for(std::chrono::seconds(tiempo));
 			//tiempo
+			this_thread::sleep_for(std::chrono::seconds(tiempo));
 			alistadores->ordenarListaPorTiempo();
 			//resetear tiempos
 			alistadores->resetearTiempos();
-			this_thread::sleep_for(std::chrono::seconds(tiempo));
+			
 			alistadores->mostrarAlistadores();
 			alistadoresApagados->mostrarAlistadores();
 
@@ -1313,6 +1325,7 @@ void menuRobots(ListaRobots *robots){ //Esto lo maneja Jota
 		cout<<"5. Imprimir lista de Robots"<<endl;
 		cout<<"Digite la opción que desea: "<<endl;
 		getline(cin,opcion);//validaciones
+
 		if (esIntRango(opcion,6,0)){
 			aceptado=true;
 			cout<<"Ingrese el número del robot: "<<endl;

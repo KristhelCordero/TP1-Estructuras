@@ -539,21 +539,22 @@ struct ColaPicking{
     NodoPedido * desencolar();
 };
 
-struct ColaAlistados{
+// struct ColaAlistados{
        
-    NodoPedido * primerPedido, * ultimoPedido;
-    //mutex mtx;
+//     NodoPedido * primerPedido, * ultimoPedido;
+//     //mutex mtx;
 
-    ColaAlistados(){
-        primerPedido=ultimoPedido=NULL;
-    }
+//     ColaAlistados(){
+//         primerPedido=ultimoPedido=NULL;
+//     }
 
-    bool estaVacia();
-    void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos);
-    void imprimir();
-    int largo();
-    NodoPedido * desencolar();
-};
+//     bool estaVacia();
+//     void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos);
+//     void imprimir();
+//     int largo();
+
+//     NodoPedido * desencolar();
+// };
 
 
 // struct ThreadAlistador
@@ -582,14 +583,27 @@ struct ColaAlistados{
 //         }
 //     }
 // };
-
+ struct Alistador
+ {
+     Alistador *siguiente;
+     Alistador *anterior;
+     bool apagado;
+     int ID;
+     int tiempo;
+     Alistador(bool _apagado, int _ID){
+         apagado=_apagado;
+         ID=_ID;
+         tiempo= 0;
+     }
+     void alistar(NodoPedido*pedido, ColaAlistadoos *alistados, ListaDoble * articulos);
+ };
 struct ListaAlistadores{
     Alistador * primerAlistador;
     Alistador * ultimoAlistador;
 
     ListaAlistadores(){
 		primerAlistador=ultimoAlistador=NULL;
-        for(int i; i<=6, i++){
+        for(int i; i<=6; i++){
             insertarFinal(false,i+1);
         }
     }
@@ -614,20 +628,7 @@ struct ListaAlistadores{
 
 
 
- struct Alistador
- {
-     Alistador *siguiente;
-     Alistador *anterior;
-     bool apagado;
-     int ID;
-     int tiempo;
-     Alistador(bool _apagado, int _ID){
-         apagado=_apagado;
-         ID=_ID;
-         tiempo= 0;
-     }
-     void alistar(NodoPedido*pedido, ColaAlistados *alistados, ListaDoble * articulos);
- };
+
 
 
 struct ColaAlistadores{
@@ -654,13 +655,13 @@ struct ThreadPicking
     atomic<bool> terminar;
     atomic<bool> apagado;
     ColaAlisto *paraAlisto; //ingreso
-    ColaAlistados *alistados;
+    ColaAlistadoos *alistados;
     ListaDoble *articulos;
     ListaAlistadores * alistadores;
     ListaAlistadores * alistadoresApagados;
 
 
-    ThreadPicking (ColaAlisto* _paraAlisto, ColaAlistados * _alistados,
+    ThreadPicking (ColaAlisto* _paraAlisto, ColaAlistadoos * _alistados,
      ListaDoble * _articulos, ListaAlistadores * _alistadores):
     apagado(false), terminar(false), paraAlisto(_paraAlisto), alistados(_alistados),
     alistadores( _alistadores),articulos(_articulos){
