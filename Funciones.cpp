@@ -58,14 +58,14 @@ void ColaPedidos::imprimir(){
 		cout<<"Está vacía"<<endl;
 	}else{
 		while(tmp!=ultimoPedido){
+			cout<<tmp->numeroPedido<<endl; 
+			cout<<tmp->codigoCliente<<endl;
+			cout<<"----------------------"<<endl;
+			tmp=tmp->siguiente;
+    	}
 		cout<<tmp->numeroPedido<<endl; 
 		cout<<tmp->codigoCliente<<endl;
 		cout<<"----------------------"<<endl;
-		tmp=tmp->siguiente;
-    }
-	cout<<tmp->numeroPedido<<endl; 
-	cout<<tmp->codigoCliente<<endl;
-	cout<<"----------------------"<<endl;
 	}
 }
 
@@ -112,7 +112,7 @@ NodoPedido * ColaPedidosPrioridad::desencolar(){
 	}else{
 		ultimoPedido = NULL;
 	}
-borrado->siguiente = NULL;
+	borrado->siguiente = NULL;
 	return borrado;
 }
 
@@ -444,10 +444,13 @@ Producto * ListaProductos::borrarAlFinal(){
 //FALTA PROBAR ESTA FUNCION
 Producto * ListaProductos::revisarProductosFaltantes(ListaDoble *listaArticulos){
 	Producto *tmp=primerProducto;
-	while(tmp!=NULL){
+	while(tmp!=ultimoProducto){
 		if (tmp->cantidad>listaArticulos->cantidadArticuloBodega(tmp->codigoProducto)){
 			return tmp; // si devuelve un producto, hay que enviar ese producto a fabricar
 		}
+	}
+	if (tmp->cantidad>listaArticulos->cantidadArticuloBodega(tmp->codigoProducto)){
+		return tmp; // si devuelve un producto, hay que enviar ese producto a fabricar
 	}
 	return tmp; //si tmp es NULL no hay ningun producto faltante
 }
@@ -679,7 +682,7 @@ int ColaAlistadoos::largo(){
 // COLA FACTURACION --------------------------------------------------------------------------------------
 bool ColaFacturacion::estaVacia(){
 	// lock_guard<mutex> lock(mtx);
-	return primerPedido==NULL;
+	return primerPedido==0;
 }
 
 void ColaFacturacion::encolar(int _numeroPedido, string _codigoCliente, ListaProductos * _productos, BitacoraMovimientos * _bitacora){
@@ -898,14 +901,14 @@ void threadPedidos::leerArchivosPedidos() {
         while(pausado){
             this_thread::sleep_for(chrono::milliseconds(2000));
         }
-		// cout<<"Entré"<<endl;
+		cout<<"Entré"<<endl;
         if(direccion=opendir(dir.c_str())){
             while(elementos=readdir(direccion)){
 				_nombreArchivo=".\\Pedidos-Clientes\\";
 				_nombreArchivo+=elementos->d_name;
-				// cout<<_nombreArchivo<<endl;
+				cout<<_nombreArchivo<<endl;
 				if(_nombreArchivo!=".\\Pedidos-Clientes\\." && _nombreArchivo!=".\\Pedidos-Clientes\\.."){
-                	// cout<<"Estoy"<<endl;
+                	cout<<"Estoy"<<endl;
 					nombreArchivo=leerYEncolarPedidos(cola, colaPrioridad,_nombreArchivo, listaClientes, listaArticulos);
                 	if(nombreArchivo=="Error"){
 						// cout<<"Llegué1"<<endl;
@@ -944,40 +947,46 @@ void ThreadBalanceador::procesarPedidos(){
 		while(apagado){
             this_thread::sleep_for(chrono::milliseconds(2000));
         }
-		// cout<<"BALANCEADOR" <<endl;
+		cout<<"BALANCEADOR" <<endl;
 		if (!colaEspecial->estaVacia()){
-			// cout<<"BALANCEADOR cola especial" <<endl;
+			cout<<"BALANCEADOR cola especial" <<endl;
 			pedidoProcesandose=colaEspecial->desencolar();
 			procesando=true;
 		}
 		else if (!colaPrioridad->estaVacia()){
-			// cout<<"BALANCEADOR cola prioridad" <<endl;
-			pedidoProcesandose=colaPrioridad->desencolar();
+			cout<<"BALANCEADOR cola prioridad" <<endl;
+			pedidoProcesandose=colaPrioridad->desencolar(); ////////&//
+			cout<<"BALANCEADOR cola prioridad2" <<endl;
 			procesando=true;
 		}
 		else if (!cola->estaVacia()){
-			// cout<<"BALANCEADOR cola normal" <<endl;
+			cout<<"BALANCEADOR cola normal" <<endl;
 			pedidoProcesandose=cola->desencolar();
 			procesando=true;
 		}
 		else{
-			// cout<<"BALANCEADOR esperando" <<endl;
+			cout<<"BALANCEADOR esperando" <<endl;
 			this_thread::sleep_for(chrono::seconds(5));
 		}
 		if (procesando){
+			cout<<"BALANCEADOR procesando" <<endl;
 			pedidoProcesandose->annadirMovimiento(new Movimiento("Balanceador: ", pedidoProcesandose->numeroPedido +
 			"_"+ pedidoProcesandose->codigoCliente +"_"+obtenerFechaYHoraActual()));
+			cout<<"BALANCEADOR procesando2" <<endl;
 			do{
+				cout<<"BALANCEADOR procesando3" <<endl;
 				productoAElaborar=pedidoProcesandose->productos->revisarProductosFaltantes(listaArticulos);
+				cout<<"BALANCEADOR procesando555555555" <<endl;
 				if (productoAElaborar==NULL){//No hay ningún producto faltante
-					// cout<<"BALANCEADOR ya elaboré2" <<endl;
+					cout<<"BALANCEADOR ya elaboré2" <<endl;
 					listaArticulos->apartarProductos(pedidoProcesandose->productos);
 					colaDeAlisto->encolar(pedidoProcesandose);
 					procesando=false;
-					// cout<<"BALANCEADOR ya elaboré" <<endl;
+					cout<<"BALANCEADOR ya elaboré" <<endl;
 				}else{
+					cout<<"BALANCEADOR aquii en el else de chill" <<endl;
 					while(robotAsignado==NULL){
-						// cout<<"BALANCEADOR robot" <<endl;
+						cout<<"BALANCEADOR robot" <<endl;
 						robotAsignado=listaRobots->asignarPedidoRobot(productoAElaborar->codigoProducto);
 						this_thread::sleep_for(chrono::seconds(12));
 					}
@@ -986,13 +995,13 @@ void ThreadBalanceador::procesarPedidos(){
 					cantidadFabricar=productoAElaborar->cantidad-listaArticulos->cantidadArticuloBodega(productoAElaborar->codigoProducto);
 					fechaInicio=obtenerFechaYHoraActual();
 					esperarSegundos=cantidadFabricar*listaArticulos->sacarTiempoFabricacion(productoAElaborar->codigoProducto);
-					// cout<<"BALANCEADOR elaborando" <<endl;
+					cout<<"BALANCEADOR elaborando" <<endl;
 					this_thread::sleep_for(chrono::seconds(esperarSegundos));
 					listaArticulos->annadirProductoAlmacen(cantidadFabricar, productoAElaborar->codigoProducto);
 					nuevo=new Movimiento(productoAElaborar->codigoProducto,robotAsignado->codigoRobot,
 					to_string(cantidadFabricar),obtenerFechaYHoraActual(),fechaInicio);
 					pedidoProcesandose->annadirMovimiento(nuevo);
-					// cout<<"BALANCEADOR elaborando2" <<endl;
+					cout<<"BALANCEADOR elaborando2" <<endl;
 				}
 			}while (procesando);
 		}
@@ -1006,13 +1015,13 @@ void ThreadEmpacador::empacarPedidos(){
             this_thread::sleep_for(chrono::seconds(10));
         }
 		if (!colaAlistados->estaVacia()){
-			// cout<<"Empacando"<<endl;
+			cout<<"Empacando"<<endl;
 			NodoPedido *pedido= colaAlistados->desencolar();
 			int cantidadSegundos= pedido->productos->cantidadArticulosDistintos();
 			this_thread::sleep_for(chrono::seconds(cantidadSegundos));
 			colaFacturacion->encolar(pedido->numeroPedido,pedido->codigoCliente,pedido->productos, pedido->movimientos);
 		}else{
-			// cout<<"Empacando esperando"<<endl;
+			cout<<"Empacando esperando"<<endl;
 			this_thread::sleep_for(chrono::seconds(5));
 		}
 	}
@@ -1027,14 +1036,14 @@ void ThreadFacturador::facturarPedidos(){
         }
 		if (!colaFacturacion->estaVacia()){
 			pedidoEmpacado=colaFacturacion->desencolar();
-			// cout<<"Desencolé"<<endl;
+			cout<<"Desencolé"<<endl;
 		
 			pedidoEmpacado->annadirMovimiento(new Movimiento("Finalizado: ", pedidoEmpacado->numeroPedido +
 				"_"+ pedidoEmpacado->codigoCliente +"_"+obtenerFechaYHoraActual()));
-			// cout<<"Añadí el movimiento"<<endl;
+			cout<<"Añadí el movimiento"<<endl;
 			facturarPedido(pedidoEmpacado, to_string(pedidoEmpacado->numeroPedido)+"_"+
 			pedidoEmpacado->codigoCliente+"_"); //+"_"+obtenerFechaActual()+obtenerHoraActual()
-			// cout<<"Facturé"<<endl;
+			cout<<"Facturé"<<endl;
 			this_thread::sleep_for(chrono::seconds(1));
 		}else{
 			this_thread::sleep_for(chrono::seconds(1));
