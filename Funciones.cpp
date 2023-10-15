@@ -1130,6 +1130,7 @@ int ListaAlistadores::tiempoMaximo(){
 	while (temp!=NULL){
 		if (temp->tiempo>tiempoMaximo){
 			tiempoMaximo=temp->tiempo;
+			cout<<"hola soy"<<tiempoMaximo<<endl;
 		}
 		temp=temp->siguiente;
 	}
@@ -1280,7 +1281,7 @@ void ThreadPicking::picking(){
 				cout<<"Acabo de desencolar"<<endl;
 				producto = pedido->productos->primerProducto;
 			}
-			while (producto!=NULL || alistador!=NULL){
+			while (producto!=NULL && alistador!=NULL){
 			//listaordenada por tiempo
 				cout<<"Calculo Tiempo"<<endl;
 				alistador->tiempo=calcularTiempoIda(producto,articulos);
@@ -1476,7 +1477,9 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 int calcularTiempoIda(Producto * producto, ListaDoble * articulos){
 	string ubicacion=articulos->encontrarUbicacionArticulo(producto->codigoProducto);
 	int columna=ubicacion[0]-'A';
-	int fila = ubicacion[1]*10+ubicacion[2];
+	
+	int fila = (ubicacion[1]-'0')*10+(ubicacion[2]-'0');
+	cout<<columna<<"  :3  "<<fila<<endl;
 	return columna+fila;
 
 }
