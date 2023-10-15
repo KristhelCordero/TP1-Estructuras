@@ -1509,6 +1509,42 @@ void menuAlistadores(){
 // colocas aqui lo que ocupes, para hacer lo que dice la especificacion de la tp
 }
 
+void menuColas(ColaPedidos * cola, ColaPedidosPrioridad * colaPrioridad, ColaPedidosEspeciales * colaEspecial, 
+ColaAlisto *colaAlisto, ColaAlistadoos *colaAlistados, ColaFacturacion *colaFacturacion){
+	string opcion;
+	cout<<"------------------------------- MENÚ -------------------------------"<<endl;
+	cout<<"1: Imprimir cola de pedidos"<<endl;
+	cout<<"2: Imprimir cola de pedidos de prioridad"<<endl;
+	cout<<"3: Imprimir cola de pedidos especiales"<<endl;
+	cout<<"4: Imprimir cola de alisto"<<endl;
+	cout<<"5: Imprimir cola de alistados"<<endl;
+	cout<<"6: Imprimir cola de facturación"<<endl;
+	getline(cin,opcion);
+	switch (stoi(opcion)){
+	case 1:
+		cola->imprimir();
+		break;
+	case 2:
+		colaPrioridad->imprimir();
+		break;
+	case 3:
+		colaEspecial->imprimir();
+		break;
+	case 4:
+		colaAlisto->imprimir();
+		break;
+	case 5:
+		colaAlistados->imprimir();
+		break;
+	case 6:
+		colaFacturacion->imprimir();
+		break;
+	default:
+		cout<<"No se seleccionó ninguna opción"<<endl;
+		break;
+	}
+}
+
 // Validaciones ----------------------------------------------------------------------------------------------
 // FALTA PROBAR ESTA FUNCION
 bool esInt(string numero) {

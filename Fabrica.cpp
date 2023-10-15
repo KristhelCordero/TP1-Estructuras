@@ -81,7 +81,7 @@ int main(int argc, char const *argv[])
             }
             break;
         case 8:
-
+            menuColas(cola, colaPrioridad, colaEspecial, colaAlisto, colaAlistados, colaFacturacion);
             break;
         default:
             cout<<"La opción escogida no existe."<<endl;
