@@ -1291,7 +1291,6 @@ void ThreadPicking::picking(){
 					articulos->encontrarUbicacionArticulo(producto->codigoProducto),to_string(tiempo)));
 				cout<<"Calculo Tiempo3"<<endl;
 				producto=producto->siguienteProducto;
-				cout<<"Calculo Tiempo4"<<endl;
 				alistador=alistador->siguiente;
 			}
 			if (producto!=NULL){ pedido->alistado=true;}
@@ -1476,10 +1475,9 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 
 int calcularTiempoIda(Producto * producto, ListaDoble * articulos){
 	string ubicacion=articulos->encontrarUbicacionArticulo(producto->codigoProducto);
-	int columna=ubicacion[0]-'A';
+	int columna=ubicacion[0]-'A'+1;
 	
 	int fila = (ubicacion[1]-'0')*10+(ubicacion[2]-'0');
-	cout<<columna<<"  :3  "<<fila<<endl;
 	return columna+fila;
 
 }
