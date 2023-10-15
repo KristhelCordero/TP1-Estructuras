@@ -2,6 +2,20 @@
 
 int main(int argc, char const *argv[])
 {
+
+    // Movimiento *movimiento= new Movimiento("string1",obtenerFechaYHoraActual());
+    // cout<<"hola"<<endl;
+    // cout<< movimiento->info<<endl;
+    // BitacoraMovimientos *bitacora= new BitacoraMovimientos();
+    // bitacora->agregarMovimiento(movimiento);
+
+    // ListaProductos *productos=new ListaProductos();
+    // productos->insertarFinalProducto("Hola, soy el codigo",12);
+    // NodoPedido *pedido= new NodoPedido(9, "hola soy el otro codigo",productos);
+    // string nombre = pedido->numeroPedido +"_"+ pedido->codigoCliente +"_"+ obtenerFechaSYHoraActual();
+    // nombre.erase(0, 1);
+    // cout<<nombre<<endl;
+    // cout<<facturarPedido(pedido, nombre)<<endl;// no me acorde
     ColaPedidos *cola=new ColaPedidos();
     ColaPedidosPrioridad *colaPrioridad= new ColaPedidosPrioridad();
     ColaPedidosEspeciales *colaEspecial= new ColaPedidosEspeciales();
