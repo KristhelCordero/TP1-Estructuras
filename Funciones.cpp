@@ -94,15 +94,18 @@ void ColaPedidosPrioridad::encolar(int _numeroPedido, string _codigoCliente,List
 
 NodoPedido * ColaPedidosPrioridad::desencolar(){
 	// lock_guard<mutex> lock(mtx);
-	NodoPedido * borrado= primerPedido;
-	if(primerPedido==ultimoPedido){
-		primerPedido=ultimoPedido=NULL;
-	}else{
-		primerPedido=primerPedido->siguiente;
-		borrado->siguiente=NULL;
-		primerPedido->anterior=NULL;
+	if (primerPedido == NULL){
+        return NULL;  
 	}
-	return borrado;
+    NodoPedido* borrado = primerPedido;
+    primerPedido = primerPedido->siguiente;
+    if (primerPedido != NULL) {
+        primerPedido->anterior = NULL;
+	}else{
+        ultimoPedido = NULL;
+	}
+    borrado->siguiente = NULL;
+    return borrado;
 }
 
 void ColaPedidosPrioridad::imprimir(){
@@ -148,15 +151,18 @@ void ColaPedidosEspeciales::encolar(int _numeroPedido, string _codigoCliente,Lis
 
 NodoPedido * ColaPedidosEspeciales::desencolar(){
 	// lock_guard<mutex> lock(mtx);
-	NodoPedido * borrado= primerPedido;
-	if(primerPedido==ultimoPedido){
-		primerPedido=ultimoPedido=NULL;
-	}else{
-		primerPedido=primerPedido->siguiente;
-		borrado->siguiente=NULL;
-		primerPedido->anterior=NULL;
+	if (primerPedido == NULL){
+        return NULL;  
 	}
-	return borrado;
+    NodoPedido* borrado = primerPedido;
+    primerPedido = primerPedido->siguiente;
+    if (primerPedido != NULL) {
+        primerPedido->anterior = NULL;
+	}else{
+        ultimoPedido = NULL;
+	}
+    borrado->siguiente = NULL;
+    return borrado;
 }
 
 void ColaPedidosEspeciales::imprimir(){
@@ -360,6 +366,21 @@ int ListaDoble::sacarTiempoFabricacion(string _codigo){
 	return 0;
 }
 
+void ListaDoble::apartarProductos(ListaProductos *listaProductos){
+	Producto * tmp = listaProductos->primerProducto;
+	NodoArticulo * tmp2 = primerArticulo; 
+	while(tmp2!=NULL){
+		tmp = listaProductos->primerProducto;
+		while (tmp!=NULL){
+			if (tmp->codigoProducto==tmp2->codigo){
+				tmp2->cantidad=tmp2->cantidad-tmp->cantidad;
+			}
+			tmp=tmp->siguienteProducto;
+		}
+		tmp2=tmp2->siguiente;
+    }
+}
+
 //LISTA PRODUCTOS ------------------------------------------------------------------------------------------
 void ListaProductos::insertarInicioProducto(string _codigoProducto, int _cantidad){
     if (primerProducto==NULL)
@@ -527,15 +548,18 @@ void ColaAlisto::encolar(NodoPedido *pedido){
 
 NodoPedido * ColaAlisto::desencolar(){
 	// lock_guard<mutex> lock(mtx);
-	NodoPedido * borrado= primerPedido;
-	if(primerPedido==ultimoPedido){
-		primerPedido=ultimoPedido=NULL;
-	}else{
-		primerPedido=primerPedido->siguiente;
-		borrado->siguiente=NULL;
-		primerPedido->anterior=NULL;
+	if (primerPedido == NULL){
+        return NULL;  
 	}
-	return borrado;
+    NodoPedido* borrado = primerPedido;
+    primerPedido = primerPedido->siguiente;
+    if (primerPedido != NULL) {
+        primerPedido->anterior = NULL;
+	}else{
+        ultimoPedido = NULL;
+	}
+    borrado->siguiente = NULL;
+    return borrado;
 }
 
 void ColaAlisto::imprimir(){
@@ -581,15 +605,18 @@ void ColaAlistadoos::encolar(NodoPedido *pedido){
 
 NodoPedido * ColaAlistadoos::desencolar(){
 	// lock_guard<mutex> lock(mtx);
-	NodoPedido * borrado= primerPedido;
-	if(primerPedido==ultimoPedido){
-		primerPedido=ultimoPedido=NULL;
-	}else{
-		primerPedido=primerPedido->siguiente;
-		borrado->siguiente=NULL;
-		primerPedido->anterior=NULL;
+	if (primerPedido == NULL){
+        return NULL;  
 	}
-	return borrado;
+    NodoPedido* borrado = primerPedido;
+    primerPedido = primerPedido->siguiente;
+    if (primerPedido != NULL) {
+        primerPedido->anterior = NULL;
+	}else{
+        ultimoPedido = NULL;
+	}
+    borrado->siguiente = NULL;
+    return borrado;
 }
 
 void ColaAlistadoos::imprimir(){
@@ -655,15 +682,18 @@ void ColaFacturacion::encolar(int _numeroPedido, string _codigoCliente,ListaProd
 
 NodoPedido * ColaFacturacion::desencolar(){
 	// lock_guard<mutex> lock(mtx);
-	NodoPedido * borrado= primerPedido;
-	if(primerPedido==ultimoPedido){
-		primerPedido=ultimoPedido=NULL;
-	}else{
-		primerPedido=primerPedido->siguiente;
-		borrado->siguiente=NULL;
-		primerPedido->anterior=NULL;
+	if (primerPedido == NULL){
+        return NULL;  
 	}
-	return borrado;
+    NodoPedido* borrado = primerPedido;
+    primerPedido = primerPedido->siguiente;
+    if (primerPedido != NULL) {
+        primerPedido->anterior = NULL;
+	}else{
+        ultimoPedido = NULL;
+	}
+    borrado->siguiente = NULL;
+    return borrado;
 }
 
 void ColaFacturacion::imprimir(){
@@ -923,6 +953,7 @@ void ThreadBalanceador::procesarPedidos(){
 		do{
 			productoAElaborar=pedidoProcesandose->productos->revisarProductosFaltantes(listaArticulos);
 			if (productoAElaborar==NULL){//No hay ningún producto faltante
+				listaArticulos->apartarProductos(pedidoProcesandose->productos);
 				colaDeAlisto->encolar(pedidoProcesandose);
 				procesando=false;
 			}else{
