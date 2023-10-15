@@ -948,6 +948,7 @@ void ThreadBalanceador::procesarPedidos(){
 		while(apagado){
             this_thread::sleep_for(chrono::milliseconds(2000));
         }
+		procesando=false;
 		cout<<"BALANCEADOR" <<endl;
 		if (!colaEspecial->estaVacia()){
 			cout<<"BALANCEADOR cola especial" <<endl;
@@ -1272,38 +1273,37 @@ void ThreadPicking::encenderAlistador(int ID) {
 }
 
 void ThreadPicking::picking(){
-	while (!terminar)
-		{
-			Alistador* alistador;
-			NodoPedido*pedido=NULL;
-			Producto * producto;
-			int tiempo=0;
-
-		while(!Pausar){
+	while (!terminar){
+		while(apagado){
 			this_thread::sleep_for(std::chrono::seconds(5));
 		}
-		while (!paraAlisto->estaVacia())
-		{
+		Alistador *alistador;
+		NodoPedido *pedido=NULL;
+		Producto *producto;
+		int tiempo=0;
+		cout<<"HOLA SOY EL PICKING"<<endl;
+		if (!paraAlisto->estaVacia()){
+			cout<<"Estoy alistando"<<endl;
 			alistador=alistadores->primerAlistador;
 			if(pedido==NULL||pedido->alistado){ //alistado empieza com NULL en todos los pedidos
 				pedido= paraAlisto->desencolar();
+				cout<<"Acabo de desencolar"<<endl;
 				producto = pedido->productos->primerProducto;
 			}
 			while (producto!=NULL&&alistador!=NULL){
 			//listaordenada por tiempo
-			
+				cout<<"Calculo Tiempo"<<endl;
 				alistador->tiempo=calcularTiempoIda(producto,articulos);
+				cout<<"Calculo Tiempo2"<<endl;
 				//alistador->alistar(pedido,alistados, articulos);//
 				pedido->annadirMovimiento(new Movimiento(to_string(alistador->ID), producto->codigoProducto,
 					articulos->encontrarUbicacionArticulo(producto->codigoProducto),to_string(tiempo)));
 				producto=producto->siguienteProducto;
 				alistador=alistador->siguiente;
-
 			}
 			if (producto!=NULL){ pedido->alistado=true;}
 			//calcular duracion maxima (y durarla)
 			tiempo=alistadores->tiempoMaximo();
-			
 			cout<<"Alistadores desplegados\nProductos listos en: "<<tiempo<<endl;
 			std::this_thread::sleep_for(std::chrono::seconds(tiempo));
 			//encolar producto
@@ -1319,14 +1319,10 @@ void ThreadPicking::picking(){
 			//resetear tiempos
 			alistadores->resetearTiempos();
 			pasarAlistadoresEncendidosYApagados();
-
+		}else{
+			this_thread::sleep_for(std::chrono::seconds(10));
 		}
-
-		
-		
-		
-	}
-	
+	}	
 }
 
 bool ColaAlistadores::estaVacia(){
@@ -1621,39 +1617,6 @@ void menuAlistadores(ListaAlistadores *encendidos, ListaAlistadores *apagados){
 		break;
 	}
 }
-// void menuAlistadores(ListaAlistadores * listaAlistadores){
-// // colocas aqui lo que ocupes, para hacer lo que dice la especificacion de la tp
-// 	string opcion,IDRobot;
-// 	cout<<"------------------------------- MENÚ -------------------------------"<<endl;
-// 	cout<<"1. Apagar Robot"<<endl;
-// 	cout<<"2. Encender Robot"<<endl;
-// 	cout<<"3. Imprimir lista de Alistadores"<<endl;
-// 	getline(cin,opcion);//validaciones
-// 	if(!esInt(opcion)){opcion="0";}//Linea que salva codigos
-// 	switch (stoi(opcion))
-// 	{
-// 	case 1:
-// 		cout<<"Digite el ID del robot alistador que desea apagar (1-6): "<<flush;
-// 		getline(cin,IDRobot);
-// 		if(esIntRango(IDRobot,7,0)){
-// 		picking->apagarAlistador(stoi(IDRobot));
-// 		}
-// 		break;
-// 	case 2:
-// 		cout<<"Digite el ID del robot alistador que desea encender (1-6): "<<flush;
-// 		getline(cin,IDRobot);
-// 		if(esIntRango(IDRobot,7,0)){
-// 			picking->encenderAlistador(stoi(IDRobot));
-// 		}
-// 		break;
-// 	case 3:
-// 		picking->alistadores->mostrarAlistadores();
-// 		break;
-// 	default:
-// 		cout<<"No se seleccionó ninguna opción"<<endl;
-// 		break;
-// 	}
-// }
 
 void menuColas(ColaPedidos * cola, ColaPedidosPrioridad * colaPrioridad, ColaPedidosEspeciales * colaEspecial, 
 ColaAlisto *colaAlisto, ColaAlistadoos *colaAlistados, ColaFacturacion *colaFacturacion){
