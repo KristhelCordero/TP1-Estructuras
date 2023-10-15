@@ -36,7 +36,7 @@ int main(int argc, char const *argv[])
     // this_thread::sleep_for(chrono::seconds(1));
     ThreadBalanceador balanceador(cola,colaPrioridad,listaArticulos,colaEspecial,listaRobots, colaAlisto);
     // this_thread::sleep_for(chrono::seconds(1));
-    ThreadPicking picking(colaAlisto, colaAlistados, listaArticulos, alistadores);
+    ThreadPicking picking(colaAlisto, colaAlistados, listaArticulos, alistadores, );
     // this_thread::sleep_for(chrono::seconds(1));
     ThreadEmpacador threadEmpacador(colaFacturacion,colaAlistados);
     // this_thread::sleep_for(chrono::seconds(1));
@@ -62,7 +62,7 @@ int main(int argc, char const *argv[])
             menuNuevoCliente(listaClientes);
             break;
         case 4:
-            // menuAlistadores(alistadores); 
+            menuAlistadores(,); 
             break;
         case 5:
             menuRobots(listaRobots);
