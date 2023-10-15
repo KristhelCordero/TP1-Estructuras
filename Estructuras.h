@@ -664,7 +664,3 @@ struct ThreadPicking
         }
     }
 };
-
-
-
-
