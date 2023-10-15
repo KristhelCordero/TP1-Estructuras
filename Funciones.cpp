@@ -1137,6 +1137,41 @@ void ListaAlistadores::resetearTiempos(){
 	}
 }
 
+void ListaAlistadores::apagarAlistador(int ID){
+	Alistador * temp = primerAlistador;
+	while (temp!=NULL)
+	{
+		if (temp->ID==ID){
+			temp->apagado=true;
+			cout<<"Alistador "<<ID<<" apagado"<<endl;
+		}
+	}	 
+}
+void ListaAlistadores::encenderAlistador(int ID){
+	Alistador * temp = primerAlistador;
+	while (temp!=NULL)
+	{
+		if (temp->ID==ID){
+			temp->apagado=false;
+			cout<<"Alistador "<<ID<<" encendido"<<endl;
+
+		}
+	}	 
+}
+
+bool ListaAlistadores::exist(int ID){
+	Alistador*temp=primerAlistador;
+	while (temp!=NULL)
+	{
+		if(temp->ID==ID){
+			return true;
+		}
+		temp=temp->siguiente;
+	}
+	return false;
+	
+}
+
 // void Alistador::alistar(NodoPedido * pedido, ColaAlistados * alistados, ListaDoble * articulos){
 // 	int tiempo = calcularTiempoIda(pedido, articulos);
 
@@ -1146,6 +1181,27 @@ void ListaAlistadores::resetearTiempos(){
 // 	"Alistador: "<<ID<<endl;
 // 	std::this_thread::sleep_for(std::chrono::seconds(5));
 // }
+
+void ThreadPicking::pasarAlistadoresEncendidosYApagados(){
+	Alistador* tempEncendidos= alistadores->primerAlistador; 
+	Alistador * tempApagados= alistadoresApagados->primerAlistador;
+	while (tempEncendidos!=NULL)
+	{
+		if (tempEncendidos->apagado){
+			apagarAlistador(tempEncendidos->ID);
+		}
+		tempEncendidos=tempEncendidos->siguiente;
+	}
+	while (tempApagados!=NULL)
+	{
+		if (!tempEncendidos->apagado){
+			encenderAlistador(tempApagados->ID);
+		}
+		tempApagados=tempApagados->siguiente;
+	}
+	
+}
+
 
 void ThreadPicking::apagarAlistador(int ID){
 	Alistador * temp=alistadores->primerAlistador;
@@ -1193,12 +1249,10 @@ void ThreadPicking::encenderAlistador(int ID) {
                 alistadoresApagados->ultimoAlistador = temp->anterior;
             }
             delete temp;
-			cout<<"Alistador "<<ID<<" encendido"<<endl;
             break;
         }
         temp = temp->siguiente;
     }
-	cout<<"El alistador no existe o no se encuentra apagado"<<endl;
 }
 
 void ThreadPicking::picking(){
@@ -1247,9 +1301,8 @@ void ThreadPicking::picking(){
 			alistadores->ordenarListaPorTiempo();
 			//resetear tiempos
 			alistadores->resetearTiempos();
-			
-			alistadoresApagados->mostrarAlistadores();
-
+			pasarAlistadoresEncendidosYApagados();
+		
 
 
 		}
@@ -1265,18 +1318,14 @@ bool ColaAlistadores::estaVacia(){
 
 void ColaAlistadores::encolar(Alistador *alistador){
 	// lock_guard<mutex> lock(mtx);
-	cout<<"Estoy en encolar"<<endl;
 	if(estaVacia()){ // se cae aqui
 		primerAlistador=ultimoAlistador=alistador;
-		cout<<"ehhhh"<<endl;
 	}else{
 		ultimoAlistador->siguiente= alistador;
 		ultimoAlistador->siguiente->anterior=ultimoAlistador;
 		ultimoAlistador=ultimoAlistador->siguiente; 
-		cout<<"ehhhh22"<<endl;
     }
 	//esto último no está probado
-	cout<<"AHHHHH"<<endl;
 	// Movimiento *nuevo=new Movimiento("A empaque: ", obtenerFechaActual()+" "+obtenerHoraActual());
 	// ultimoPedido->annadirMovimiento(nuevo);
 	
@@ -1507,7 +1556,7 @@ void menuNuevoCliente(ListaClientes * listaClientes){
 	listaClientes->annadirClienteAlArchivo(codigoCliente,nombre,stoi(prioridad));
 }
 
-void menuAlistadores(ThreadPicking *picking){
+void menuAlistadores(ListaAlistadores *encendidos, ListaAlistadores *apagados){
 // colocas aqui lo que ocupes, para hacer lo que dice la especificacion de la tp
 	string opcion,IDRobot;
 	cout<<"------------------------------- MENÚ -------------------------------"<<endl;
@@ -1516,31 +1565,47 @@ void menuAlistadores(ThreadPicking *picking){
 	cout<<"3. Imprimir lista de Alistadores"<<endl;
 	getline(cin,opcion);//validaciones
 	if(!esInt(opcion)){opcion="0";}//Linea que salva codigos
-	switch (stoi(opcion))
-	{
+	switch (stoi(opcion)){
 	case 1:
 		cout<<"Digite el ID del robot alistador que desea apagar (1-6): "<<flush;
 		getline(cin,IDRobot);
 		if(esIntRango(IDRobot,7,0)){
-		picking->apagarAlistador(stoi(IDRobot));
-		}
+			if (encendidos->exist(stoi(IDRobot))){
+				encendidos->apagarAlistador(stoi(IDRobot));
+			}else{
+				cout<<"El alistador"<<IDRobot<<" ya esta apagado"<<endl;
+			}
+		
+		}else{
+			cout<< "El ID de alistador ingresado no existe"<<endl;
+			}
 		break;
 	case 2:
 		cout<<"Digite el ID del robot alistador que desea encender (1-6): "<<flush;
 		getline(cin,IDRobot);
-		if(esIntRango(IDRobot,7,0)){
-			picking->encenderAlistador(stoi(IDRobot));
 
-		}
+		if(esIntRango(IDRobot,7,0)){
+			if (apagados->exist(stoi(IDRobot))){
+				apagados->encenderAlistador(stoi(IDRobot));
+			}else{
+				cout<<"El alistador"<<IDRobot<<" ya esta encendido"<<endl;
+			}
+		
+		}else{
+			cout<< "El ID de alistador ingresado no existe"<<endl;
+			}
+			
 		break;
 	case 3:
-		picking->alistadores->mostrarAlistadores();
+		encendidos->mostrarAlistadores();
+		apagados->mostrarAlistadores();
+
 		break;
 	default:
 		cout<<"No se seleccionó ninguna opción"<<endl;
 		break;
 	}
-	}
+}
 void menuColas(ColaPedidos * cola, ColaPedidosPrioridad * colaPrioridad, ColaPedidosEspeciales * colaEspecial, 
 ColaAlisto *colaAlisto, ColaAlistadoos *colaAlistados, ColaFacturacion *colaFacturacion){
 	string opcion;

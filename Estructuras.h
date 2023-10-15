@@ -572,6 +572,8 @@ struct ColaPicking{
 //         }
 //     }
 // };
+
+
 struct Alistador {
     Alistador *siguiente;
     Alistador *anterior;
@@ -603,6 +605,10 @@ struct ListaAlistadores{
     int tiempoMaximo();
     void resetearTiempos();
     void mostrarAlistadores();
+    void apagarAlistador(int ID);
+    void encenderAlistador(int ID);
+    bool exist(int ID);
+
     //Destructor
     ~ListaAlistadores() {
         Alistador* tmp = primerAlistador;
@@ -646,9 +652,9 @@ struct ThreadPicking
 
 
     ThreadPicking (ColaAlisto* _paraAlisto, ColaAlistadoos * _alistados,
-     ListaDoble * _articulos, ListaAlistadores * _alistadores):
+     ListaDoble * _articulos, ListaAlistadores * _alistadores, ListaAlistadores * _alistadoresApagados):
     apagado(false), terminar(false), paraAlisto(_paraAlisto), alistados(_alistados),
-    alistadores( _alistadores),articulos(_articulos){
+    alistadores( _alistadores),alistadoresApagados(_alistadoresApagados),articulos(_articulos){
         thread = std::thread(ThreadPicking::picking, this);
 
     }
@@ -657,6 +663,7 @@ struct ThreadPicking
     void encenderAlistador(int ID);//
     void Pausar() {apagado = true;}
     void Reanudar() {apagado = false;}
+    void pasarAlistadoresEncendidosYApagados();
     void Terminar() {
         terminar = true;
         if (thread.joinable()) {
