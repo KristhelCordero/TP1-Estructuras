@@ -57,7 +57,7 @@ int main(int argc, char const *argv[])
             menuNuevoCliente(listaClientes);
             break;
         case 4:
-            menuAlistadores(); //Aqui lo que ocupes ---------------------------------------------
+            menuAlistadores(alistadores); //Aqui lo que ocupes ---------------------------------------------
             break;
         case 5:
             menuRobots(listaRobots);
@@ -92,6 +92,7 @@ int main(int argc, char const *argv[])
     //Todos los terminar aqui(creo que para que todo termine tiene que estar todo encendido)
     threadPed.Terminar();
     balanceador.Terminar();
+    picking.Terminar();
     threadEmpacador.Terminar();
     threadFacturador.Terminar();
     this_thread::sleep_for(chrono::seconds(3));

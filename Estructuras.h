@@ -275,6 +275,7 @@ struct ListaDoble {
     int cantidadArticuloBodega(string _codigo);
     int sacarTiempoFabricacion(string _codigo);
     void apartarProductos(ListaProductos *listaProductos);
+    void annadirProductoAlmacen(int cantProducto, string codigoProducto);
 
         //Destructor
     ~ListaDoble() {
