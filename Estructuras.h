@@ -593,10 +593,13 @@ struct ListaAlistadores{
     Alistador * primerAlistador;
     Alistador * ultimoAlistador;
 
-    ListaAlistadores(){
+    ListaAlistadores(bool encendidos){
 		primerAlistador=ultimoAlistador=NULL;
-        for(int i; i<=6; i++){
-            insertarFinal(false,i+1);
+
+        if (encendidos){
+            for(int i; i<=6; i++){
+                insertarFinal(false,i+1);
+            }
         }
     }
 
