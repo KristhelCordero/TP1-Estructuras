@@ -1191,7 +1191,7 @@ bool ListaAlistadores::exist(int ID){
 // void Alistador::alistar(NodoPedido * pedido, ColaAlistados * alistados, ListaDoble * articulos){
 // 	int tiempo = calcularTiempoIda(pedido, articulos);
 
-// 	std::this_thread::sleep_for(std::chrono::seconds(tiempo));
+// std::this_thread::sleep_for(std::chrono::seconds(tiempo));
 // 	alistados->encolar( pedido->numeroPedido, pedido->codigoCliente, pedido->productos);
 // 	cout<<"Pedido "<< pedido->numeroPedido <<" alistado. \n"<<
 // 	"Alistador: "<<ID<<endl;
@@ -1276,26 +1276,21 @@ void ThreadPicking::picking(){
 		NodoPedido*pedido=NULL;
 		Producto * producto;
 		int tiempo=0;
-		while (!paraAlisto->estaVacia())
-		{
+		while (!paraAlisto->estaVacia()){
 			alistador=alistadores->primerAlistador;
 			if(pedido==NULL||pedido->alistado){ //alistado empieza com NULL en todos los pedidos
 				pedido= paraAlisto->desencolar();
 				producto = pedido->productos->primerProducto;
 			}
-			while (producto!=NULL&&alistador!=NULL)//
-			//listaordenada por tiempo
-			{
-				
+			while (producto!=NULL&&alistador!=NULL){
 				alistador->tiempo=calcularTiempoIda(producto,articulos);
 				//alistador->alistar(pedido,alistados, articulos);//
 				pedido->annadirMovimiento(new Movimiento(to_string(alistador->ID), producto->codigoProducto,
 					articulos->encontrarUbicacionArticulo(producto->codigoProducto),to_string(tiempo)));
 				producto=producto->siguienteProducto;
 				alistador=alistador->siguiente;
-
 			}
-			if (producto!=NULL){ pedido->alistado=true;}
+			if (producto!=NULL){pedido->alistado=true;}
 			//calcular duracion maxima (y durarla)
 			tiempo=alistadores->tiempoMaximo();
 			
@@ -1314,9 +1309,6 @@ void ThreadPicking::picking(){
 			//resetear tiempos
 			alistadores->resetearTiempos();
 			pasarAlistadoresEncendidosYApagados();
-		
-
-
 		}
 		
 	}
