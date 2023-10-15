@@ -31,7 +31,8 @@ void ColaPedidos::encolar(int _numeroPedido, string _codigoCliente,ListaProducto
 		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
-	Movimiento *nuevo= new Movimiento("En cola: "," AAAh ");
+	Movimiento *nuevo= new Movimiento("En cola: ", ultimoPedido->numeroPedido +"_"+ 
+		ultimoPedido->codigoCliente +"_"+obtenerFechaYHoraActual());
 	ultimoPedido->annadirMovimiento(nuevo);
 }
 
