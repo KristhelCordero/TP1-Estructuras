@@ -35,6 +35,8 @@ int main(int argc, char const *argv[])
 
     threadPedidos threadPed(cola, colaPrioridad, listaClientes, listaArticulos);
     // this_thread::sleep_for(chrono::seconds(1));
+    this_thread::sleep_for(chrono::seconds(2));
+    threadPed.Terminar();
     ThreadBalanceador balanceador(cola,colaPrioridad,listaArticulos,colaEspecial,listaRobots, colaAlisto);
     // this_thread::sleep_for(chrono::seconds(1));
     ThreadPicking picking(colaAlisto, colaAlistados, listaArticulos, alistadores, alistadoresApagados);
@@ -106,7 +108,7 @@ int main(int argc, char const *argv[])
     cout<<"Apagando Componentes..."<<endl;
     //Todos los terminar aqui(creo que para que todo termine tiene que estar todo encendido)
     this_thread::sleep_for(chrono::seconds(10));
-    // threadPed.Terminar();
+    threadPed.Terminar();
     // colaPrioridad->imprimir();
     // cout<<"*************************************************************************************************" <<endl;
     // cola->imprimir();

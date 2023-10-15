@@ -186,6 +186,7 @@ struct NodoPedido{
         productos=_productos;
         movimientos=_bitacora;
         alistado=false;
+        siguiente=anterior=NULL;
     }
 
     void annadirMovimiento(Movimiento* nuevoMovimiento);
@@ -353,6 +354,7 @@ struct Robot{
         apagado=_apagado;
         esPrioridad=_esPrioridad;
         disponible=true;
+        siguiente=anterior=NULL;
     }
 
     void imprimir();

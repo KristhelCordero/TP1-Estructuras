@@ -58,15 +58,12 @@ void ColaPedidos::imprimir(){
 	if (estaVacia()){
 		cout<<"Está vacía"<<endl;
 	}else{
-		while(tmp!=ultimoPedido){
+		while(tmp!=NULL){
 			cout<<tmp->numeroPedido<<endl; 
 			cout<<tmp->codigoCliente<<endl;
 			cout<<"----------------------"<<endl;
 			tmp=tmp->siguiente;
     	}
-		cout<<tmp->numeroPedido<<endl; 
-		cout<<tmp->codigoCliente<<endl;
-		cout<<"----------------------"<<endl;
 	}
 }
 
@@ -84,7 +81,7 @@ int ColaPedidos::largo(){
 //COLA PRIORIDAD -------------------------------------------------------------------------------------------
 bool ColaPedidosPrioridad::estaVacia(){
 	// lock_guard<mutex> lock(mtx);
-	return primerPedido==0;
+	return primerPedido==NULL;
 }
 
 void ColaPedidosPrioridad::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
@@ -107,8 +104,8 @@ NodoPedido * ColaPedidosPrioridad::desencolar(){
         return NULL;  
 	}
     NodoPedido* borrado = primerPedido;
-	primerPedido = primerPedido->siguiente;
-    if (primerPedido != NULL) {
+    if (primerPedido->siguiente != NULL) {
+		primerPedido = primerPedido->siguiente;
 		primerPedido->anterior = NULL;
 	}else{
 		ultimoPedido = NULL;
@@ -120,15 +117,12 @@ NodoPedido * ColaPedidosPrioridad::desencolar(){
 void ColaPedidosPrioridad::imprimir(){
 	// lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
-	while(tmp!=ultimoPedido){
+	while(tmp!=NULL){
 		cout<<tmp->numeroPedido<<endl; 
 		cout<<tmp->codigoCliente<<endl;
 		cout<<"----------------------"<<endl;
 		tmp=tmp->siguiente;
     }
-	cout<<tmp->numeroPedido<<endl; 
-	cout<<tmp->codigoCliente<<endl;
-	cout<<"----------------------"<<endl;
 }
 
 int ColaPedidosPrioridad::largo(){
@@ -174,7 +168,7 @@ NodoPedido * ColaPedidosEspeciales::desencolar(){
 	}else{
 		ultimoPedido = NULL;
 	}
-borrado->siguiente = NULL;
+	borrado->siguiente = NULL;
 	return borrado;
 }
 
@@ -564,7 +558,7 @@ void ColaAlisto::encolar(NodoPedido *pedido){
 	else{
 		ultimoPedido->siguiente= pedido;
 		ultimoPedido->siguiente->anterior=ultimoPedido;
-		ultimoPedido=ultimoPedido->anterior; 
+		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
 	Movimiento *nuevo=new Movimiento("En cola de alisto: ", pedido->numeroPedido +"_"+ 
@@ -902,14 +896,14 @@ void threadPedidos::leerArchivosPedidos() {
         while(pausado){
             this_thread::sleep_for(chrono::milliseconds(2000));
         }
-		cout<<"Entré"<<endl;
+		// cout<<"Entré"<<endl;
         if(direccion=opendir(dir.c_str())){
             while(elementos=readdir(direccion)){
 				_nombreArchivo=".\\Pedidos-Clientes\\";
 				_nombreArchivo+=elementos->d_name;
-				cout<<_nombreArchivo<<endl;
+				// cout<<_nombreArchivo<<endl;
 				if(_nombreArchivo!=".\\Pedidos-Clientes\\." && _nombreArchivo!=".\\Pedidos-Clientes\\.."){
-                	cout<<"Estoy"<<endl;
+                	// cout<<"Estoy"<<endl;
 					nombreArchivo=leerYEncolarPedidos(cola, colaPrioridad,_nombreArchivo, listaClientes, listaArticulos);
                 	if(nombreArchivo=="Error"){
 						// cout<<"Llegué1"<<endl;
@@ -949,27 +943,23 @@ void ThreadBalanceador::procesarPedidos(){
             this_thread::sleep_for(chrono::milliseconds(2000));
         }
 		procesando=false;
-		cout<<"BALANCEADOR" <<endl;
+		cout<<"BALANCEADOR" <<flush<<endl;
 		if (!colaEspecial->estaVacia()){
 			cout<<"BALANCEADOR cola especial" <<endl;
 			pedidoProcesandose=colaEspecial->desencolar();
 			procesando=true;
-		}
-		else if (!colaPrioridad->estaVacia()){
+		}else if (!colaPrioridad->estaVacia()){
 			cout<<"BALANCEADOR cola prioridad" <<endl;
 			pedidoProcesandose=colaPrioridad->desencolar(); ////////&//
 			procesando=true;
-		}
-		else if (!cola->estaVacia()){
+		}else if (!cola->estaVacia()){
 			cout<<"BALANCEADOR cola normal" <<endl;
 			pedidoProcesandose=cola->desencolar();
 			procesando=true;
-		}
-		else{
+		}else{
 			cout<<"BALANCEADOR esperando" <<endl;
 			this_thread::sleep_for(chrono::seconds(5));
-		}
-		if (procesando){
+		}if (procesando){
 			cout<<"BALANCEADOR procesando" <<endl;
 			pedidoProcesandose->annadirMovimiento(new Movimiento("Balanceador: ", pedidoProcesandose->numeroPedido +
 			"_"+ pedidoProcesandose->codigoCliente +"_"+obtenerFechaYHoraActual()));
@@ -989,7 +979,7 @@ void ThreadBalanceador::procesarPedidos(){
 					while(robotAsignado==NULL){
 						cout<<"BALANCEADOR robot" <<endl;
 						robotAsignado=listaRobots->asignarPedidoRobot(productoAElaborar->codigoProducto);
-						this_thread::sleep_for(chrono::seconds(12));
+						this_thread::sleep_for(chrono::seconds(2));
 					}
 					pedidoProcesandose->annadirMovimiento(new Movimiento("A robot de fabricación "+robotAsignado->codigoRobot,
 					obtenerFechaYHoraActual()));
@@ -1022,7 +1012,7 @@ void ThreadEmpacador::empacarPedidos(){
 			this_thread::sleep_for(chrono::seconds(cantidadSegundos));
 			colaFacturacion->encolar(pedido->numeroPedido,pedido->codigoCliente,pedido->productos, pedido->movimientos);
 		}else{
-			cout<<"Empacando esperando"<<endl;
+			cout<<"Empacando esperando"<<flush<<endl;
 			this_thread::sleep_for(chrono::seconds(5));
 		}
 	}
@@ -1290,7 +1280,7 @@ void ThreadPicking::picking(){
 				cout<<"Acabo de desencolar"<<endl;
 				producto = pedido->productos->primerProducto;
 			}
-			while (producto!=NULL&&alistador!=NULL){
+			while (producto!=NULL || alistador!=NULL){
 			//listaordenada por tiempo
 				cout<<"Calculo Tiempo"<<endl;
 				alistador->tiempo=calcularTiempoIda(producto,articulos);
@@ -1298,7 +1288,9 @@ void ThreadPicking::picking(){
 				//alistador->alistar(pedido,alistados, articulos);//
 				pedido->annadirMovimiento(new Movimiento(to_string(alistador->ID), producto->codigoProducto,
 					articulos->encontrarUbicacionArticulo(producto->codigoProducto),to_string(tiempo)));
+				cout<<"Calculo Tiempo3"<<endl;
 				producto=producto->siguienteProducto;
+				cout<<"Calculo Tiempo4"<<endl;
 				alistador=alistador->siguiente;
 			}
 			if (producto!=NULL){ pedido->alistado=true;}
