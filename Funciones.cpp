@@ -5,7 +5,7 @@ ListaClientes* listaClientes, ListaDoble* listaArticulos);
 string obtenerHoraActual();
 string obtenerFechaActual();
 string facturarPedido(NodoPedido *pedido, string _nombreArchivo);
-bool esInt();
+bool esInt(string num);
 bool esIntRango(string numero, int menorQue, int mayorQue);
 int calcularTiempoIda(Producto * producto,ListaDoble * articulos);
 
@@ -885,8 +885,7 @@ void ThreadBalanceador::procesarPedidos(){
 				colaDeAlisto->encolar(pedidoProcesandose);
 				procesando=false;
 			}else{
-				//hay que mandar a elaborar un producto
-				//hay que hacer los robots por eso no he hecho esta parte XD
+				RobotFabricador robot();
 			}
 		}while (procesando);
 	}
@@ -1278,6 +1277,7 @@ string obtenerFechaActual() {
 	 tiempoLocal.tm_mon + 1, tiempoLocal.tm_year + 1900);
     return std::string(buffer);
 }
+
 string obtenerFechaYHoraActual() {
     string fecha = obtenerFechaActual();
     string hora = obtenerHoraActual();
@@ -1326,8 +1326,6 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 	archivo.close();
 	return "Listo";
 }
-
-
 
 int calcularTiempoIda(Producto * producto, ListaDoble * articulos){
 	string ubicacion=articulos->encontrarUbicacionArticulo(producto->codigoProducto);

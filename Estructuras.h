@@ -383,9 +383,6 @@ struct ListaRobots{
     Robot * asignarPedidoRobot(string _CodigoProducto);
 };
 
-//COLA DE PICKING
-
-
 //------------------------------------------THREADS----------------------------------------------------
 struct threadPedidos {
     thread thread; 
@@ -476,7 +473,6 @@ struct RobotFabricador{
         thread = std::thread(RobotFabricador::elaborarProducto, this);
     }
 
-
     void elaborarProducto();
 };
 
@@ -533,12 +529,8 @@ struct ThreadFacturador{
     ~ThreadFacturador() {Terminar();}
 };
 
-
 //PIKIN -----------------------------------------------------------------------------------------------
-
-
 struct ColaPicking{
-       
     NodoPedido * primerPedido, * ultimoPedido;
     //mutex mtx;
 
@@ -570,7 +562,6 @@ struct ColaPicking{
 //     NodoPedido * desencolar();
 // };
 
-
 // struct ThreadAlistador
 // {
 //     int ID;
@@ -580,8 +571,6 @@ struct ColaPicking{
 //     mutex mtx;
 //     atomic<bool> terminar;
 //     atomic<bool> apagado;
-    
-
 
 //     ThreadAlistador (ColaPedidos* _colaPicking):
 //     apagado(false), terminar(false), colaPicking(_colaPicking){
@@ -597,20 +586,20 @@ struct ColaPicking{
 //         }
 //     }
 // };
- struct Alistador
- {
-     Alistador *siguiente;
-     Alistador *anterior;
-     bool apagado;
-     int ID;
-     int tiempo;
-     Alistador(bool _apagado, int _ID){
-         apagado=_apagado;
-         ID=_ID;
-         tiempo= 0;
-     }
-     void alistar(NodoPedido*pedido, ColaAlistadoos *alistados, ListaDoble * articulos);
- };
+struct Alistador {
+    Alistador *siguiente;
+    Alistador *anterior;
+    bool apagado;
+    int ID;
+    int tiempo;
+    Alistador(bool _apagado, int _ID){
+        apagado=_apagado;
+        ID=_ID;
+        tiempo= 0;
+    }
+    void alistar(NodoPedido*pedido, ColaAlistadoos *alistados, ListaDoble * articulos);
+};
+
 struct ListaAlistadores{
     Alistador * primerAlistador;
     Alistador * ultimoAlistador;
@@ -639,11 +628,6 @@ struct ListaAlistadores{
     }
 
 };
-
-
-
-
-
 
 struct ColaAlistadores{
        
