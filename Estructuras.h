@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <ctime>
+#include <unordered_set>
 using namespace std;
 
 //LISTA BASE
@@ -272,6 +273,7 @@ struct ListaDoble {
     int largo();
     bool encontrarArticuloRepetido(string _codigo);
     int cantidadArticuloBodega(string _codigo);
+    int sacarTiempoFabricacion(string _codigo);
 
         //Destructor
     ~ListaDoble() {
@@ -436,10 +438,13 @@ struct ThreadBalanceador{
     ColaPedidosEspeciales *colaEspecial;
     ColaAlisto *colaDeAlisto;
     ListaDoble *listaArticulos;
+    ListaRobots *listaRobots;
     bool procesando=false;
     // Constructor
-    ThreadBalanceador(ColaPedidos *_cola, ColaPedidosPrioridad *_colaPrioridad, ListaDoble *_listaArticulos, ColaPedidosEspeciales * _colaEspecial):
-    apagado(false), terminar(false), cola(_cola), colaPrioridad(_colaPrioridad), listaArticulos(_listaArticulos), colaEspecial(_colaEspecial){
+    ThreadBalanceador(ColaPedidos *_cola, ColaPedidosPrioridad *_colaPrioridad, ListaDoble *_listaArticulos,
+    ColaPedidosEspeciales * _colaEspecial, ListaRobots *_listaRobots, ColaAlisto *_colaDeAlisto):
+    apagado(false), terminar(false), cola(_cola), colaPrioridad(_colaPrioridad), 
+    listaArticulos(_listaArticulos), colaEspecial(_colaEspecial), listaRobots(_listaRobots), colaDeAlisto(_colaDeAlisto){
         thread = std::thread(ThreadBalanceador::procesarPedidos, this);
     }
     // Función que será ejecutada por el thread
@@ -454,26 +459,6 @@ struct ThreadBalanceador{
     }
     //Destructor
     ~ThreadBalanceador() {Terminar();}
-};
-
-//ROBOTS ----------------------------------------------------------------------------------------------
-struct RobotFabricador{
-    thread thread;
-    atomic<bool> apagado; 
-    atomic<bool> terminar;
-    bool procesado;
-    Producto * productoAElaborar;
-    int cantidadAlmacen;
-    int tiempoFabricacion;
-    ListaRobots * listaRobots;
-
-    RobotFabricador(Producto *_producto, int _cantidadAlmacen, int _tiempoFabricacion, ListaRobots * _listaRobots):
-    apagado(false), terminar(false), procesado(false), productoAElaborar(_producto), cantidadAlmacen(_cantidadAlmacen), 
-    tiempoFabricacion(_tiempoFabricacion), listaRobots(_listaRobots){
-        thread = std::thread(RobotFabricador::elaborarProducto, this);
-    }
-
-    void elaborarProducto();
 };
 
 // EMPACADOR ------------------------------------------------------------------------------------------
