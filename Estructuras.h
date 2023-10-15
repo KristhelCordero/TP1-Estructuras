@@ -380,6 +380,7 @@ struct ListaRobots{
     bool existsRobot(string _numRobot);
     void modificarRobot(string _codigo, int opcion);
     Robot * buscarRobot(string _codigoRobot);
+    Robot * asignarPedidoRobot(string _CodigoProducto);
 };
 
 //COLA DE PICKING
@@ -460,10 +461,23 @@ struct ThreadBalanceador{
 
 //ROBOTS ----------------------------------------------------------------------------------------------
 struct RobotFabricador{
-// operar desde el thread la lista de robots
-// hacer una función que opere al robot correspondiente
-// Necesito: ver donde putas meto las validaciones :)
-    void elaborarProducto(Producto * productoAElaborar);
+    thread thread;
+    atomic<bool> apagado; 
+    atomic<bool> terminar;
+    bool procesado;
+    Producto * productoAElaborar;
+    int cantidadAlmacen;
+    int tiempoFabricacion;
+    ListaRobots * listaRobots;
+
+    RobotFabricador(Producto *_producto, int _cantidadAlmacen, int _tiempoFabricacion, ListaRobots * _listaRobots):
+    apagado(false), terminar(false), procesado(false), productoAElaborar(_producto), cantidadAlmacen(_cantidadAlmacen), 
+    tiempoFabricacion(_tiempoFabricacion), listaRobots(_listaRobots){
+        thread = std::thread(RobotFabricador::elaborarProducto, this);
+    }
+
+
+    void elaborarProducto();
 };
 
 // EMPACADOR ------------------------------------------------------------------------------------------

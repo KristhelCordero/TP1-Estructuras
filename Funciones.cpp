@@ -800,6 +800,19 @@ void ListaRobots::modificarRobot(string _codigo, int opcion){
 		break;
 	}
 }
+
+Robot * ListaRobots::asignarPedidoRobot(string _CodigoProducto){
+	string tipoProducto = string(1,_CodigoProducto.at(0));
+	Robot * tmp =primerRobot;
+	bool flag=true;
+	do{
+		if((tmp->articuloFabrica==tipoProducto)&&(!tmp->apagado&&tmp->disponible)){
+			return tmp;
+			flag=false;
+		}		
+	} while (flag);
+	return NULL;
+}
 //BITACORA DE MOVIMIENTOS -----------------------------------------------------------------------------------
 
 // THREAD PEDIDOS -------------------------------------------------------------------------------------------
@@ -880,7 +893,22 @@ void ThreadBalanceador::procesarPedidos(){
 }
 
 //THREAD ROBOTS ---------------------------------------------------------------------------------------------
-void RobotFabricador::elaborarProducto(Producto * productoAElaborar){
+void RobotFabricador::elaborarProducto(){
+	Robot* robotAsignado=listaRobots->asignarPedidoRobot(productoAElaborar->codigoProducto);
+	
+	while(!terminar){
+		while(apagado){
+			this_thread::sleep_for(chrono::milliseconds(2000));
+		}
+		if (robotAsignado==NULL){
+			this_thread::sleep_for(chrono::seconds(10));
+		}else{
+			while(productoAElaborar->cantidad<cantidadAlmacen){
+				this_thread::sleep_for(chrono::seconds(tiempoFabricacion));
+				productoAElaborar->cantidad++;
+			}
+		}
+	}
 	//Todavía no sé muy bien como va a funcionar esto
 }
 
@@ -890,11 +918,11 @@ void ThreadEmpacador::empacarPedidos(){
 		while(apagado){
             this_thread::sleep_for(chrono::seconds(10));
         }
-if (!colaAlistados->estaVacia()){
-		NodoPedido *pedido= colaAlistados->desencolar();
-		int cantidadSegundos= pedido->productos->cantidadArticulosDistintos();
-		this_thread::sleep_for(chrono::seconds(cantidadSegundos));
-		colaFacturacion->encolar(pedido->numeroPedido,pedido->codigoCliente,pedido->productos);
+		if (!colaAlistados->estaVacia()){
+			NodoPedido *pedido= colaAlistados->desencolar();
+			int cantidadSegundos= pedido->productos->cantidadArticulosDistintos();
+			this_thread::sleep_for(chrono::seconds(cantidadSegundos));
+			colaFacturacion->encolar(pedido->numeroPedido,pedido->codigoCliente,pedido->productos);
 		}else{
 			this_thread::sleep_for(chrono::seconds(2));
 		}
@@ -908,26 +936,23 @@ void ThreadFacturador::facturarPedidos(){
 		while(apagado){
             this_thread::sleep_for(chrono::seconds(10));
         }
-if (!colaFacturacion->estaVacia()){
-		pedidoEmpacado=colaFacturacion->desencolar();
-		cout<<"Desencolé"<<endl;
+		if (!colaFacturacion->estaVacia()){
+			pedidoEmpacado=colaFacturacion->desencolar();
+			cout<<"Desencolé"<<endl;
 		
-		pedidoEmpacado->annadirMovimiento(new Movimiento("Finalizado: "," AAAh "));
-		cout<<"Añadí el movimiento"<<endl;
-		facturarPedido(pedidoEmpacado, to_string(pedidoEmpacado->numeroPedido)+"_"+
-		pedidoEmpacado->codigoCliente+"_"); //+"_"+obtenerFechaActual()+obtenerHoraActual()
-		cout<<"Facturé"<<endl;
-		this_thread::sleep_for(chrono::seconds(1));
-}else{
+			pedidoEmpacado->annadirMovimiento(new Movimiento("Finalizado: "," AAAh "));
+			cout<<"Añadí el movimiento"<<endl;
+			facturarPedido(pedidoEmpacado, to_string(pedidoEmpacado->numeroPedido)+"_"+
+			pedidoEmpacado->codigoCliente+"_"); //+"_"+obtenerFechaActual()+obtenerHoraActual()
+			cout<<"Facturé"<<endl;
 			this_thread::sleep_for(chrono::seconds(1));
-	}
-
+		}else{
+			this_thread::sleep_for(chrono::seconds(1));
+		}
 	}
 }
 
-
-
-//LISTA ALISTADORES
+//LISTA ALISTADORES -------------------------------------------------------------------------------------------
 int ListaAlistadores::largo(){
 	int largo=0;
 	Alistador* nodo=primerAlistador;
@@ -1008,6 +1033,7 @@ void ListaAlistadores::mostrarAlistadores() {
         orden++;
     }
 }
+
 int ListaAlistadores::tiempoMaximo(){
 	Alistador * temp= primerAlistador;
 	int tiempoMaximo=0;
@@ -1019,6 +1045,7 @@ int ListaAlistadores::tiempoMaximo(){
 	}
 	return tiempoMaximo;
 }
+
 void ListaAlistadores::resetearTiempos(){
 	Alistador * temp= primerAlistador;
 	while (temp!=NULL){
@@ -1026,7 +1053,6 @@ void ListaAlistadores::resetearTiempos(){
 		temp= temp->siguiente;
 	}
 }
-
 
 // void Alistador::alistar(NodoPedido * pedido, ColaAlistados * alistados, ListaDoble * articulos){
 // 	int tiempo = calcularTiempoIda(pedido, articulos);
@@ -1064,6 +1090,7 @@ void ThreadPicking::apagarAlistador(int ID){
 	}
 	
 }
+
 void ThreadPicking::encenderAlistador(int ID) {
     Alistador* temp = alistadoresApagados->primerAlistador;
     while (temp != NULL) {
@@ -1187,9 +1214,6 @@ void ColaAlistadores::imprimir(){
 		tmp=tmp->siguiente;
     }
 }
-
-
-
 
 //--------------------------------------- FUNCIONES SIN ESTRUCTURA ------------------------------------------
 string leerYEncolarPedidos(ColaPedidos* cola, ColaPedidosPrioridad* colaPrioridad,string _nombreArchivo,
