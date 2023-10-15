@@ -1503,7 +1503,7 @@ void menuNuevoCliente(ListaClientes * listaClientes){
 	listaClientes->annadirClienteAlArchivo(codigoCliente,nombre,stoi(prioridad));
 }
 
-void menuAlistadores(ThreadPicking *picking){
+void menuAlistadores(ListaAlistadores * listaAlistadores){
 // colocas aqui lo que ocupes, para hacer lo que dice la especificacion de la tp
 	string opcion,IDRobot;
 	cout<<"------------------------------- MENÚ -------------------------------"<<endl;

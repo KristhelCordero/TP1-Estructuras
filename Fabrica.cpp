@@ -57,7 +57,7 @@ int main(int argc, char const *argv[])
             menuNuevoCliente(listaClientes);
             break;
         case 4:
-            menuAlistadores(picking); 
+            menuAlistadores(alistadores); 
             break;
         case 5:
             menuRobots(listaRobots);
