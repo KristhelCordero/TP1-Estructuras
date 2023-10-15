@@ -31,8 +31,7 @@ void ColaPedidos::encolar(int _numeroPedido, string _codigoCliente,ListaProducto
 		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
-	Movimiento *nuevo= new Movimiento("En cola: ", ultimoPedido->numeroPedido +"_"+ 
-		ultimoPedido->codigoCliente +"_"+obtenerFechaYHoraActual());
+	Movimiento *nuevo= new Movimiento("En cola: ", obtenerFechaYHoraActual());
 	ultimoPedido->annadirMovimiento(nuevo);
 }
 
@@ -94,8 +93,7 @@ void ColaPedidosPrioridad::encolar(int _numeroPedido, string _codigoCliente,List
 		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
-	ultimoPedido->annadirMovimiento(new Movimiento("En cola: ", ultimoPedido->numeroPedido +"_"+ 
-		ultimoPedido->codigoCliente +"_"+obtenerFechaYHoraActual()));
+	ultimoPedido->annadirMovimiento(new Movimiento("En cola de Prioridad: ", obtenerFechaYHoraActual()));
 }
 
 NodoPedido * ColaPedidosPrioridad::desencolar(){
@@ -152,8 +150,7 @@ void ColaPedidosEspeciales::encolar(int _numeroPedido, string _codigoCliente,Lis
 		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
-	ultimoPedido->annadirMovimiento(new Movimiento("En cola: ", ultimoPedido->numeroPedido +"_"
-		+ ultimoPedido->codigoCliente +"_"+obtenerFechaYHoraActual()));
+	ultimoPedido->annadirMovimiento(new Movimiento("En cola de pedidos especiales: ", obtenerFechaYHoraActual()));
 }
 
 NodoPedido * ColaPedidosEspeciales::desencolar(){
@@ -561,8 +558,7 @@ void ColaAlisto::encolar(NodoPedido *pedido){
 		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
-	Movimiento *nuevo=new Movimiento("En cola de alisto: ", pedido->numeroPedido +"_"+ 
-		pedido->codigoCliente +"_"+obtenerFechaYHoraActual());
+	Movimiento *nuevo=new Movimiento("En cola de alisto: ",obtenerFechaYHoraActual());
 	ultimoPedido->annadirMovimiento(nuevo);
 }
 
@@ -620,8 +616,7 @@ void ColaAlistadoos::encolar(NodoPedido *pedido){
 		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
-	ultimoPedido->annadirMovimiento(new Movimiento("En cola de alisto: ", 
-		pedido->numeroPedido +"_"+ pedido->codigoCliente +"_"+obtenerFechaYHoraActual()));
+	ultimoPedido->annadirMovimiento(new Movimiento("En cola de empaque: ", obtenerFechaYHoraActual()));
 }
 
 NodoPedido * ColaAlistadoos::desencolar(){
@@ -662,17 +657,6 @@ int ColaAlistadoos::largo(){
 	return contador;
 }
 
-// void ColaAlistados::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
-// 	if(estaVacia())
-// 		primerPedido=ultimoPedido=pedido;
-// 	else{
-// 		ultimoPedido->siguiente= pedido;
-// 		ultimoPedido->siguiente->anterior=ultimoPedido;
-// 		ultimoPedido=ultimoPedido->siguiente; 
-//     }
-// 	//esto último no está probado
-// 	ultimoPedido->annadirMovimiento(new Movimiento("En cola de alisto: "," AAAh "));
-// }
 
 // COLA FACTURACION --------------------------------------------------------------------------------------
 bool ColaFacturacion::estaVacia(){
@@ -682,21 +666,15 @@ bool ColaFacturacion::estaVacia(){
 
 void ColaFacturacion::encolar(int _numeroPedido, string _codigoCliente, ListaProductos * _productos, BitacoraMovimientos * _bitacora){
 	// lock_guard<mutex> lock(mtx);
-	cout<<"Estoy en encolar"<<endl;
 	if(estaVacia()){ // se cae aqui
-		cout<<"ehhhh--"<<endl;
 		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos, _bitacora);
-		cout<<"ehhhh"<<endl;
 	}else{
-		cout<<"Entré..."<<endl;
 		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos, _bitacora);
 		ultimoPedido->siguiente->anterior=ultimoPedido;
 		ultimoPedido=ultimoPedido->siguiente; 
-		cout<<"ehhhh22"<<endl;
     }
 	//esto último no está probado
-	Movimiento *nuevo=new Movimiento("A empaque: ",  ultimoPedido->numeroPedido +"_"+
-	 ultimoPedido->codigoCliente +"_"+obtenerFechaYHoraActual());
+	Movimiento *nuevo=new Movimiento("A cola de facturación: ", obtenerFechaYHoraActual());
 	ultimoPedido->annadirMovimiento(nuevo);
 	
 }
@@ -942,7 +920,6 @@ void ThreadBalanceador::procesarPedidos(){
 		while(apagado){
             this_thread::sleep_for(chrono::milliseconds(2000));
         }
-		procesando=false;
 		cout<<"BALANCEADOR" <<flush<<endl;
 		if (!colaEspecial->estaVacia()){
 			cout<<"BALANCEADOR cola especial" <<endl;
@@ -958,11 +935,12 @@ void ThreadBalanceador::procesarPedidos(){
 			procesando=true;
 		}else{
 			cout<<"BALANCEADOR esperando" <<endl;
+			procesando=false;
 			this_thread::sleep_for(chrono::seconds(5));
-		}if (procesando){
+		}
+		if (procesando){
 			cout<<"BALANCEADOR procesando" <<endl;
-			pedidoProcesandose->annadirMovimiento(new Movimiento("Balanceador: ", pedidoProcesandose->numeroPedido +
-			"_"+ pedidoProcesandose->codigoCliente +"_"+obtenerFechaYHoraActual()));
+			pedidoProcesandose->annadirMovimiento(new Movimiento("Balanceador: ", obtenerFechaYHoraActual()));
 			cout<<"BALANCEADOR procesando2" <<endl;
 			do{
 				cout<<"BALANCEADOR procesando3" <<endl;
@@ -1029,8 +1007,7 @@ void ThreadFacturador::facturarPedidos(){
 			pedidoEmpacado=colaFacturacion->desencolar();
 			cout<<"Desencolé"<<endl;
 		
-			pedidoEmpacado->annadirMovimiento(new Movimiento("Finalizado: ", pedidoEmpacado->numeroPedido +
-				"_"+ pedidoEmpacado->codigoCliente +"_"+obtenerFechaYHoraActual()));
+			pedidoEmpacado->annadirMovimiento(new Movimiento("Finalizado: ", obtenerFechaYHoraActual()));
 			cout<<"Añadí el movimiento"<<endl;
 			facturarPedido(pedidoEmpacado, to_string(pedidoEmpacado->numeroPedido)+"_"+
 			pedidoEmpacado->codigoCliente+"_"+obtenerFechaYHoraActual()); //+"_"+obtenerFechaActual()+obtenerHoraActual()
