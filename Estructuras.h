@@ -22,7 +22,7 @@ struct ListaDoble;
 struct BitacoraMovimientos;
 struct Movimiento;
 
-//Lista de Clientes(Ordenar por Prioridad*) -----------------------------------------------------------
+//LISTA CLIENTES (Ordenar por Prioridad*) -------------------------------------------------------------
 struct Cliente{
     string codigoCliente, nombreCliente;
     int prioridad;
@@ -60,7 +60,7 @@ struct ListaClientes{ //Lista simple
     }
 };
 
-//Lista de Productos ----------------------------------------------------------------------------------
+//LISTA PRODUCTOS -------------------------------------------------------------------------------------
 struct Producto{
     Producto * siguienteProducto, * productoAnterior;
     string codigoProducto;
@@ -170,7 +170,7 @@ struct BitacoraMovimientos{
     }
 };
 
-// Cola de Pedidos ------------------------------------------------------------------------------------
+// COLA DE PEDIDOS ------------------------------------------------------------------------------------
 struct NodoPedido{
     NodoPedido * siguiente;
     NodoPedido * anterior;
@@ -236,7 +236,7 @@ struct ColaPedidosEspeciales{
     NodoPedido * desencolar();
 };
 
-// Lista Doble ----------------------------------------------------------------------------------------
+// LISTA DOBLE ----------------------------------------------------------------------------------------
 struct NodoArticulo{
     string codigo, categoria, ubicacion;
 	int cantidad, tiempoFabricacion;
@@ -441,7 +441,7 @@ struct ThreadBalanceador{
     ColaAlisto *colaDeAlisto;
     ListaDoble *listaArticulos;
     ListaRobots *listaRobots;
-    bool procesando;
+    atomic<bool> procesando;
     // Constructor
     ThreadBalanceador(ColaPedidos *_cola, ColaPedidosPrioridad *_colaPrioridad, ListaDoble *_listaArticulos,
     ColaPedidosEspeciales * _colaEspecial, ListaRobots *_listaRobots, ColaAlisto *_colaDeAlisto):
