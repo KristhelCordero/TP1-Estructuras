@@ -55,12 +55,19 @@ NodoPedido * ColaPedidos::desencolar(){
 void ColaPedidos::imprimir(){
 	// lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
-	while(tmp!=NULL){
+	if (estaVacia()){
+		cout<<"Está vacía"<<endl;
+	}else{
+		while(tmp!=ultimoPedido){
 		cout<<tmp->numeroPedido<<endl; 
 		cout<<tmp->codigoCliente<<endl;
 		cout<<"----------------------"<<endl;
 		tmp=tmp->siguiente;
     }
+	cout<<tmp->numeroPedido<<endl; 
+	cout<<tmp->codigoCliente<<endl;
+	cout<<"----------------------"<<endl;
+	}
 }
 
 int ColaPedidos::largo(){
@@ -113,12 +120,15 @@ borrado->siguiente = NULL;
 void ColaPedidosPrioridad::imprimir(){
 	// lock_guard<mutex> lock(mtx);
 	NodoPedido * tmp = primerPedido;
-	while(tmp!=NULL){
+	while(tmp!=ultimoPedido){
 		cout<<tmp->numeroPedido<<endl; 
 		cout<<tmp->codigoCliente<<endl;
-		cout<<"----------------------"<<endl; 
+		cout<<"----------------------"<<endl;
 		tmp=tmp->siguiente;
     }
+	cout<<tmp->numeroPedido<<endl; 
+	cout<<tmp->codigoCliente<<endl;
+	cout<<"----------------------"<<endl;
 }
 
 int ColaPedidosPrioridad::largo(){
@@ -889,14 +899,14 @@ void threadPedidos::leerArchivosPedidos() {
         while(pausado){
             this_thread::sleep_for(chrono::milliseconds(2000));
         }
-		cout<<"Entré"<<endl;
+		// cout<<"Entré"<<endl;
         if(direccion=opendir(dir.c_str())){
             while(elementos=readdir(direccion)){
 				_nombreArchivo=".\\Pedidos-Clientes\\";
 				_nombreArchivo+=elementos->d_name;
-				cout<<_nombreArchivo<<endl;
+				// cout<<_nombreArchivo<<endl;
 				if(_nombreArchivo!=".\\Pedidos-Clientes\\." && _nombreArchivo!=".\\Pedidos-Clientes\\.."){
-                	cout<<"Estoy"<<endl;
+                	// cout<<"Estoy"<<endl;
 					nombreArchivo=leerYEncolarPedidos(cola, colaPrioridad,_nombreArchivo, listaClientes, listaArticulos);
                 	if(nombreArchivo=="Error"){
 						// cout<<"Llegué1"<<endl;
@@ -1018,14 +1028,14 @@ void ThreadFacturador::facturarPedidos(){
         }
 		if (!colaFacturacion->estaVacia()){
 			pedidoEmpacado=colaFacturacion->desencolar();
-			cout<<"Desencolé"<<endl;
+			// cout<<"Desencolé"<<endl;
 		
 			pedidoEmpacado->annadirMovimiento(new Movimiento("Finalizado: ", pedidoEmpacado->numeroPedido +
 				"_"+ pedidoEmpacado->codigoCliente +"_"+obtenerFechaYHoraActual()));
-			cout<<"Añadí el movimiento"<<endl;
+			// cout<<"Añadí el movimiento"<<endl;
 			facturarPedido(pedidoEmpacado, to_string(pedidoEmpacado->numeroPedido)+"_"+
 			pedidoEmpacado->codigoCliente+"_"); //+"_"+obtenerFechaActual()+obtenerHoraActual()
-			cout<<"Facturé"<<endl;
+			// cout<<"Facturé"<<endl;
 			this_thread::sleep_for(chrono::seconds(1));
 		}else{
 			this_thread::sleep_for(chrono::seconds(1));
@@ -1145,6 +1155,7 @@ void ListaAlistadores::apagarAlistador(int ID){
 		}
 	}	 
 }
+
 void ListaAlistadores::encenderAlistador(int ID){
 	Alistador * temp = primerAlistador;
 	while (temp!=NULL)
@@ -1199,7 +1210,6 @@ void ThreadPicking::pasarAlistadoresEncendidosYApagados(){
 	}
 	
 }
-
 
 void ThreadPicking::apagarAlistador(int ID){
 	Alistador * temp=alistadores->primerAlistador;
@@ -1359,7 +1369,7 @@ ListaClientes* listaClientes, ListaDoble* listaArticulos){
 	string texto, numPedido, codigoCliente, codigoProducto, cantidadP, cont;
 	ListaProductos * productos= new ListaProductos();
 	archivo.open(_nombreArchivo,ios::in);
-	cout<<"Estoy en leer y encolar"<<endl;
+	// cout<<"Estoy en leer y encolar"<<endl;
 	if (archivo.fail()){
 		// cout<<"No lei el archivo"<<endl;
 		exit(1);
@@ -1390,7 +1400,7 @@ ListaClientes* listaClientes, ListaDoble* listaArticulos){
 			// cout<<"Aqui pedido2"<<endl;
 			return "Error";
 		}
-		cout<<"Terminé leer y encolar"<<endl;
+		// cout<<"Terminé leer y encolar"<<endl;
 		archivo.close();
 		return _nombreArchivo;
 	}

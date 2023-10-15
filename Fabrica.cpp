@@ -30,13 +30,14 @@ int main(int argc, char const *argv[])
     ColaFacturacion *colaFacturacion=new ColaFacturacion();
     ColaAlistadoos *colaAlistados=new ColaAlistadoos();
     ColaAlisto *colaAlisto= new ColaAlisto();
-    ListaAlistadores *alistadores= new ListaAlistadores();
+    ListaAlistadores *alistadores= new ListaAlistadores(true);
+    ListaAlistadores *alistadoresApagados= new ListaAlistadores(false);
 
     threadPedidos threadPed(cola, colaPrioridad, listaClientes, listaArticulos);
     // this_thread::sleep_for(chrono::seconds(1));
     ThreadBalanceador balanceador(cola,colaPrioridad,listaArticulos,colaEspecial,listaRobots, colaAlisto);
     // this_thread::sleep_for(chrono::seconds(1));
-    ThreadPicking picking(colaAlisto, colaAlistados, listaArticulos, alistadores, );
+    ThreadPicking picking(colaAlisto, colaAlistados, listaArticulos, alistadores, alistadoresApagados);
     // this_thread::sleep_for(chrono::seconds(1));
     ThreadEmpacador threadEmpacador(colaFacturacion,colaAlistados);
     // this_thread::sleep_for(chrono::seconds(1));
@@ -62,7 +63,7 @@ int main(int argc, char const *argv[])
             menuNuevoCliente(listaClientes);
             break;
         case 4:
-            menuAlistadores(,); 
+            menuAlistadores(alistadores,alistadoresApagados); 
             break;
         case 5:
             menuRobots(listaRobots);
