@@ -1166,10 +1166,12 @@ void ThreadPicking::apagarAlistador(int ID){
                 alistadores->ultimoAlistador = temp->anterior;
             }
             delete temp;
+			cout<<"Alistador "<<ID<<" apagado"<<endl;
 			break;
 		}
 		temp= temp->siguiente;
 	}
+	cout<<"El alistador no existe o no se encuentra apagado"<<endl;
 	
 }
 
@@ -1191,11 +1193,12 @@ void ThreadPicking::encenderAlistador(int ID) {
                 alistadoresApagados->ultimoAlistador = temp->anterior;
             }
             delete temp;
-
+			cout<<"Alistador "<<ID<<" encendido"<<endl;
             break;
         }
         temp = temp->siguiente;
     }
+	cout<<"El alistador no existe o no se encuentra apagado"<<endl;
 }
 
 void ThreadPicking::picking(){
@@ -1245,7 +1248,6 @@ void ThreadPicking::picking(){
 			//resetear tiempos
 			alistadores->resetearTiempos();
 			
-			alistadores->mostrarAlistadores();
 			alistadoresApagados->mostrarAlistadores();
 
 
@@ -1505,35 +1507,40 @@ void menuNuevoCliente(ListaClientes * listaClientes){
 	listaClientes->annadirClienteAlArchivo(codigoCliente,nombre,stoi(prioridad));
 }
 
-void menuAlistadores(){
+void menuAlistadores(ThreadPicking *picking){
 // colocas aqui lo que ocupes, para hacer lo que dice la especificacion de la tp
-	string opcion,numRobot;
-	bool aceptado=false;
-	do{
-		cout<<"------------------------------- MENÚ -------------------------------"<<endl;
-		cout<<"1. Apagar Robot"<<endl;
-		cout<<"2. Encender Robot"<<endl;
-		cout<<"3. Imprimir lista de Alistadores"<<endl;
-		getline(cin,opcion);//validaciones
-
-		if (esIntRango(opcion,6,0)){
-			aceptado=true;
-			cout<<"Ingrese el número del robot: "<<endl;
-			getline(cin,numRobot);
-			if (robots->existsRobot(numRobot)){
-				aceptado=true;
-			}else{
-				aceptado=false;
-				cout<<"El robot que digitó no existe inténtelo de nuevo"<<endl;
-			}
-		}else{
-			cout<<"Ingrese un número entero que se encuentre entre las opciones"<<endl;
-			aceptado=false;
+	string opcion,IDRobot;
+	cout<<"------------------------------- MENÚ -------------------------------"<<endl;
+	cout<<"1. Apagar Robot"<<endl;
+	cout<<"2. Encender Robot"<<endl;
+	cout<<"3. Imprimir lista de Alistadores"<<endl;
+	getline(cin,opcion);//validaciones
+	if(!esInt(opcion)){opcion="0";}//Linea que salva codigos
+	switch (stoi(opcion))
+	{
+	case 1:
+		cout<<"Digite el ID del robot alistador que desea apagar (1-6): "<<flush;
+		getline(cin,IDRobot);
+		if(esIntRango(IDRobot,7,0)){
+		picking->apagarAlistador(stoi(IDRobot));
 		}
-	} while (!aceptado);
-	robots->modificarRobot(numRobot,stoi(opcion));
-}
+		break;
+	case 2:
+		cout<<"Digite el ID del robot alistador que desea encender (1-6): "<<flush;
+		getline(cin,IDRobot);
+		if(esIntRango(IDRobot,7,0)){
+			picking->encenderAlistador(stoi(IDRobot));
 
+		}
+		break;
+	case 3:
+		picking->alistadores->mostrarAlistadores();
+		break;
+	default:
+		cout<<"No se seleccionó ninguna opción"<<endl;
+		break;
+	}
+	}
 void menuColas(ColaPedidos * cola, ColaPedidosPrioridad * colaPrioridad, ColaPedidosEspeciales * colaEspecial, 
 ColaAlisto *colaAlisto, ColaAlistadoos *colaAlistados, ColaFacturacion *colaFacturacion){
 	string opcion;
