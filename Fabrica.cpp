@@ -32,13 +32,12 @@ int main(int argc, char const *argv[])
     ColaAlistadoos *colaAlistados=new ColaAlistadoos();
     ColaAlisto *colaAlisto= new ColaAlisto();
     ListaAlistadores *alistadores= new ListaAlistadores();
-    this_thread::sleep_for(chrono::seconds(1));
-    
+    // this_thread::sleep_for(chrono::seconds(1));
+    ThreadBalanceador balanceador(cola,colaPrioridad,listaArticulos,colaEspecial,listaRobots, colaAlisto);
     // this_thread::sleep_for(chrono::seconds(1));
     ThreadPicking picking(colaAlisto, colaAlistados, listaArticulos, alistadores);
     // this_thread::sleep_for(chrono::seconds(1));
     ThreadEmpacador threadEmpacador(colaFacturacion,colaAlistados);
-    ThreadBalanceador balanceador(cola,colaPrioridad,listaArticulos,colaEspecial,listaRobots, colaAlisto);
     // this_thread::sleep_for(chrono::seconds(1));
     ThreadFacturador threadFacturador(colaFacturacion);
     // this_thread::sleep_for(chrono::seconds(1));
@@ -94,7 +93,7 @@ int main(int argc, char const *argv[])
         }
     } while (opcion!=0);
     cout<<"Apagando Componentes..."<<endl;
-    // //Todos los terminar aqui(creo que para que todo termine tiene que estar todo encendido)
+    //Todos los terminar aqui(creo que para que todo termine tiene que estar todo encendido)
     this_thread::sleep_for(chrono::seconds(10));
     // threadPed.Terminar();
     // colaPrioridad->imprimir();

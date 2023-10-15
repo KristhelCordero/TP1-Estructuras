@@ -881,7 +881,6 @@ Robot * ListaRobots::asignarPedidoRobot(string _CodigoProducto){
 	}
 	return NULL;
 }
-//BITACORA DE MOVIMIENTOS -----------------------------------------------------------------------------------
 
 // THREAD PEDIDOS -------------------------------------------------------------------------------------------
 void threadPedidos::leerArchivosPedidos() {
@@ -889,14 +888,15 @@ void threadPedidos::leerArchivosPedidos() {
         while(pausado){
             this_thread::sleep_for(chrono::milliseconds(2000));
         }
-		// cout<<"Entré"<<endl;
+		cout<<"Entré"<<endl;
         if(direccion=opendir(dir.c_str())){
             while(elementos=readdir(direccion)){
 				_nombreArchivo=".\\Pedidos-Clientes\\";
 				_nombreArchivo+=elementos->d_name;
-				// cout<<_nombreArchivo<<endl;
+				cout<<_nombreArchivo<<endl;
 				if(_nombreArchivo!=".\\Pedidos-Clientes\\." && _nombreArchivo!=".\\Pedidos-Clientes\\.."){
-                	nombreArchivo=leerYEncolarPedidos(cola, colaPrioridad,_nombreArchivo, listaClientes, listaArticulos);
+                	cout<<"Estoy"<<endl;
+					nombreArchivo=leerYEncolarPedidos(cola, colaPrioridad,_nombreArchivo, listaClientes, listaArticulos);
                 	if(nombreArchivo=="Error"){
 						// cout<<"Llegué1"<<endl;
                 	    nombreArchivo=".\\Errores\\"+_nombreArchivo.erase(0,19);
@@ -988,18 +988,6 @@ void ThreadBalanceador::procesarPedidos(){
 		}
 	}
 }
-
-//THREAD ROBOTS ---------------------------------------------------------------------------------------------
-// void RobotFabricador::elaborarProducto(){
-// 	Robot* robotAsignado=listaRobots->asignarPedidoRobot(productoAElaborar->codigoProducto);
-// 	int esperarSegundos= productoAElaborar->cantidad*tiempoFabricacion;
-// 	while(!terminar){
-// 		while(apagado){
-// 			this_thread::sleep_for(chrono::milliseconds(2000));
-// 		}
-// 		this_thread::sleep_for(chrono::seconds(esperarSegundos));
-// 	}
-// }
 
 //THREAD EMPACADOR ------------------------------------------------------------------------------------------
 void ThreadEmpacador::empacarPedidos(){
@@ -1321,7 +1309,7 @@ ListaClientes* listaClientes, ListaDoble* listaArticulos){
 	string texto, numPedido, codigoCliente, codigoProducto, cantidadP, cont;
 	ListaProductos * productos= new ListaProductos();
 	archivo.open(_nombreArchivo,ios::in);
-	// cout<<"Estoy en leer y encolar"<<endl;
+	cout<<"Estoy en leer y encolar"<<endl;
 	if (archivo.fail()){
 		// cout<<"No lei el archivo"<<endl;
 		exit(1);
@@ -1352,7 +1340,7 @@ ListaClientes* listaClientes, ListaDoble* listaArticulos){
 			// cout<<"Aqui pedido2"<<endl;
 			return "Error";
 		}
-		// cout<<"Terminé leer y encolar"<<endl;
+		cout<<"Terminé leer y encolar"<<endl;
 		archivo.close();
 		return _nombreArchivo;
 	}
