@@ -8,7 +8,7 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo);
 bool esInt(string num);
 bool esIntRango(string numero, int menorQue, int mayorQue);
 int calcularTiempoIda(Producto * producto,ListaDoble * articulos);
-
+string obtenerFechaSYHoraActual();
 // Hay que cambiar los desencolar por el desencolar que está en colaPedidos
 
 //COLA PEDIDOS-----------------------------------------------------------------------------------------------
@@ -89,7 +89,8 @@ void ColaPedidosPrioridad::encolar(int _numeroPedido, string _codigoCliente,List
 		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
-	ultimoPedido->annadirMovimiento(new Movimiento("En cola: "," AAAh "));
+	ultimoPedido->annadirMovimiento(new Movimiento("En cola: ", ultimoPedido->numeroPedido +"_"+ 
+		ultimoPedido->codigoCliente +"_"+obtenerFechaSYHoraActual()));
 }
 
 NodoPedido * ColaPedidosPrioridad::desencolar(){
@@ -146,7 +147,8 @@ void ColaPedidosEspeciales::encolar(int _numeroPedido, string _codigoCliente,Lis
 		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
-	ultimoPedido->annadirMovimiento(new Movimiento("En cola: "," AAAh "));
+	ultimoPedido->annadirMovimiento(new Movimiento("En cola: ", ultimoPedido->numeroPedido +"_"
+		+ ultimoPedido->codigoCliente +"_"+obtenerFechaSYHoraActual()));
 }
 
 NodoPedido * ColaPedidosEspeciales::desencolar(){
@@ -542,7 +544,8 @@ void ColaAlisto::encolar(NodoPedido *pedido){
 		ultimoPedido=ultimoPedido->anterior; 
     }
 	//esto último no está probado
-	Movimiento *nuevo=new Movimiento("En cola de alisto: "," AAAh ");
+	Movimiento *nuevo=new Movimiento("En cola de alisto: ", pedido->numeroPedido +"_"+ 
+		pedido->codigoCliente +"_"+obtenerFechaSYHoraActual());
 	ultimoPedido->annadirMovimiento(nuevo);
 }
 
@@ -600,7 +603,8 @@ void ColaAlistadoos::encolar(NodoPedido *pedido){
 		ultimoPedido=ultimoPedido->siguiente; 
     }
 	//esto último no está probado
-	ultimoPedido->annadirMovimiento(new Movimiento("En cola de alisto: "," AAAh "));
+	ultimoPedido->annadirMovimiento(new Movimiento("En cola de alisto: ", 
+		pedido->numeroPedido +"_"+ pedido->codigoCliente +"_"+obtenerFechaSYHoraActual()));
 }
 
 NodoPedido * ColaAlistadoos::desencolar(){
@@ -674,8 +678,8 @@ void ColaFacturacion::encolar(int _numeroPedido, string _codigoCliente,ListaProd
 		cout<<"ehhhh22"<<endl;
     }
 	//esto último no está probado
-	cout<<"AHHHHH"<<endl;
-	Movimiento *nuevo=new Movimiento("A empaque: ", " AAAh ");
+	Movimiento *nuevo=new Movimiento("A empaque: ",  ultimoPedido->numeroPedido +"_"+
+	 ultimoPedido->codigoCliente +"_"+obtenerFechaSYHoraActual());
 	ultimoPedido->annadirMovimiento(nuevo);
 	
 }
@@ -948,7 +952,8 @@ void ThreadBalanceador::procesarPedidos(){
 			}
 			else
 				this_thread::sleep_for(chrono::seconds(3));
-			pedidoProcesandose->annadirMovimiento(new Movimiento("Balanceador: "," AAAh "));
+			pedidoProcesandose->annadirMovimiento(new Movimiento("Balanceador: ", pedidoProcesandose->numeroPedido +
+				"_"+ pedidoProcesandose->codigoCliente +"_"+obtenerFechaSYHoraActual()));
 		}while (!procesando);
 		do{
 			productoAElaborar=pedidoProcesandose->productos->revisarProductosFaltantes(listaArticulos);
@@ -1017,7 +1022,8 @@ void ThreadFacturador::facturarPedidos(){
 			pedidoEmpacado=colaFacturacion->desencolar();
 			cout<<"Desencolé"<<endl;
 		
-			pedidoEmpacado->annadirMovimiento(new Movimiento("Finalizado: "," AAAh "));
+			pedidoEmpacado->annadirMovimiento(new Movimiento("Finalizado: ", pedidoEmpacado->numeroPedido +
+				"_"+ pedidoEmpacado->codigoCliente +"_"+obtenerFechaSYHoraActual()));
 			cout<<"Añadí el movimiento"<<endl;
 			facturarPedido(pedidoEmpacado, to_string(pedidoEmpacado->numeroPedido)+"_"+
 			pedidoEmpacado->codigoCliente+"_"); //+"_"+obtenerFechaActual()+obtenerHoraActual()
@@ -1160,7 +1166,6 @@ void ThreadPicking::apagarAlistador(int ID){
                 alistadores->ultimoAlistador = temp->anterior;
             }
             delete temp;
-
 			break;
 		}
 		temp= temp->siguiente;
@@ -1200,6 +1205,7 @@ void ThreadPicking::picking(){
 			NodoPedido*pedido=NULL;
 			Producto * producto;
 			int tiempo=0;
+
 			
 		while (!paraAlisto->estaVacia())
 		{
@@ -1211,14 +1217,19 @@ void ThreadPicking::picking(){
 			while (producto!=NULL&&alistador!=NULL)//
 			//listaordenada por tiempo
 			{
+				
 				alistador->tiempo=calcularTiempoIda(producto,articulos);
 				//alistador->alistar(pedido,alistados, articulos);//
+				pedido->annadirMovimiento(new Movimiento(to_string(alistador->ID), producto->codigoProducto,
+					articulos->encontrarUbicacionArticulo(producto->codigoProducto),to_string(tiempo)));
 				producto=producto->siguienteProducto;
 				alistador=alistador->siguiente;
+
 			}
 			if (producto!=NULL){ pedido->alistado=true;}
 			//calcular duracion maxima (y durarla)
 			tiempo=alistadores->tiempoMaximo();
+			
 			cout<<"Alistadores desplegados\nProductos listos en: "<<tiempo<<endl;
 			std::this_thread::sleep_for(std::chrono::seconds(tiempo));
 			//encolar producto
@@ -1341,9 +1352,9 @@ string obtenerHoraActual() {
     time_t tiempoActual = chrono::system_clock::to_time_t(ahora);
     tm tiempoLocal = *localtime(&tiempoActual);
     char buffer[9];
-    sprintf(buffer, "%02d:%02d:%02d", tiempoLocal.tm_hour,
+    sprintf(buffer, "%02d-%02d-%02d", tiempoLocal.tm_hour,
 	 tiempoLocal.tm_min, tiempoLocal.tm_sec);
-    return std::string(buffer);
+    return string(buffer);
 }
 
 string obtenerFechaActual() {
@@ -1351,15 +1362,15 @@ string obtenerFechaActual() {
     time_t tiempoActual = chrono::system_clock::to_time_t(ahora);
     tm tiempoLocal = *localtime(&tiempoActual);
     char buffer[11];
-    sprintf(buffer, "%02d/%02d/%04d", tiempoLocal.tm_mday,
+    sprintf(buffer, "%02d-%02d-%04d", tiempoLocal.tm_mday,
 	 tiempoLocal.tm_mon + 1, tiempoLocal.tm_year + 1900);
-    return std::string(buffer);
+    return string(buffer);
 }
 
 string obtenerFechaYHoraActual() {
     string fecha = obtenerFechaActual();
     string hora = obtenerHoraActual();
-    return fecha + " " + hora;
+    return fecha + "_" + hora;
 }
 
 string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
