@@ -444,15 +444,15 @@ Producto * ListaProductos::borrarAlFinal(){
 //FALTA PROBAR ESTA FUNCION
 Producto * ListaProductos::revisarProductosFaltantes(ListaDoble *listaArticulos){
 	Producto *tmp=primerProducto;
-	while(tmp!=ultimoProducto){
+	while(tmp!=NULL){
+		cout<<"Revisar" <<endl;
 		if (tmp->cantidad>listaArticulos->cantidadArticuloBodega(tmp->codigoProducto)){
+			cout<<"Revisar22" <<endl;
 			return tmp; // si devuelve un producto, hay que enviar ese producto a fabricar
 		}
+		tmp=tmp->siguienteProducto;
 	}
-	if (tmp->cantidad>listaArticulos->cantidadArticuloBodega(tmp->codigoProducto)){
-		return tmp; // si devuelve un producto, hay que enviar ese producto a fabricar
-	}
-	return tmp; //si tmp es NULL no hay ningun producto faltante
+	return NULL; //si tmp es NULL no hay ningun producto faltante
 }
 //FALTA PROBAR ESTA FUNCION
 bool ListaProductos::exists(string _codigoProducto){
@@ -956,7 +956,6 @@ void ThreadBalanceador::procesarPedidos(){
 		else if (!colaPrioridad->estaVacia()){
 			cout<<"BALANCEADOR cola prioridad" <<endl;
 			pedidoProcesandose=colaPrioridad->desencolar(); ////////&//
-			cout<<"BALANCEADOR cola prioridad2" <<endl;
 			procesando=true;
 		}
 		else if (!cola->estaVacia()){
@@ -1272,14 +1271,11 @@ void ThreadPicking::encenderAlistador(int ID) {
 }
 
 void ThreadPicking::picking(){
-	while (!terminar)
-			{
-			Alistador* alistador;
-			NodoPedido*pedido=NULL;
-			Producto * producto;
-			int tiempo=0;
-
-			
+	while (!terminar){
+		Alistador* alistador;
+		NodoPedido*pedido=NULL;
+		Producto * producto;
+		int tiempo=0;
 		while (!paraAlisto->estaVacia())
 		{
 			alistador=alistadores->primerAlistador;
