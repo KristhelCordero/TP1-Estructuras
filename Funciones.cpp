@@ -926,7 +926,7 @@ void threadPedidos::leerArchivosPedidos() {
 void ThreadBalanceador::procesarPedidos(){
 	NodoPedido * pedidoProcesandose;
 	Producto * productoAElaborar;
-	Robot* robotAsignado=NULL;
+	Robot * robotAsignado=NULL;
 	int esperarSegundos, cantidadFabricar;
 	Movimiento * nuevo;
 	string fechaInicio;
@@ -934,47 +934,55 @@ void ThreadBalanceador::procesarPedidos(){
 		while(apagado){
             this_thread::sleep_for(chrono::milliseconds(2000));
         }
-		do{
-			if (colaEspecial->largo()>=1){
-				pedidoProcesandose=colaEspecial->desencolar();
-				procesando=true;
-			}
-			else if (colaPrioridad->largo()>=1){
-				pedidoProcesandose=colaPrioridad->desencolar();
-				procesando=true;
-			}
-			else if (cola->largo()>=1){
-				pedidoProcesandose=cola->desencolar();
-				procesando=true;
-			}
-			else
-				this_thread::sleep_for(chrono::seconds(3));
+		cout<<"BALANCEADOR" <<endl;
+		if (colaEspecial->largo()>=1){
+			pedidoProcesandose=colaEspecial->desencolar();
+			procesando=true;
+		}
+		else if (colaPrioridad->largo()>=1){
+			pedidoProcesandose=colaPrioridad->desencolar();
+			procesando=true;
+			cout<<"BALANCEADOR cola prioridad" <<endl;
+		}
+		else if (cola->largo()>=1){
+			cout<<"BALANCEADOR cola normal" <<endl;
+			pedidoProcesandose=cola->desencolar();
+			procesando=true;
+		}
+		else{
+			this_thread::sleep_for(chrono::seconds(5));
+			cout<<"BALANCEADOR esperando" <<endl;
+		}
+		if (procesando){
 			pedidoProcesandose->annadirMovimiento(new Movimiento("Balanceador: ", pedidoProcesandose->numeroPedido +
-				"_"+ pedidoProcesandose->codigoCliente +"_"+obtenerFechaYHoraActual()));
-		}while (!procesando);
-		do{
-			productoAElaborar=pedidoProcesandose->productos->revisarProductosFaltantes(listaArticulos);
-			if (productoAElaborar==NULL){//No hay ningún producto faltante
-				listaArticulos->apartarProductos(pedidoProcesandose->productos);
-				colaDeAlisto->encolar(pedidoProcesandose);
-				procesando=false;
-			}else{
-				while(robotAsignado==NULL){
-					robotAsignado=listaRobots->asignarPedidoRobot(productoAElaborar->codigoProducto);
-					this_thread::sleep_for(chrono::seconds(15));
+			"_"+ pedidoProcesandose->codigoCliente +"_"+obtenerFechaYHoraActual()));
+			do{
+				productoAElaborar=pedidoProcesandose->productos->revisarProductosFaltantes(listaArticulos);
+				if (productoAElaborar==NULL){//No hay ningún producto faltante
+					listaArticulos->apartarProductos(pedidoProcesandose->productos);
+					colaDeAlisto->encolar(pedidoProcesandose);
+					procesando=false;
+					cout<<"BALANCEADOR ya elaboré" <<endl;
+				}else{
+					while(robotAsignado==NULL){
+						robotAsignado=listaRobots->asignarPedidoRobot(productoAElaborar->codigoProducto);
+						this_thread::sleep_for(chrono::seconds(15));
+					}
+					pedidoProcesandose->annadirMovimiento(new Movimiento("A robot de fabricación "+robotAsignado->codigoRobot,
+					obtenerFechaYHoraActual()));
+					cantidadFabricar=productoAElaborar->cantidad-listaArticulos->cantidadArticuloBodega(productoAElaborar->codigoProducto);
+					fechaInicio=obtenerFechaYHoraActual();
+					esperarSegundos=cantidadFabricar*listaArticulos->sacarTiempoFabricacion(productoAElaborar->codigoProducto);
+					cout<<"BALANCEADOR elaborando" <<endl;
+					this_thread::sleep_for(chrono::seconds(esperarSegundos));
+					listaArticulos->annadirProductoAlmacen(cantidadFabricar, productoAElaborar->codigoProducto);
+					nuevo=new Movimiento(productoAElaborar->codigoProducto,robotAsignado->codigoRobot,
+					to_string(cantidadFabricar),obtenerFechaYHoraActual(),fechaInicio);
+					pedidoProcesandose->annadirMovimiento(nuevo);
+					cout<<"BALANCEADOR elaborando2" <<endl;
 				}
-				pedidoProcesandose->annadirMovimiento(new Movimiento("A robot de fabricación "+robotAsignado->codigoRobot,
-				obtenerFechaYHoraActual()));
-				cantidadFabricar=productoAElaborar->cantidad-listaArticulos->cantidadArticuloBodega(productoAElaborar->codigoProducto);
-				fechaInicio=obtenerFechaYHoraActual();
-				esperarSegundos=cantidadFabricar*listaArticulos->sacarTiempoFabricacion(productoAElaborar->codigoProducto);
-				this_thread::sleep_for(chrono::seconds(esperarSegundos));
-				listaArticulos->annadirProductoAlmacen(cantidadFabricar, productoAElaborar->codigoProducto);
-				nuevo=new Movimiento(productoAElaborar->codigoProducto,robotAsignado->codigoRobot,
-				to_string(cantidadFabricar),obtenerFechaYHoraActual(),fechaInicio);
-				pedidoProcesandose->annadirMovimiento(nuevo);
-			}
-		}while (procesando);
+			}while (procesando);
+		}
 	}
 }
 
@@ -997,12 +1005,14 @@ void ThreadEmpacador::empacarPedidos(){
             this_thread::sleep_for(chrono::seconds(10));
         }
 		if (!colaAlistados->estaVacia()){
+			cout<<"Empacando"<<endl;
 			NodoPedido *pedido= colaAlistados->desencolar();
 			int cantidadSegundos= pedido->productos->cantidadArticulosDistintos();
 			this_thread::sleep_for(chrono::seconds(cantidadSegundos));
 			colaFacturacion->encolar(pedido->numeroPedido,pedido->codigoCliente,pedido->productos);
 		}else{
-			this_thread::sleep_for(chrono::seconds(2));
+			cout<<"Empacando esperando"<<endl;
+			this_thread::sleep_for(chrono::seconds(5));
 		}
 	}
 }
@@ -1466,11 +1476,7 @@ int menuPrincipal(){
 	cout<<"8: Imprimir Colas"<<endl;
 	cout<<"0: Terminar la simulación"<<endl;
 	getline(cin,opcion);//validaciones varias
-	if (opcion=="0"){
-		return 0;
-	}else{
-		return 1;
-	}
+	return stoi(opcion);
 }
 
 void menuPedidosEspeciales(ColaPedidosEspeciales * colaEspecial){
@@ -1503,39 +1509,39 @@ void menuNuevoCliente(ListaClientes * listaClientes){
 	listaClientes->annadirClienteAlArchivo(codigoCliente,nombre,stoi(prioridad));
 }
 
-void menuAlistadores(ListaAlistadores * listaAlistadores){
-// colocas aqui lo que ocupes, para hacer lo que dice la especificacion de la tp
-	string opcion,IDRobot;
-	cout<<"------------------------------- MENÚ -------------------------------"<<endl;
-	cout<<"1. Apagar Robot"<<endl;
-	cout<<"2. Encender Robot"<<endl;
-	cout<<"3. Imprimir lista de Alistadores"<<endl;
-	getline(cin,opcion);//validaciones
-	if(!esInt(opcion)){opcion="0";}//Linea que salva codigos
-	switch (stoi(opcion))
-	{
-	case 1:
-		cout<<"Digite el ID del robot alistador que desea apagar (1-6): "<<flush;
-		getline(cin,IDRobot);
-		if(esIntRango(IDRobot,7,0)){
-		picking->apagarAlistador(stoi(IDRobot));
-		}
-		break;
-	case 2:
-		cout<<"Digite el ID del robot alistador que desea encender (1-6): "<<flush;
-		getline(cin,IDRobot);
-		if(esIntRango(IDRobot,7,0)){
-			picking->encenderAlistador(stoi(IDRobot));
-		}
-		break;
-	case 3:
-		picking->alistadores->mostrarAlistadores();
-		break;
-	default:
-		cout<<"No se seleccionó ninguna opción"<<endl;
-		break;
-	}
-}
+// void menuAlistadores(ListaAlistadores * listaAlistadores){
+// // colocas aqui lo que ocupes, para hacer lo que dice la especificacion de la tp
+// 	string opcion,IDRobot;
+// 	cout<<"------------------------------- MENÚ -------------------------------"<<endl;
+// 	cout<<"1. Apagar Robot"<<endl;
+// 	cout<<"2. Encender Robot"<<endl;
+// 	cout<<"3. Imprimir lista de Alistadores"<<endl;
+// 	getline(cin,opcion);//validaciones
+// 	if(!esInt(opcion)){opcion="0";}//Linea que salva codigos
+// 	switch (stoi(opcion))
+// 	{
+// 	case 1:
+// 		cout<<"Digite el ID del robot alistador que desea apagar (1-6): "<<flush;
+// 		getline(cin,IDRobot);
+// 		if(esIntRango(IDRobot,7,0)){
+// 		picking->apagarAlistador(stoi(IDRobot));
+// 		}
+// 		break;
+// 	case 2:
+// 		cout<<"Digite el ID del robot alistador que desea encender (1-6): "<<flush;
+// 		getline(cin,IDRobot);
+// 		if(esIntRango(IDRobot,7,0)){
+// 			picking->encenderAlistador(stoi(IDRobot));
+// 		}
+// 		break;
+// 	case 3:
+// 		picking->alistadores->mostrarAlistadores();
+// 		break;
+// 	default:
+// 		cout<<"No se seleccionó ninguna opción"<<endl;
+// 		break;
+// 	}
+// }
 
 void menuColas(ColaPedidos * cola, ColaPedidosPrioridad * colaPrioridad, ColaPedidosEspeciales * colaEspecial, 
 ColaAlisto *colaAlisto, ColaAlistadoos *colaAlistados, ColaFacturacion *colaFacturacion){
