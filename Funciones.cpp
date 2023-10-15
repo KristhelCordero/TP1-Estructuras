@@ -24,9 +24,9 @@ bool ColaPedidos::estaVacia(){
 void ColaPedidos::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
 	// lock_guard<mutex> lock(mtx);
 	if(estaVacia())
-		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos, new BitacoraMovimientos());
 	else{
-		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos, new BitacoraMovimientos());
 		ultimoPedido->siguiente->anterior=ultimoPedido;
 		ultimoPedido=ultimoPedido->siguiente; 
     }
@@ -82,9 +82,9 @@ bool ColaPedidosPrioridad::estaVacia(){
 void ColaPedidosPrioridad::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
 	// lock_guard<mutex> lock(mtx);
 	if(estaVacia())
-		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos, new BitacoraMovimientos());
 	else{
-		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos, new BitacoraMovimientos());
 		ultimoPedido->siguiente->anterior=ultimoPedido;
 		ultimoPedido=ultimoPedido->siguiente; 
     }
@@ -140,9 +140,9 @@ bool ColaPedidosEspeciales::estaVacia(){
 void ColaPedidosEspeciales::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
 	// lock_guard<mutex> lock(mtx);
 	if(estaVacia())
-		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos, new BitacoraMovimientos());
 	else{
-		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos, new BitacoraMovimientos());
 		ultimoPedido->siguiente->anterior=ultimoPedido;
 		ultimoPedido=ultimoPedido->siguiente; 
     }
@@ -672,16 +672,16 @@ bool ColaFacturacion::estaVacia(){
 	return primerPedido==NULL;
 }
 
-void ColaFacturacion::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
+void ColaFacturacion::encolar(int _numeroPedido, string _codigoCliente, ListaProductos * _productos, BitacoraMovimientos * _bitacora){
 	// lock_guard<mutex> lock(mtx);
 	cout<<"Estoy en encolar"<<endl;
 	if(estaVacia()){ // se cae aqui
 		cout<<"ehhhh--"<<endl;
-		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+		primerPedido=ultimoPedido=new NodoPedido(_numeroPedido, _codigoCliente, _productos, _bitacora);
 		cout<<"ehhhh"<<endl;
 	}else{
 		cout<<"Entré..."<<endl;
-		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos);
+		ultimoPedido->siguiente= new NodoPedido(_numeroPedido, _codigoCliente, _productos, _bitacora);
 		ultimoPedido->siguiente->anterior=ultimoPedido;
 		ultimoPedido=ultimoPedido->siguiente; 
 		cout<<"ehhhh22"<<endl;
@@ -1000,7 +1000,7 @@ void ThreadEmpacador::empacarPedidos(){
 			NodoPedido *pedido= colaAlistados->desencolar();
 			int cantidadSegundos= pedido->productos->cantidadArticulosDistintos();
 			this_thread::sleep_for(chrono::seconds(cantidadSegundos));
-			colaFacturacion->encolar(pedido->numeroPedido,pedido->codigoCliente,pedido->productos);
+			colaFacturacion->encolar(pedido->numeroPedido,pedido->codigoCliente,pedido->productos, pedido->movimientos);
 		}else{
 			// cout<<"Empacando esperando"<<endl;
 			this_thread::sleep_for(chrono::seconds(5));
