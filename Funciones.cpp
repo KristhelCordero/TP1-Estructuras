@@ -99,14 +99,14 @@ NodoPedido * ColaPedidosPrioridad::desencolar(){
         return NULL;  
 	}
     NodoPedido* borrado = primerPedido;
-    primerPedido = primerPedido->siguiente;
+	primerPedido = primerPedido->siguiente;
     if (primerPedido != NULL) {
-        primerPedido->anterior = NULL;
+		primerPedido->anterior = NULL;
 	}else{
-        ultimoPedido = NULL;
+		ultimoPedido = NULL;
 	}
-    borrado->siguiente = NULL;
-    return borrado;
+borrado->siguiente = NULL;
+	return borrado;
 }
 
 void ColaPedidosPrioridad::imprimir(){
@@ -157,14 +157,14 @@ NodoPedido * ColaPedidosEspeciales::desencolar(){
         return NULL;  
 	}
     NodoPedido* borrado = primerPedido;
-    primerPedido = primerPedido->siguiente;
+	primerPedido = primerPedido->siguiente;
     if (primerPedido != NULL) {
-        primerPedido->anterior = NULL;
+		primerPedido->anterior = NULL;
 	}else{
-        ultimoPedido = NULL;
+		ultimoPedido = NULL;
 	}
-    borrado->siguiente = NULL;
-    return borrado;
+borrado->siguiente = NULL;
+	return borrado;
 }
 
 void ColaPedidosEspeciales::imprimir(){
@@ -555,14 +555,14 @@ NodoPedido * ColaAlisto::desencolar(){
         return NULL;  
 	}
     NodoPedido* borrado = primerPedido;
-    primerPedido = primerPedido->siguiente;
+	primerPedido = primerPedido->siguiente;
     if (primerPedido != NULL) {
-        primerPedido->anterior = NULL;
+		primerPedido->anterior = NULL;
 	}else{
-        ultimoPedido = NULL;
+		ultimoPedido = NULL;
 	}
-    borrado->siguiente = NULL;
-    return borrado;
+borrado->siguiente = NULL;
+	return borrado;
 }
 
 void ColaAlisto::imprimir(){
@@ -613,14 +613,14 @@ NodoPedido * ColaAlistadoos::desencolar(){
         return NULL;  
 	}
     NodoPedido* borrado = primerPedido;
-    primerPedido = primerPedido->siguiente;
+	primerPedido = primerPedido->siguiente;
     if (primerPedido != NULL) {
-        primerPedido->anterior = NULL;
+		primerPedido->anterior = NULL;
 	}else{
-        ultimoPedido = NULL;
+		ultimoPedido = NULL;
 	}
-    borrado->siguiente = NULL;
-    return borrado;
+borrado->siguiente = NULL;
+	return borrado;
 }
 
 void ColaAlistadoos::imprimir(){
@@ -690,14 +690,14 @@ NodoPedido * ColaFacturacion::desencolar(){
         return NULL;  
 	}
     NodoPedido* borrado = primerPedido;
-    primerPedido = primerPedido->siguiente;
+	primerPedido = primerPedido->siguiente;
     if (primerPedido != NULL) {
-        primerPedido->anterior = NULL;
+		primerPedido->anterior = NULL;
 	}else{
-        ultimoPedido = NULL;
+		ultimoPedido = NULL;
 	}
-    borrado->siguiente = NULL;
-    return borrado;
+borrado->siguiente = NULL;
+	return borrado;
 }
 
 void ColaFacturacion::imprimir(){
@@ -958,7 +958,7 @@ void ThreadBalanceador::procesarPedidos(){
 		do{
 			productoAElaborar=pedidoProcesandose->productos->revisarProductosFaltantes(listaArticulos);
 			if (productoAElaborar==NULL){//No hay ningún producto faltante
-				listaArticulos->apartarProductos(pedidoProcesandose->productos);
+listaArticulos->apartarProductos(pedidoProcesandose->productos);
 				colaDeAlisto->encolar(pedidoProcesandose);
 				procesando=false;
 			}else{
@@ -1506,6 +1506,31 @@ void menuNuevoCliente(ListaClientes * listaClientes){
 
 void menuAlistadores(){
 // colocas aqui lo que ocupes, para hacer lo que dice la especificacion de la tp
+	string opcion,numRobot;
+	bool aceptado=false;
+	do{
+		cout<<"------------------------------- MENÚ -------------------------------"<<endl;
+		cout<<"1. Apagar Robot"<<endl;
+		cout<<"2. Encender Robot"<<endl;
+		cout<<"3. Imprimir lista de Alistadores"<<endl;
+		getline(cin,opcion);//validaciones
+
+		if (esIntRango(opcion,6,0)){
+			aceptado=true;
+			cout<<"Ingrese el número del robot: "<<endl;
+			getline(cin,numRobot);
+			if (robots->existsRobot(numRobot)){
+				aceptado=true;
+			}else{
+				aceptado=false;
+				cout<<"El robot que digitó no existe inténtelo de nuevo"<<endl;
+			}
+		}else{
+			cout<<"Ingrese un número entero que se encuentre entre las opciones"<<endl;
+			aceptado=false;
+		}
+	} while (!aceptado);
+	robots->modificarRobot(numRobot,stoi(opcion));
 }
 
 // Validaciones ----------------------------------------------------------------------------------------------
