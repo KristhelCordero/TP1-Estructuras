@@ -5,7 +5,7 @@ ListaClientes* listaClientes, ListaDoble* listaArticulos);
 string obtenerHoraActual();
 string obtenerFechaActual();
 string facturarPedido(NodoPedido *pedido, string _nombreArchivo);
-bool esInt();
+bool esInt(string num);
 bool esIntRango(string numero, int menorQue, int mayorQue);
 int calcularTiempoIda(Producto * producto,ListaDoble * articulos);
 string obtenerFechaSYHoraActual();
@@ -37,18 +37,14 @@ void ColaPedidos::encolar(int _numeroPedido, string _codigoCliente,ListaProducto
 
 NodoPedido * ColaPedidos::desencolar(){
 	// lock_guard<mutex> lock(mtx);
-	cout<<"Estoy en desencolar cola pedidos"<<endl;
 	if (primerPedido == NULL){
-		cout<<"Entré aqui"<<endl;
         return NULL;  
 	}
     NodoPedido* borrado = primerPedido;
     primerPedido = primerPedido->siguiente;
     if (primerPedido != NULL) {
-		cout<<"Entré aqui2"<<endl;
         primerPedido->anterior = NULL;
 	}else{
-		cout<<"Entré aqui3"<<endl;
         ultimoPedido = NULL;
 	}
     borrado->siguiente = NULL;
@@ -349,6 +345,17 @@ int ListaDoble::revisarListaArticulos(){
 			return 1;
 		}else if(encontrarArticuloRepetido(tmp->codigo)){
 			return 1;
+		}
+		tmp=tmp->siguiente;
+    }
+	return 0;
+}
+
+int ListaDoble::sacarTiempoFabricacion(string _codigo){
+	NodoArticulo * tmp = primerArticulo;
+	while(tmp!=NULL){
+		if(tmp->codigo==_codigo){
+			return tmp->tiempoFabricacion;
 		}
 		tmp=tmp->siguiente;
     }
@@ -773,6 +780,18 @@ bool ListaRobots::existsRobot(string _numRobot){
 	return false;
 }
 
+void ListaRobots::imprimir(){
+	// lock_guard<mutex> lock(mtx);
+	Robot * tmp = primerRobot;
+	while(tmp!=NULL){
+		cout<<"Número: "<<tmp->codigoRobot<<endl; 
+		cout<<"Artículo: "<<tmp->articuloFabrica<<endl;
+		cout<<"Es prioridad: "<<tmp->esPrioridad<<endl;
+		cout<<"----------------------"<<endl; 
+		tmp=tmp->siguiente;
+    }
+}
+
 void ListaRobots::modificarRobot(string _codigo, int opcion){
 	// cout<<"1. Modificar Categoría"<<endl;
 	// cout<<"2. Apagar Robot"<<endl;
@@ -780,27 +799,46 @@ void ListaRobots::modificarRobot(string _codigo, int opcion){
 	// cout<<"4. Cambiar Prioridad"<<endl;
 	// cout<<"5. Imprimir lista de Robots"<<endl;
 	Robot * tmp= primerRobot;
+	string nuevo;
+	unordered_set<string> opciones = {"A", "B", "C", "AB", "BC", "AC", "CB", "CA"};
+	bool aceptado=false;
 	while (tmp->codigoRobot!=_codigo){
 		tmp=tmp->siguiente;
 	}
 	switch (opcion){
 	case 1:
-		
+		do{
+			cout<<"Ingrese el nuevo artículo que fabricará el robot: "<<endl;
+			getline(cin,nuevo);
+			if (opciones.count(nuevo)>0){
+				aceptado=true;
+			}else{
+				cout<<"Ese tipo de artículo no existe"<<endl;
+			}
+		} while (!aceptado);
+		tmp->articuloFabrica=nuevo;
 		break;
 	case 2:
-		
+		tmp->apagado=true;
+		cout<<"Robot apagado"<<endl;
 		break;
 	case 3:
-		
+		tmp->apagado=false;
+		cout<<"Robot Encendido"<<endl;
 		break;
 	case 4:
-		
+		if (tmp->esPrioridad){
+			tmp->esPrioridad=false;
+		}else{
+			tmp->esPrioridad=true;
+		}
+		cout<<"Prioridad del robot cambiada"<<endl;
 		break;
 	case 5:
-		
+		imprimir();
 		break;
 	default:
-	
+		cout<<"No se seleccionó una opción válida"<<endl;
 		break;
 	}
 }
@@ -808,13 +846,12 @@ void ListaRobots::modificarRobot(string _codigo, int opcion){
 Robot * ListaRobots::asignarPedidoRobot(string _CodigoProducto){
 	string tipoProducto = string(1,_CodigoProducto.at(0));
 	Robot * tmp =primerRobot;
-	bool flag=true;
-	do{
-		if((tmp->articuloFabrica==tipoProducto)&&(!tmp->apagado&&tmp->disponible)){
+	while (tmp!=NULL){
+		if((tmp->articuloFabrica==tipoProducto)&&((!tmp->apagado)&&tmp->disponible)){
 			return tmp;
-			flag=false;
-		}		
-	} while (flag);
+		}	
+		tmp=tmp->siguiente;	
+	}
 	return NULL;
 }
 //BITACORA DE MOVIMIENTOS -----------------------------------------------------------------------------------
@@ -862,6 +899,10 @@ void threadPedidos::leerArchivosPedidos() {
 void ThreadBalanceador::procesarPedidos(){
 	NodoPedido * pedidoProcesandose;
 	Producto * productoAElaborar;
+	Robot* robotAsignado=NULL;
+	int esperarSegundos;
+	Movimiento * nuevo;
+	string fechaInicio;
 	while (!terminar){
 		while(apagado){
             this_thread::sleep_for(chrono::milliseconds(2000));
@@ -884,38 +925,43 @@ void ThreadBalanceador::procesarPedidos(){
 			pedidoProcesandose->annadirMovimiento(new Movimiento("Balanceador: ", pedidoProcesandose->numeroPedido +
 				"_"+ pedidoProcesandose->codigoCliente +"_"+obtenerFechaSYHoraActual()));
 		}while (!procesando);
-		productoAElaborar=pedidoProcesandose->productos->revisarProductosFaltantes(listaArticulos);
 		do{
+			productoAElaborar=pedidoProcesandose->productos->revisarProductosFaltantes(listaArticulos);
 			if (productoAElaborar==NULL){//No hay ningún producto faltante
 				colaDeAlisto->encolar(pedidoProcesandose);
 				procesando=false;
 			}else{
-				//hay que mandar a elaborar un producto
-				//hay que hacer los robots por eso no he hecho esta parte XD
+				while(robotAsignado==NULL){
+					robotAsignado=listaRobots->asignarPedidoRobot(productoAElaborar->codigoProducto);
+					this_thread::sleep_for(chrono::seconds(15));
+				}
+				pedidoProcesandose->annadirMovimiento(new Movimiento("A robot de fabricación "+robotAsignado->codigoRobot,
+				obtenerFechaYHoraActual()));
+				esperarSegundos=(productoAElaborar->cantidad-listaArticulos->cantidadArticuloBodega(productoAElaborar->codigoProducto));
+				fechaInicio=obtenerFechaYHoraActual();
+				esperarSegundos=(productoAElaborar->cantidad-
+				listaArticulos->cantidadArticuloBodega(productoAElaborar->codigoProducto))*
+				listaArticulos->sacarTiempoFabricacion(productoAElaborar->codigoProducto);
+				this_thread::sleep_for(chrono::seconds(esperarSegundos));
+				nuevo=new Movimiento(productoAElaborar->codigoProducto,
+				robotAsignado->codigoRobot,to_string(esperarSegundos),obtenerFechaYHoraActual(),fechaInicio);
+				pedidoProcesandose->annadirMovimiento(nuevo);
 			}
 		}while (procesando);
 	}
 }
 
 //THREAD ROBOTS ---------------------------------------------------------------------------------------------
-void RobotFabricador::elaborarProducto(){
-	Robot* robotAsignado=listaRobots->asignarPedidoRobot(productoAElaborar->codigoProducto);
-	
-	while(!terminar){
-		while(apagado){
-			this_thread::sleep_for(chrono::milliseconds(2000));
-		}
-		if (robotAsignado==NULL){
-			this_thread::sleep_for(chrono::seconds(10));
-		}else{
-			while(productoAElaborar->cantidad<cantidadAlmacen){
-				this_thread::sleep_for(chrono::seconds(tiempoFabricacion));
-				productoAElaborar->cantidad++;
-			}
-		}
-	}
-	//Todavía no sé muy bien como va a funcionar esto
-}
+// void RobotFabricador::elaborarProducto(){
+// 	Robot* robotAsignado=listaRobots->asignarPedidoRobot(productoAElaborar->codigoProducto);
+// 	int esperarSegundos= productoAElaborar->cantidad*tiempoFabricacion;
+// 	while(!terminar){
+// 		while(apagado){
+// 			this_thread::sleep_for(chrono::milliseconds(2000));
+// 		}
+// 		this_thread::sleep_for(chrono::seconds(esperarSegundos));
+// 	}
+// }
 
 //THREAD EMPACADOR ------------------------------------------------------------------------------------------
 void ThreadEmpacador::empacarPedidos(){
@@ -1289,6 +1335,7 @@ string obtenerFechaActual() {
 	 tiempoLocal.tm_mon + 1, tiempoLocal.tm_year + 1900);
     return string(buffer);
 }
+
 string obtenerFechaYHoraActual() {
     string fecha = obtenerFechaActual();
     string hora = obtenerHoraActual();
@@ -1337,8 +1384,6 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 	archivo.close();
 	return "Listo";
 }
-
-
 
 int calcularTiempoIda(Producto * producto, ListaDoble * articulos){
 	string ubicacion=articulos->encontrarUbicacionArticulo(producto->codigoProducto);

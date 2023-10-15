@@ -26,26 +26,17 @@ int main(int argc, char const *argv[])
     ListaDoble * listaArticulos=new ListaDoble();
     listaArticulos->leerArchivoArticulos();
     threadPedidos threadPed(cola, colaPrioridad, listaClientes, listaArticulos);
-    // this_thread::sleep_for(chrono::seconds(9));
-    // threadPed.Terminar();
     ListaRobots *listaRobots= new ListaRobots();
     listaRobots->leerArchivoRobots();
     ColaFacturacion *colaFacturacion=new ColaFacturacion();
     ColaAlistadoos *colaAlistados=new ColaAlistadoos();
-    // this_thread::sleep_for(chrono::seconds(12));
-    // threadEmpacador.Terminar();
-    // colaFacturacion->imprimir();
-    ThreadBalanceador balanceador(cola,colaPrioridad,listaArticulos,colaEspecial);
+    ColaAlisto *colaAlisto= new ColaAlisto();
+    ListaAlistadores *alistadores= new ListaAlistadores();
+    ThreadBalanceador balanceador(cola,colaPrioridad,listaArticulos,colaEspecial,listaRobots, colaAlisto);
+    ThreadPicking picking(colaAlisto, colaAlistados, listaArticulos, alistadores);
     ThreadEmpacador threadEmpacador(colaFacturacion,colaAlistados);
     ThreadFacturador threadFacturador(colaFacturacion);
-    // cout<<"1: Agregar Pedido"<<endl;
-	// cout<<"2: Apagar/Encender Balanceador"<<endl;
-	// cout<<"3: Agregar Cliente"<<endl;
-	// cout<<"4: Modificar Alistadores"<<endl;
-	// cout<<"5: Modificar Robots Fabricadores"<<endl;
-	// cout<<"6: Apagar/Encender Empacador"<<endl;
-	// cout<<"7: Apagar/Encender Facturador"<<endl;
-	// cout<<"0: Terminar la simulación"<<endl;
+
     int opcion=1;
     do{
         opcion=menuPrincipal();
@@ -103,5 +94,7 @@ int main(int argc, char const *argv[])
     this_thread::sleep_for(chrono::seconds(5));
     cout<<"Componentes Apagados..."<<endl;
     cout<<"Simulación terminada..."<<endl;
+
     return 0;
+
 }
