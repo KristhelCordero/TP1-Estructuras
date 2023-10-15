@@ -548,7 +548,7 @@ void Cliente::imprimir(){
 // COLA DE ALISTO ------------------------------------------------------------------------------------------
 bool ColaAlisto::estaVacia(){
 	// lock_guard<mutex> lock(mtx);
-	return primerPedido==0;
+	return primerPedido==NULL;////////////////////////!!!!!!!!!!!!!!assssssssasdsanfkjsdhfnafnhaslfhadljfhbguyuu
 }
 
 void ColaAlisto::encolar(NodoPedido *pedido){
