@@ -22,7 +22,7 @@ struct ListaDoble;
 struct BitacoraMovimientos;
 struct Movimiento;
 
-//Lista de Clientes(Ordenar por Prioridad*) -----------------------------------------------------------
+//LISTA CLIENTES (Ordenar por Prioridad*) -------------------------------------------------------------
 struct Cliente{
     string codigoCliente, nombreCliente;
     int prioridad;
@@ -60,7 +60,7 @@ struct ListaClientes{ //Lista simple
     }
 };
 
-//Lista de Productos ----------------------------------------------------------------------------------
+//LISTA PRODUCTOS -------------------------------------------------------------------------------------
 struct Producto{
     Producto * siguienteProducto, * productoAnterior;
     string codigoProducto;
@@ -148,12 +148,12 @@ struct BitacoraMovimientos{
     }
 
     void agregarMovimiento(Movimiento* nuevoMovimiento) {
-        cout <<"Agregar Movimiento"<<endl;
+        // cout <<"Agregar Movimiento"<<endl;
         if (primerMov==NULL) {
-            cout <<"Caso 1"<<endl;
+            // cout <<"Caso 1"<<endl;
             primerMov = ultimoMov =nuevoMovimiento;
         } else {
-            cout <<"Caso 2"<<endl;
+            // cout <<"Caso 2"<<endl;
             ultimoMov->siguiente = nuevoMovimiento;
             ultimoMov->siguiente->anterior = ultimoMov;
             ultimoMov = ultimoMov->siguiente;
@@ -170,7 +170,7 @@ struct BitacoraMovimientos{
     }
 };
 
-// Cola de Pedidos ------------------------------------------------------------------------------------
+// COLA DE PEDIDOS ------------------------------------------------------------------------------------
 struct NodoPedido{
     NodoPedido * siguiente;
     NodoPedido * anterior;
@@ -236,7 +236,7 @@ struct ColaPedidosEspeciales{
     NodoPedido * desencolar();
 };
 
-// Lista Doble ----------------------------------------------------------------------------------------
+// LISTA DOBLE ----------------------------------------------------------------------------------------
 struct NodoArticulo{
     string codigo, categoria, ubicacion;
 	int cantidad, tiempoFabricacion;
@@ -275,6 +275,7 @@ struct ListaDoble {
     int cantidadArticuloBodega(string _codigo);
     int sacarTiempoFabricacion(string _codigo);
     void apartarProductos(ListaProductos *listaProductos);
+    void annadirProductoAlmacen(int cantProducto, string codigoProducto);
 
         //Destructor
     ~ListaDoble() {
@@ -440,11 +441,11 @@ struct ThreadBalanceador{
     ColaAlisto *colaDeAlisto;
     ListaDoble *listaArticulos;
     ListaRobots *listaRobots;
-    bool procesando=false;
+    atomic<bool> procesando;
     // Constructor
     ThreadBalanceador(ColaPedidos *_cola, ColaPedidosPrioridad *_colaPrioridad, ListaDoble *_listaArticulos,
     ColaPedidosEspeciales * _colaEspecial, ListaRobots *_listaRobots, ColaAlisto *_colaDeAlisto):
-    apagado(false), terminar(false), cola(_cola), colaPrioridad(_colaPrioridad), 
+    apagado(false), terminar(false), procesando(false), cola(_cola), colaPrioridad(_colaPrioridad), 
     listaArticulos(_listaArticulos), colaEspecial(_colaEspecial), listaRobots(_listaRobots), colaDeAlisto(_colaDeAlisto){
         thread = std::thread(ThreadBalanceador::procesarPedidos, this);
     }

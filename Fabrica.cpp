@@ -19,10 +19,10 @@ int main(int argc, char const *argv[])
     ColaPedidos *cola=new ColaPedidos();
     ColaPedidosPrioridad *colaPrioridad= new ColaPedidosPrioridad();
     ColaPedidosEspeciales *colaEspecial= new ColaPedidosEspeciales();
-    // cout<<"---------------------------- CLIENTES -------------------------------------"<<endl;
+    // // cout<<"---------------------------- CLIENTES -------------------------------------"<<endl;
     ListaClientes *listaClientes=new ListaClientes();
     listaClientes->leerArchivoClientes();
-    // cout<<"---------------------------- ARTÍCULOS ------------------------------------"<<endl;
+    // // cout<<"---------------------------- ARTÍCULOS ------------------------------------"<<endl;
     ListaDoble * listaArticulos=new ListaDoble();
     listaArticulos->leerArchivoArticulos();
     threadPedidos threadPed(cola, colaPrioridad, listaClientes, listaArticulos);
@@ -32,11 +32,15 @@ int main(int argc, char const *argv[])
     ColaAlistadoos *colaAlistados=new ColaAlistadoos();
     ColaAlisto *colaAlisto= new ColaAlisto();
     ListaAlistadores *alistadores= new ListaAlistadores();
+    // this_thread::sleep_for(chrono::seconds(1));
     ThreadBalanceador balanceador(cola,colaPrioridad,listaArticulos,colaEspecial,listaRobots, colaAlisto);
+    // this_thread::sleep_for(chrono::seconds(1));
     ThreadPicking picking(colaAlisto, colaAlistados, listaArticulos, alistadores);
+    // this_thread::sleep_for(chrono::seconds(1));
     ThreadEmpacador threadEmpacador(colaFacturacion,colaAlistados);
+    // this_thread::sleep_for(chrono::seconds(1));
     ThreadFacturador threadFacturador(colaFacturacion);
-
+    // this_thread::sleep_for(chrono::seconds(1));
     int opcion=1;
     do{
         opcion=menuPrincipal();
@@ -57,7 +61,7 @@ int main(int argc, char const *argv[])
             menuNuevoCliente(listaClientes);
             break;
         case 4:
-            menuAlistadores(); //Aqui lo que ocupes ---------------------------------------------
+            // menuAlistadores(alistadores); 
             break;
         case 5:
             menuRobots(listaRobots);
@@ -90,11 +94,15 @@ int main(int argc, char const *argv[])
     } while (opcion!=0);
     cout<<"Apagando Componentes..."<<endl;
     //Todos los terminar aqui(creo que para que todo termine tiene que estar todo encendido)
-    threadPed.Terminar();
+    this_thread::sleep_for(chrono::seconds(10));
+    // threadPed.Terminar();
+    // colaPrioridad->imprimir();
+    // cout<<"*************************************************************************************************" <<endl;
+    // cola->imprimir();
     balanceador.Terminar();
+    picking.Terminar();
     threadEmpacador.Terminar();
     threadFacturador.Terminar();
-    this_thread::sleep_for(chrono::seconds(3));
     listaArticulos->actualizarArchivoArticulos();
     cout<<"Componentes Apagados..."<<endl;
     cout<<"Simulación terminada..."<<endl;
