@@ -877,7 +877,7 @@ Robot * ListaRobots::asignarPedidoRobot(string _CodigoProducto){
 	string tipoProducto = string(1,_CodigoProducto.at(0));
 	Robot * tmp =primerRobot;
 	while (tmp!=NULL){
-		if((tmp->articuloFabrica==tipoProducto)&&((!tmp->apagado)&&tmp->disponible)){
+		if((tmp->articuloFabrica==tipoProducto || tmp->articuloFabrica=="Todos")&&((!tmp->apagado)&&tmp->disponible)){
 			return tmp;
 		}	
 		tmp=tmp->siguiente;	
@@ -1465,6 +1465,7 @@ int menuPrincipal(){
 	cout<<"5: Modificar Robots Fabricadores"<<endl;
 	cout<<"6: Apagar/Encender Empacador"<<endl;
 	cout<<"7: Apagar/Encender Facturador"<<endl;
+	cout<<"8: Imprimir Colas"<<endl;
 	cout<<"0: Terminar la simulación"<<endl;
 	getline(cin,opcion);//validaciones varias
 	if (opcion=="0"){
@@ -1531,6 +1532,42 @@ void menuAlistadores(){
 		}
 	} while (!aceptado);
 	robots->modificarRobot(numRobot,stoi(opcion));
+}
+
+void menuColas(ColaPedidos * cola, ColaPedidosPrioridad * colaPrioridad, ColaPedidosEspeciales * colaEspecial, 
+ColaAlisto *colaAlisto, ColaAlistadoos *colaAlistados, ColaFacturacion *colaFacturacion){
+	string opcion;
+	cout<<"------------------------------- MENÚ -------------------------------"<<endl;
+	cout<<"1: Imprimir cola de pedidos"<<endl;
+	cout<<"2: Imprimir cola de pedidos de prioridad"<<endl;
+	cout<<"3: Imprimir cola de pedidos especiales"<<endl;
+	cout<<"4: Imprimir cola de alisto"<<endl;
+	cout<<"5: Imprimir cola de alistados"<<endl;
+	cout<<"6: Imprimir cola de facturación"<<endl;
+	getline(cin,opcion);
+	switch (stoi(opcion)){
+	case 1:
+		cola->imprimir();
+		break;
+	case 2:
+		colaPrioridad->imprimir();
+		break;
+	case 3:
+		colaEspecial->imprimir();
+		break;
+	case 4:
+		colaAlisto->imprimir();
+		break;
+	case 5:
+		colaAlistados->imprimir();
+		break;
+	case 6:
+		colaFacturacion->imprimir();
+		break;
+	default:
+		cout<<"No se seleccionó ninguna opción"<<endl;
+		break;
+	}
 }
 
 // Validaciones ----------------------------------------------------------------------------------------------
