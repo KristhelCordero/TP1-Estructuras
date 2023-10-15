@@ -1520,7 +1520,8 @@ int menuPrincipal(){
 	cout<<"5: Modificar Robots Fabricadores"<<endl;
 	cout<<"6: Apagar/Encender Empacador"<<endl;
 	cout<<"7: Apagar/Encender Facturador"<<endl;
-	cout<<"8: Imprimir Colas"<<endl;
+	cout<<"8: Apagar/Encender Picking"<<endl;	
+	cout<<"9: Imprimir Colas"<<endl;
 	cout<<"0: Terminar la simulación"<<endl;
 	getline(cin,opcion);//validaciones varias
 	return stoi(opcion);
