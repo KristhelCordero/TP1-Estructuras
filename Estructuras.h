@@ -180,11 +180,11 @@ struct NodoPedido{
     int numeroPedido;
     bool alistado;
 
-    NodoPedido(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
+    NodoPedido(int _numeroPedido, string _codigoCliente,ListaProductos * _productos, BitacoraMovimientos *_bitacora){
         numeroPedido=_numeroPedido;
         codigoCliente=_codigoCliente;
         productos=_productos;
-        movimientos= new BitacoraMovimientos();
+        movimientos=_bitacora;
         alistado=false;
     }
 
@@ -331,7 +331,7 @@ struct ColaFacturacion{
     }
 
     bool estaVacia();
-    void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos);
+    void encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos, BitacoraMovimientos *_bitacora);
     void imprimir();
     int largo();
     NodoPedido * desencolar();

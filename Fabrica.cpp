@@ -25,13 +25,14 @@ int main(int argc, char const *argv[])
     // // cout<<"---------------------------- ARTÍCULOS ------------------------------------"<<endl;
     ListaDoble * listaArticulos=new ListaDoble();
     listaArticulos->leerArchivoArticulos();
-    threadPedidos threadPed(cola, colaPrioridad, listaClientes, listaArticulos);
     ListaRobots *listaRobots= new ListaRobots();
     listaRobots->leerArchivoRobots();
     ColaFacturacion *colaFacturacion=new ColaFacturacion();
     ColaAlistadoos *colaAlistados=new ColaAlistadoos();
     ColaAlisto *colaAlisto= new ColaAlisto();
     ListaAlistadores *alistadores= new ListaAlistadores();
+
+    threadPedidos threadPed(cola, colaPrioridad, listaClientes, listaArticulos);
     // this_thread::sleep_for(chrono::seconds(1));
     ThreadBalanceador balanceador(cola,colaPrioridad,listaArticulos,colaEspecial,listaRobots, colaAlisto);
     // this_thread::sleep_for(chrono::seconds(1));
