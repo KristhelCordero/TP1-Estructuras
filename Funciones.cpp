@@ -877,7 +877,7 @@ Robot * ListaRobots::asignarPedidoRobot(string _CodigoProducto){
 	string tipoProducto = string(1,_CodigoProducto.at(0));
 	Robot * tmp =primerRobot;
 	while (tmp!=NULL){
-		if((tmp->articuloFabrica==tipoProducto)&&((!tmp->apagado)&&tmp->disponible)){
+		if((tmp->articuloFabrica==tipoProducto || tmp->articuloFabrica=="Todos")&&((!tmp->apagado)&&tmp->disponible)){
 			return tmp;
 		}	
 		tmp=tmp->siguiente;	
@@ -1465,6 +1465,7 @@ int menuPrincipal(){
 	cout<<"5: Modificar Robots Fabricadores"<<endl;
 	cout<<"6: Apagar/Encender Empacador"<<endl;
 	cout<<"7: Apagar/Encender Facturador"<<endl;
+	cout<<"8: Imprimir Colas"<<endl;
 	cout<<"0: Terminar la simulación"<<endl;
 	getline(cin,opcion);//validaciones varias
 	if (opcion=="0"){

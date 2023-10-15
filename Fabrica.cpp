@@ -57,7 +57,7 @@ int main(int argc, char const *argv[])
             menuNuevoCliente(listaClientes);
             break;
         case 4:
-            menuAlistadores(); //Aqui lo que ocupes 
+            menuAlistadores(); //Aqui lo que ocupes ---------------------------------------------
             break;
         case 5:
             menuRobots(listaRobots);
@@ -80,6 +80,9 @@ int main(int argc, char const *argv[])
                 cout<<"El facturador ha sido apagado"<<endl;
             }
             break;
+        case 8:
+
+            break;
         default:
             cout<<"La opción escogida no existe."<<endl;
             break;
@@ -92,6 +95,7 @@ int main(int argc, char const *argv[])
     threadEmpacador.Terminar();
     threadFacturador.Terminar();
     this_thread::sleep_for(chrono::seconds(3));
+    listaArticulos->actualizarArchivoArticulos();
     cout<<"Componentes Apagados..."<<endl;
     cout<<"Simulación terminada..."<<endl;
 
