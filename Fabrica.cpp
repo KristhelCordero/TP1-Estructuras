@@ -87,6 +87,15 @@ int main(int argc, char const *argv[])
             }
             break;
         case 8:
+            if (picking.apagado){
+                picking.Reanudar();
+                cout<<"El picking ha sido encendido"<<endl;
+            }else{
+                picking.Pausar();
+                cout<<"El picking ha sido apagado"<<endl;
+            }
+            break;
+        case 9:
             menuColas(cola, colaPrioridad, colaEspecial, colaAlisto, colaAlistados, colaFacturacion);
             break;
         default:
