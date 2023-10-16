@@ -728,10 +728,21 @@ void ListaRobots::insertarFinal(string _codigoRobot, string _articuloFabrica, bo
 }
 
 void Robot::imprimir(){
-	cout<<codigoRobot<<endl; 
-	cout<<articuloFabrica<<endl; 
-	cout<<apagado<<endl;
-	cout<<esPrioridad<<endl; 
+	string estado;
+	string sEsPrioridad;
+	if(apagado){
+		estado="apagado";
+	}else{estado="encendido";}
+
+	if (esPrioridad)
+	{
+		sEsPrioridad="Si";
+	}else{sEsPrioridad="No";}
+	
+	cout<<"Codigo de robot: "<<codigoRobot<<endl; 
+	cout<<"Articulo: "<<articuloFabrica<<endl; 
+	cout<<"Estado: "<<estado<<endl;
+	cout<<"De prioridad: "<<sEsPrioridad<<endl; 
 	cout<<"------------"<<endl;
 }
 
