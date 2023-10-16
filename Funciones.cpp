@@ -1044,47 +1044,36 @@ void ListaAlistadores::insertarFinal( bool _apagado, int ID){
 }
 
 void ListaAlistadores::ordenarListaPorTiempo() {
-    int largo = this->largo();
-    for (int i = 0; i < largo - 1; i++) {
-        Alistador* temp = primerAlistador;
-        Alistador* siguiente = temp->siguiente;
+    if (primerAlistador == nullptr || primerAlistador->siguiente == nullptr) {
+        return;  // La lista está vacía o solo tiene un elemento, no es necesario ordenar.
+    }
 
-        for (int j = 0; j < largo - i - 1; j++) {
-            if (temp->tiempo > siguiente->tiempo) {
-                if (temp->anterior) {
-                    temp->anterior->siguiente = siguiente;
-                } else {
+    bool huboIntercambios = true;
+    while (huboIntercambios) {
+        huboIntercambios = false;
+        Alistador* anterior = nullptr;
+        Alistador* actual = primerAlistador;
+
+        while (actual->siguiente != nullptr) {
+            Alistador* siguiente = actual->siguiente;
+            if (actual->tiempo > siguiente->tiempo) {
+                // Intercambia los nodos
+                if (anterior == nullptr) {
                     primerAlistador = siguiente;
-                }
-
-                if (siguiente->siguiente) {
-                    siguiente->siguiente->anterior = temp;
                 } else {
-                    ultimoAlistador = temp;
+                    anterior->siguiente = siguiente;
                 }
+                actual->siguiente = siguiente->siguiente;
+                siguiente->siguiente = actual;
 
-                temp->siguiente = siguiente->siguiente;
-                siguiente->anterior = temp->anterior;
-
-                temp->anterior = siguiente;
-                siguiente->siguiente = temp;
-
-                if (temp->anterior) {
-                    temp->anterior->siguiente = siguiente;
-                } else {
-                    primerAlistador = siguiente;
-                }
-
-                if (siguiente->siguiente) {
-                    siguiente->siguiente->anterior = temp;
-                } else {
-                    ultimoAlistador = temp;
-                }
+                // Actualiza el nodo anterior
+                anterior = siguiente;
+                huboIntercambios = true;
+            } else {
+                // No hubo intercambio, continúa avanzando
+                anterior = actual;
+                actual = siguiente;
             }
-
-
-            temp = siguiente;
-            siguiente = temp->siguiente;
         }
     }
 }
