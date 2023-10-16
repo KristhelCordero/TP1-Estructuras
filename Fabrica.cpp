@@ -6,7 +6,7 @@ int main(int argc, char const *argv[])
     // Movimiento *movimiento= new Movimiento("string1",obtenerFechaYHoraActual());
     // cout<<"hola"<<endl;
     // cout<< movimiento->info<<endl;
-    // BitacoraMovimientos *bitacora= new BitacoraMovimientos();
+    // BitacoraMovimientos *bitacora= new BitacoraMovimientos();dss
     // bitacora->agregarMovimiento(movimiento);
 
     // ListaProductos *productos=new ListaProductos();

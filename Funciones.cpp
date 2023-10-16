@@ -917,6 +917,7 @@ void ThreadBalanceador::procesarPedidos(){
 	Movimiento * nuevo;
 	string fechaInicio;
 	while (!terminar){
+		pedidoProcesandose=NULL;
 		while(apagado){
             this_thread::sleep_for(chrono::milliseconds(2000));
         }
