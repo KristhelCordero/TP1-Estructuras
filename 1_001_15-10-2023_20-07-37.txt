@@ -1,0 +1,20 @@
+Pedido: 	1
+Cliente: 	001
+En cola de Prioridad: 	15-10-2023_20-06-27
+Balanceador: 	15-10-2023_20-06-42
+A robot de fabricación 002	15-10-2023_20-06-44
+En cola de alisto: 	15-10-2023_20-06-47
+En cola de empaque: 	15-10-2023_20-07-31
+A cola de facturación: 	15-10-2023_20-07-36
+Finalizado: 	15-10-2023_20-07-37
+
+Robots Fábrica
+ARTICULO B09	 Fabricado en 002/n1unidades
+incio: 15-10-2023_20-06-44
+final: 15-10-2023_20-06-47
+
+Alisto 	 Alistador 1
+A01	 Ubicación: X10	final: 0s
+A03	 Ubicación: A09	final: 0s
+B09	 Ubicación: C01	final: 0s
+B00	 Ubicación: C02	final: 0s

@@ -916,13 +916,15 @@ void ThreadBalanceador::procesarPedidos(){
 		NodoPedido * pedidoProcesandose=NULL;
 		Producto * productoAElaborar=NULL;
 		Robot * robotAsignado=NULL;
-		int esperarSegundos=0, cantidadFabricar=0;
+		int esperarSegundos=0;
+		int cantidadFabricar=0;
 		Movimiento * nuevo=NULL;
 		string fechaInicio;
 		cout<<"BALANCEADOR" <<flush<<endl;
 		if (!colaEspecial->estaVacia()&&!procesando){
 			cout<<"BALANCEADOR cola especial" <<endl;
 			pedidoProcesandose=colaEspecial->desencolar();
+			cout<<"DESENCOLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"<<endl;
 			procesando=true;
 		}else if (!colaPrioridad->estaVacia()&&!procesando){
 			cout<<"BALANCEADOR cola prioridad" <<endl;
@@ -933,6 +935,7 @@ void ThreadBalanceador::procesarPedidos(){
 		}else if (!cola->estaVacia()&&!procesando){
 			cout<<"BALANCEADOR cola normal" <<endl;
 			pedidoProcesandose=cola->desencolar();
+			cout<<"DESENCOLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"<<endl;
 			procesando=true;
 		}else{
 			cout<<"BALANCEADOR esperando" <<endl;
@@ -1184,7 +1187,7 @@ void ThreadPicking::pasarAlistadoresEncendidosYApagados(){
 	}
 	while (tempApagados!=NULL)
 	{
-		if (!tempEncendidos->apagado){
+		if (!tempApagados->apagado){
 			encenderAlistador(tempApagados->ID);
 		}
 		tempApagados=tempApagados->siguiente;
@@ -1281,14 +1284,15 @@ void ThreadPicking::picking(){
 			cout<<"Alistadores desplegados\nProductos listos en: "<<tiempo<<endl;
 			std::this_thread::sleep_for(std::chrono::seconds(tiempo));
 			//encolar producto
+
+			cout<<"Alistadores regresando..."<<endl;
+			//tiempo
+			this_thread::sleep_for(std::chrono::seconds(tiempo));
 			if (pedido->alistado){
 				alistados->encolar(pedido);
 				cout<<"Pedido "<<pedido->numeroPedido<< " alistado."<<endl;
 				//movimientos??
 			}
-			cout<<"Alistadores regresando..."<<endl;
-			//tiempo
-			this_thread::sleep_for(std::chrono::seconds(tiempo));
 			cout<<"ordenando"<<endl;
 			alistadores->ordenarListaPorTiempo();
 			cout<<"ordenando2"<<endl;
