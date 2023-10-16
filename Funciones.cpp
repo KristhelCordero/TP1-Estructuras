@@ -631,7 +631,7 @@ NodoPedido * ColaAlistadoos::desencolar(){
 	}else{
 		ultimoPedido = NULL;
 	}
-borrado->siguiente = NULL;
+	borrado->siguiente = NULL;
 	return borrado;
 }
 
@@ -859,7 +859,7 @@ Robot * ListaRobots::asignarPedidoRobot(string _CodigoProducto){
 	string tipoProducto = string(1,_CodigoProducto.at(0));
 	Robot * tmp =primerRobot;
 	while (tmp!=NULL){
-		if((tmp->articuloFabrica==tipoProducto || tmp->articuloFabrica=="Todos")&&((!tmp->apagado)&&tmp->disponible)){
+		if((tmp->articuloFabrica==tipoProducto || tmp->articuloFabrica=="Todos")&&(!tmp->apagado)){
 			return tmp;
 		}	
 		tmp=tmp->siguiente;	
@@ -920,15 +920,15 @@ void ThreadBalanceador::procesarPedidos(){
 		Movimiento * nuevo=NULL;
 		string fechaInicio;
 		cout<<"BALANCEADOR" <<flush<<endl;
-		if (!colaEspecial->estaVacia()){
+		if (!colaEspecial->estaVacia()&&!procesando){
 			cout<<"BALANCEADOR cola especial" <<endl;
 			pedidoProcesandose=colaEspecial->desencolar();
 			procesando=true;
-		}else if (!colaPrioridad->estaVacia()){
+		}else if (!colaPrioridad->estaVacia()&&!procesando){
 			cout<<"BALANCEADOR cola prioridad" <<endl;
 			pedidoProcesandose=colaPrioridad->desencolar(); 
 			procesando=true;
-		}else if (!cola->estaVacia()){
+		}else if (!cola->estaVacia()&&!procesando){
 			cout<<"BALANCEADOR cola normal" <<endl;
 			pedidoProcesandose=cola->desencolar();
 			procesando=true;
@@ -940,11 +940,9 @@ void ThreadBalanceador::procesarPedidos(){
 		if (procesando){
 			cout<<"BALANCEADOR procesando" <<endl;
 			pedidoProcesandose->annadirMovimiento(new Movimiento("Balanceador: ", obtenerFechaYHoraActual()));
-			cout<<"BALANCEADOR procesando2" <<endl;
 			do{
 				cout<<"BALANCEADOR procesando3" <<endl;
 				productoAElaborar=pedidoProcesandose->productos->revisarProductosFaltantes(listaArticulos);
-				cout<<"BALANCEADOR procesando555555555" <<endl;
 				if (productoAElaborar==NULL){//No hay ningún producto faltante
 					cout<<"BALANCEADOR ya elaboré2" <<endl;
 					listaArticulos->apartarProductos(pedidoProcesandose->productos);
@@ -973,6 +971,7 @@ void ThreadBalanceador::procesarPedidos(){
 				}
 			}while (procesando);
 		}
+		this_thread::sleep_for(chrono::seconds(10));
 	}
 }
 
@@ -1009,7 +1008,7 @@ void ThreadFacturador::facturarPedidos(){
 			pedidoEmpacado->annadirMovimiento(new Movimiento("Finalizado: ", obtenerFechaYHoraActual()));
 			cout<<"Añadí el movimiento"<<endl;
 			facturarPedido(pedidoEmpacado, to_string(pedidoEmpacado->numeroPedido)+"_"+
-			pedidoEmpacado->codigoCliente+"_"+obtenerFechaYHoraActual()); //+"_"+obtenerFechaActual()+obtenerHoraActual()
+			pedidoEmpacado->codigoCliente+"_"+obtenerFechaYHoraActual()+".txt"); //+"_"+obtenerFechaActual()+obtenerHoraActual()
 			// cout<<"Facturé"<<endl;
 			this_thread::sleep_for(chrono::seconds(1));
 		}else{
