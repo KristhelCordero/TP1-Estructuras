@@ -617,14 +617,14 @@ struct ListaAlistadores{
     bool exist(int ID);
 
     //Destructor
-    ~ListaAlistadores() {
-        Alistador* tmp = primerAlistador;
-        while (tmp) {
-            Alistador* siguiente = tmp->siguiente;
-            delete tmp;
-            tmp = siguiente;
-        }
-    }
+    // ~ListaAlistadores() {
+    //     Alistador* tmp = primerAlistador;
+    //     while (tmp) {
+    //         Alistador* siguiente = tmp->siguiente;
+    //         delete tmp;
+    //         tmp = siguiente;
+    //     }
+    // }
 
 };
 
