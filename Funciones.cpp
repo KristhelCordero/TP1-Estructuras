@@ -102,8 +102,8 @@ NodoPedido * ColaPedidosPrioridad::desencolar(){
         return NULL;  
 	}
     NodoPedido* borrado = primerPedido;
-    if (primerPedido->siguiente != NULL) {
-		primerPedido = primerPedido->siguiente;
+	primerPedido = primerPedido->siguiente;
+    if (primerPedido != NULL) {
 		primerPedido->anterior = NULL;
 	}else{
 		ultimoPedido = NULL;
@@ -928,8 +928,9 @@ void ThreadBalanceador::procesarPedidos(){
 			procesando=true;
 		}else if (!colaPrioridad->estaVacia()&&!procesando){
 			cout<<"BALANCEADOR cola prioridad" <<endl;
+			// colaPrioridad->imprimir();
 			pedidoProcesandose=colaPrioridad->desencolar(); 
-			cout<<"DESENCOLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"<<endl;
+			// colaPrioridad->imprimir();
 			procesando=true;
 		}else if (!cola->estaVacia()&&!procesando){
 			cout<<"BALANCEADOR cola normal" <<endl;
@@ -1250,9 +1251,9 @@ void ThreadPicking::picking(){
 		while(apagado){
 			this_thread::sleep_for(std::chrono::seconds(5));
 		}
-		Alistador *alistador;
+		Alistador *alistador=NULL;
 		NodoPedido *pedido=NULL;
-		Producto *producto;
+		Producto *producto=NULL;
 		int tiempo=0;
 		cout<<"HOLA SOY EL PICKING"<<endl;
 		if (!paraAlisto->estaVacia()){
@@ -1290,10 +1291,14 @@ void ThreadPicking::picking(){
 			cout<<"Alistadores regresando..."<<endl;
 			//tiempo
 			this_thread::sleep_for(std::chrono::seconds(tiempo));
+			cout<<"ordenando"<<endl;
 			alistadores->ordenarListaPorTiempo();
+			cout<<"ordenando2"<<endl;
 			//resetear tiempos
-			alistadores->resetearTiempos();
+			// alistadores->resetearTiempos();
+			cout<<"resetear tiempos"<<endl;
 			pasarAlistadoresEncendidosYApagados();
+			cout<<"cambiarlos de lista"<<endl;
 		}else{
 			this_thread::sleep_for(std::chrono::seconds(10));
 		}
