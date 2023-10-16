@@ -1105,11 +1105,14 @@ int ListaAlistadores::tiempoMaximo(){
 	int tiempoMaximo=0;
 	while (temp!=NULL){
 		if (temp->tiempo>tiempoMaximo){
+			cout<<"hola soy"<<tiempoMaximo<<endl;
 			tiempoMaximo=temp->tiempo;
 			cout<<"hola soy"<<tiempoMaximo<<endl;
 		}
+		cout<<"temporal tiempo: "<<temp->tiempo<<endl;
 		temp=temp->siguiente;
 	}
+	cout<<"retorno"<<endl;
 	return tiempoMaximo;
 }
 
@@ -1272,6 +1275,7 @@ void ThreadPicking::picking(){
 			if (producto==NULL){ pedido->alistado=true;}
 			//calcular duracion maxima (y durarla)
 			tiempo=alistadores->tiempoMaximo();
+			cout<<"Prueba!: "<<tiempo<<endl;
 			cout<<"Alistadores desplegados\nProductos listos en: "<<tiempo<<endl;
 			std::this_thread::sleep_for(std::chrono::seconds(tiempo));
 			//encolar producto
@@ -1452,9 +1456,14 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 int calcularTiempoIda(Producto * producto, ListaDoble * articulos){
 	string ubicacion=articulos->encontrarUbicacionArticulo(producto->codigoProducto);
 	int columna=ubicacion[0]-'A'+1;
-	
+	cout<<"Ubicacion:"<<ubicacion<<endl;
 	int fila = (ubicacion[1]-'0')*10+(ubicacion[2]-'0');
-	return columna+fila;
+	cout<<"columna:"<<columna<<endl;
+	cout<<"fila:"<<fila<<endl;
+
+	int tiempo =columna+fila;
+	cout<<"Tiempo:"<<tiempo<<endl;
+	return tiempo;
 
 }
 

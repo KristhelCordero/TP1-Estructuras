@@ -586,6 +586,7 @@ struct Alistador {
     Alistador(bool _apagado, int _ID){
         apagado=_apagado;
         ID=_ID;
+        siguiente=anterior=NULL;
         tiempo= 0;
     }
     void alistar(NodoPedido*pedido, ColaAlistadoos *alistados, ListaDoble * articulos);
