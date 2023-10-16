@@ -1272,7 +1272,7 @@ void ThreadPicking::picking(){
 				cout<<"Calculo Tiempo2"<<endl;
 				//alistador->alistar(pedido,alistados, articulos);//
 				pedido->annadirMovimiento(new Movimiento(to_string(alistador->ID), producto->codigoProducto,
-					articulos->encontrarUbicacionArticulo(producto->codigoProducto),to_string(tiempo)));
+					articulos->encontrarUbicacionArticulo(producto->codigoProducto),to_string(alistador->tiempo)));
 				cout<<"Calculo Tiempo3"<<endl;
 				producto=producto->siguienteProducto;
 				alistador=alistador->siguiente;
