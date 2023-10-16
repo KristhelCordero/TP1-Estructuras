@@ -101,7 +101,7 @@ int main(int argc, char const *argv[])
     // } while (opcion!=0);
     // cout<<"Apagando Componentes..."<<endl;
     //Todos los terminar aqui(creo que para que todo termine tiene que estar todo encendido)
-    this_thread::sleep_for(chrono::seconds(130));
+    this_thread::sleep_for(chrono::seconds(400));
     threadPed.Terminar();
     balanceador.Terminar();
     picking.Terminar();
