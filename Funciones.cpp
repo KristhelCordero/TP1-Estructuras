@@ -926,7 +926,9 @@ void ThreadBalanceador::procesarPedidos(){
 			procesando=true;
 		}else if (!colaPrioridad->estaVacia()&&!procesando){
 			cout<<"BALANCEADOR cola prioridad" <<endl;
+			// colaPrioridad->imprimir();
 			pedidoProcesandose=colaPrioridad->desencolar(); 
+			// colaPrioridad->imprimir();
 			procesando=true;
 		}else if (!cola->estaVacia()&&!procesando){
 			cout<<"BALANCEADOR cola normal" <<endl;
@@ -970,7 +972,6 @@ void ThreadBalanceador::procesarPedidos(){
 					cout<<"BALANCEADOR elaborando2" <<endl;
 				}
 			}while (procesando);
-			pedidoProcesandose=NULL;
 		}
 		this_thread::sleep_for(chrono::seconds(10));
 	}
