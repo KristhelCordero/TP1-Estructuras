@@ -777,7 +777,7 @@ void ListaRobots::leerArchivoRobots(){
 			if (esPrioridad=="1")
 				bPrioridad=true;
 			else
-				bApagado=false;
+				bPrioridad=false;
 			insertarFinal(codigoRobot,articulo,bApagado,bPrioridad);
 		}
 		archivo.close();
@@ -1491,13 +1491,15 @@ void menuRobots(ListaRobots *robots){ //Esto lo maneja Jota
 
 		if (esIntRango(opcion,6,0)){
 			aceptado=true;
-			cout<<"Ingrese el número del robot: "<<endl;
-			getline(cin,numRobot);
-			if (robots->existsRobot(numRobot)){ //el robot debe escribirse con sus ceros respectivos adelante
-				aceptado=true;
-			}else{
-				aceptado=false;
-				cout<<"El robot que digitó no existe inténtelo de nuevo"<<endl;
+			if (esIntRango(opcion,5,0)){
+				cout<<"Ingrese el número del robot: "<<endl;
+				getline(cin,numRobot);
+				if (robots->existsRobot(numRobot)){ //el robot debe escribirse con sus ceros respectivos adelante
+					aceptado=true;
+				}else{
+					aceptado=false;
+					cout<<"El robot que digitó no existe inténtelo de nuevo"<<endl;
+				}
 			}
 		}else{
 			cout<<"Ingrese un número entero que se encuentre entre las opciones"<<endl;
