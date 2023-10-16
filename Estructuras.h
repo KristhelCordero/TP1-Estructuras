@@ -603,6 +603,9 @@ struct ListaAlistadores{
         if (encendidos){
             for(int i=0; i<6; i++){
                 insertarFinal(false,i+1);
+                cout<<primerAlistador->ID<<endl;
+                cout<<primerAlistador->siguiente<<endl;
+                cout<<ultimoAlistador->ID<<endl;
             }
         }
     }
