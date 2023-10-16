@@ -38,70 +38,71 @@ int main(int argc, char const *argv[])
     ThreadPicking picking(colaAlisto, colaAlistados, listaArticulos, alistadores, alistadoresApagados);
     ThreadEmpacador threadEmpacador(colaFacturacion,colaAlistados);
     ThreadFacturador threadFacturador(colaFacturacion);
-
-    // int opcion=1;
-    // do{
-    //     opcion=menuPrincipal();
-    //     switch (opcion){
-    //     case 1:
-    //         menuPedidosEspeciales(colaEspecial);
-    //         break;
-    //     case 2:
-    //         if (balanceador.apagado){
-    //             balanceador.Reanudar();
-    //             cout<<"El balanceador ha sido encendido"<<endl;
-    //         }else{
-    //             balanceador.Pausar();
-    //             cout<<"El balanceador ha sido apagado"<<endl;
-    //         }
-    //         break;
-    //     case 3:
-    //         menuNuevoCliente(listaClientes);
-    //         break;
-    //     case 4:
-    //         menuAlistadores(alistadores,alistadoresApagados); 
-    //         break;
-    //     case 5:
-    //         menuRobots(listaRobots);
-    //         break;
-    //     case 6:
-    //         if (threadEmpacador.apagado){
-    //             threadEmpacador.Reanudar();
-    //             cout<<"El empacador ha sido encendido"<<endl;
-    //         }else{
-    //             threadEmpacador.Pausar();
-    //             cout<<"El empacador ha sido apagado"<<endl;
-    //         }
-    //         break;
-    //     case 7:
-    //         if (threadFacturador.apagado){
-    //             threadFacturador.Reanudar();
-    //             cout<<"El facturador ha sido encendido"<<endl;
-    //         }else{
-    //             threadFacturador.Pausar();
-    //             cout<<"El facturador ha sido apagado"<<endl;
-    //         }
-    //         break;
-    //     case 8:
-    //         if (picking.apagado){
-    //             picking.Reanudar();
-    //             cout<<"El picking ha sido encendido"<<endl;
-    //         }else{
-    //             picking.Pausar();
-    //             cout<<"El picking ha sido apagado"<<endl;
-    //         }
-    //         break;
-    //     case 9:
-    //         menuColas(cola, colaPrioridad, colaEspecial, colaAlisto, colaAlistados, colaFacturacion);
-    //         break;
-    //     default:
-    //         cout<<"La opción escogida no existe."<<endl;
-    //         break;
-    //     }
-    // } while (opcion!=0);
-    // cout<<"Apagando Componentes..."<<endl;
+    int opcion=1;
+    do{
+        opcion=menuPrincipal();
+        switch (opcion){
+        case 1:
+            menuPedidosEspeciales(colaEspecial); 
+            break;
+        case 2:
+            if (balanceador.apagado){
+                balanceador.Reanudar();
+                cout<<"El balanceador ha sido encendido"<<endl;
+            }else{
+                balanceador.Pausar();
+                cout<<"El balanceador ha sido apagado"<<endl;
+            }
+            break;
+        case 3:
+            menuNuevoCliente(listaClientes);
+            break;
+        case 4:
+            menuAlistadores(alistadores,alistadoresApagados); 
+            break;
+        case 5:
+            menuRobots(listaRobots);
+            break;
+        case 6:
+            if (threadEmpacador.apagado){
+                threadEmpacador.Reanudar();
+                cout<<"El empacador ha sido encendido"<<endl;
+            }else{
+                threadEmpacador.Pausar();
+                cout<<"El empacador ha sido apagado"<<endl;
+            }
+            break;
+        case 7:
+            if (threadFacturador.apagado){
+                threadFacturador.Reanudar();
+                cout<<"El facturador ha sido encendido"<<endl;
+            }else{
+                threadFacturador.Pausar();
+                cout<<"El facturador ha sido apagado"<<endl;
+            }
+            break;
+        case 8:
+            if (picking.apagado){
+                picking.Reanudar();
+                cout<<"El picking ha sido encendido"<<endl;
+            }else{
+                picking.Pausar();
+                cout<<"El picking ha sido apagado"<<endl;
+            }
+            break;
+        case 9:
+            menuColas(cola, colaPrioridad, colaEspecial, colaAlisto, colaAlistados, colaFacturacion);
+            break;
+        case 0:
+            break;
+        default:
+            cout<<"La opción escogida no existe."<<endl;
+            break;
+        }
+    } while (opcion!=0);
+    cout<<"Apagando Componentes..."<<endl;
     // Todos los terminar aqui(creo que para que todo termine tiene que estar todo encendido)
-    this_thread::sleep_for(chrono::seconds(400));
+    this_thread::sleep_for(chrono::seconds(10));
     threadPed.Terminar();
     balanceador.Terminar();
     picking.Terminar();
