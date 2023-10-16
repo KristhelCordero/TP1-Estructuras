@@ -18,7 +18,7 @@ void NodoPedido::annadirMovimiento(Movimiento* nuevoMovimiento){
 
 bool ColaPedidos::estaVacia(){
 	// lock_guard<mutex> lock(mtx);
-	return primerPedido==0;
+	return primerPedido==NULL;
 }
 
 void ColaPedidos::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
@@ -137,7 +137,7 @@ int ColaPedidosPrioridad::largo(){
 //COLA PEDIDOS ESPECIALES -----------------------------------------------------------------------------------
 bool ColaPedidosEspeciales::estaVacia(){
 	// lock_guard<mutex> lock(mtx);
-	return primerPedido==0;
+	return primerPedido==NULL;
 }
 
 void ColaPedidosEspeciales::encolar(int _numeroPedido, string _codigoCliente,ListaProductos * _productos){
@@ -545,7 +545,7 @@ void Cliente::imprimir(){
 // COLA DE ALISTO ------------------------------------------------------------------------------------------
 bool ColaAlisto::estaVacia(){
 	// lock_guard<mutex> lock(mtx);
-	return primerPedido==NULL;////////////////////////!!!!!!!!!!!!!!assssssssasdsanfkjsdhfnafnhaslfhadljfhbguyuu
+	return primerPedido==NULL;
 }
 
 void ColaAlisto::encolar(NodoPedido *pedido){
@@ -657,11 +657,10 @@ int ColaAlistadoos::largo(){
 	return contador;
 }
 
-
 // COLA FACTURACION --------------------------------------------------------------------------------------
 bool ColaFacturacion::estaVacia(){
 	// lock_guard<mutex> lock(mtx);
-	return primerPedido==0;
+	return primerPedido==NULL;
 }
 
 void ColaFacturacion::encolar(int _numeroPedido, string _codigoCliente, ListaProductos * _productos, BitacoraMovimientos * _bitacora){
@@ -910,16 +909,16 @@ void threadPedidos::leerArchivosPedidos() {
 // THREAD BALANCEADOR ---------------------------------------------------------------------------------------
 // No está probado
 void ThreadBalanceador::procesarPedidos(){
-	NodoPedido * pedidoProcesandose=NULL;
-	Producto * productoAElaborar=NULL;
-	Robot * robotAsignado=NULL;
-	int esperarSegundos, cantidadFabricar;
-	Movimiento * nuevo=NULL;
-	string fechaInicio;
 	while (!terminar){
 		while(apagado){
             this_thread::sleep_for(chrono::milliseconds(2000));
         }
+		NodoPedido * pedidoProcesandose=NULL;
+		Producto * productoAElaborar=NULL;
+		Robot * robotAsignado=NULL;
+		int esperarSegundos=0, cantidadFabricar=0;
+		Movimiento * nuevo=NULL;
+		string fechaInicio;
 		cout<<"BALANCEADOR" <<flush<<endl;
 		if (!colaEspecial->estaVacia()){
 			cout<<"BALANCEADOR cola especial" <<endl;
@@ -927,7 +926,7 @@ void ThreadBalanceador::procesarPedidos(){
 			procesando=true;
 		}else if (!colaPrioridad->estaVacia()){
 			cout<<"BALANCEADOR cola prioridad" <<endl;
-			pedidoProcesandose=colaPrioridad->desencolar(); ////////&//
+			pedidoProcesandose=colaPrioridad->desencolar(); 
 			procesando=true;
 		}else if (!cola->estaVacia()){
 			cout<<"BALANCEADOR cola normal" <<endl;
@@ -1296,7 +1295,7 @@ void ThreadPicking::picking(){
 
 bool ColaAlistadores::estaVacia(){
 	// lock_guard<mutex> lock(mtx);
-	return primerAlistador==0;
+	return primerAlistador==NULL;
 }
 
 void ColaAlistadores::encolar(Alistador *alistador){
