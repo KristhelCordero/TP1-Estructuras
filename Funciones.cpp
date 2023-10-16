@@ -1120,6 +1120,7 @@ int ListaAlistadores::tiempoMaximo(){
 void ListaAlistadores::resetearTiempos(){
 	Alistador * temp= primerAlistador;
 	while (temp!=NULL){
+		cout<<"Aqui estoy con la cara destapada"<<endl;
 		temp->tiempo=0;
 		temp= temp->siguiente;
 	}
@@ -1292,7 +1293,7 @@ void ThreadPicking::picking(){
 			alistadores->ordenarListaPorTiempo();
 			cout<<"ordenando2"<<endl;
 			//resetear tiempos
-			// alistadores->resetearTiempos();
+			alistadores->resetearTiempos();
 			cout<<"resetear tiempos"<<endl;
 			pasarAlistadoresEncendidosYApagados();
 			cout<<"cambiarlos de lista"<<endl;
