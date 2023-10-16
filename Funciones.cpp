@@ -1271,7 +1271,7 @@ void ThreadPicking::picking(){
 				producto=producto->siguienteProducto;
 				alistador=alistador->siguiente;
 			}
-			if (producto!=NULL){ pedido->alistado=true;}
+			if (producto==NULL){ pedido->alistado=true;}
 			//calcular duracion maxima (y durarla)
 			tiempo=alistadores->tiempoMaximo();
 			cout<<"Alistadores desplegados\nProductos listos en: "<<tiempo<<endl;
