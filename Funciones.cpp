@@ -1123,7 +1123,7 @@ int ListaAlistadores::tiempoMaximo(){
 void ListaAlistadores::resetearTiempos(){
 	Alistador * temp= primerAlistador;
 	while (temp!=NULL){
-		cout<<"Aqui estoy con la cara destapada"<<endl;
+		cout<<temp->ID<<endl;
 		temp->tiempo=0;
 		temp= temp->siguiente;
 	}
