@@ -910,14 +910,13 @@ void threadPedidos::leerArchivosPedidos() {
 // THREAD BALANCEADOR ---------------------------------------------------------------------------------------
 // No está probado
 void ThreadBalanceador::procesarPedidos(){
-	NodoPedido * pedidoProcesandose;
-	Producto * productoAElaborar;
+	NodoPedido * pedidoProcesandose=NULL;
+	Producto * productoAElaborar=NULL;
 	Robot * robotAsignado=NULL;
 	int esperarSegundos, cantidadFabricar;
-	Movimiento * nuevo;
+	Movimiento * nuevo=NULL;
 	string fechaInicio;
 	while (!terminar){
-		pedidoProcesandose=NULL;
 		while(apagado){
             this_thread::sleep_for(chrono::milliseconds(2000));
         }
