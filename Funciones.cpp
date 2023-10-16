@@ -1,4 +1,7 @@
 #include "Estructuras.h"
+/*
+Elaborado por: Kristhel Cordero y Kendall Piedra
+*/
 
 string leerYEncolarPedidos(ColaPedidos* cola, ColaPedidosPrioridad* colaPrioridad,string _nombreArchivo,
 ListaClientes* listaClientes, ListaDoble* listaArticulos);

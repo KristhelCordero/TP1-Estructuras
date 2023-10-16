@@ -14,6 +14,10 @@
 #include <unordered_set>
 using namespace std;
 
+/*
+Elaborado por: Kristhel Cordero y Kendall Piedra
+*/
+
 //LISTA BASE
 //NOTA PARA KRIS DE KRIS DEL PASADO: REVISAR LOS NEW DE LAS LISTAS QUE ESTÁN DENTRO DE NODOS
 // hay que agregar los destructores a las structs que les faltan, los que están añadidos no están probados

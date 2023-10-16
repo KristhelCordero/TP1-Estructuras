@@ -1,4 +1,7 @@
 #include "Funciones.cpp"
+/*
+Elaborado por: Kristhel Cordero y Kendall Piedra
+*/
 
 int main(int argc, char const *argv[])
 {
