@@ -1120,12 +1120,12 @@ void ListaAlistadores::resetearTiempos(){
 
 void ListaAlistadores::apagarAlistador(int ID){
 	Alistador * temp = primerAlistador;
-	while (temp!=NULL)
-	{
+	while (temp!=NULL){
 		if (temp->ID==ID){
 			temp->apagado=true;
 			// cout<<"Alistador "<<ID<<" apagado"<<endl;
 		}
+		temp=temp->siguiente;
 	}	 
 }
 
@@ -1482,7 +1482,7 @@ void menuRobots(ListaRobots *robots){ //Esto lo maneja Jota
 			aceptado=true;
 			cout<<"Ingrese el número del robot: "<<endl;
 			getline(cin,numRobot);
-			if (robots->existsRobot(numRobot)){
+			if (robots->existsRobot(numRobot)){ //el robot debe escribirse con sus ceros respectivos adelante
 				aceptado=true;
 			}else{
 				aceptado=false;
@@ -1556,9 +1556,12 @@ void menuAlistadores(ListaAlistadores *encendidos, ListaAlistadores *apagados){
 	case 1:
 		cout<<"Digite el ID del robot alistador que desea apagar (1-6): "<<flush;
 		getline(cin,IDRobot);
+		cout<<"Holi"<<endl;
 		if(esIntRango(IDRobot,7,0)){
 			if (encendidos->exist(stoi(IDRobot))){
+				cout<<"Holi2"<<endl;
 				encendidos->apagarAlistador(stoi(IDRobot));
+				cout<<"Holi3"<<endl;
 			}else{
 				cout<<"El alistador"<<IDRobot<<" ya esta apagado"<<endl;
 			}
