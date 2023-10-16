@@ -1034,9 +1034,9 @@ int ListaAlistadores::largo(){
 }
 
 void ListaAlistadores::insertarFinal( bool _apagado, int ID){
-    if (primerAlistador==NULL)
+    if (primerAlistador==NULL){
 	    primerAlistador=ultimoAlistador=new Alistador(_apagado, ID);
-    else{
+	}else{
 	    ultimoAlistador->siguiente= new Alistador(_apagado, ID);
 	    ultimoAlistador->siguiente->anterior=ultimoAlistador;
 	    ultimoAlistador=ultimoAlistador->siguiente; 
@@ -1281,7 +1281,7 @@ void ThreadPicking::picking(){
 			//calcular duracion maxima (y durarla)
 			tiempo=alistadores->tiempoMaximo();
 			cout<<"Prueba!: "<<tiempo<<endl;
-			cout<<"Alistadores desplegados\nProductos listos en: "<<tiempo<<endl;
+			cout<<"Alistadores desplegados\nProductos listos en: "<<tiempo * 2<<endl;
 			std::this_thread::sleep_for(std::chrono::seconds(tiempo));
 			//encolar producto
 
