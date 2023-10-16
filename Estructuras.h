@@ -105,7 +105,8 @@ struct Movimiento{
     bool robot; 
     string articulo, fabricadoEn, cantidad, fechaInicio, fechaFinal;
     bool alistador;
-    string numAlistador, tiempo; //ubi y articulo aqui 2
+    string numAlistador;
+    string tiempo; //ubi y articulo aqui 2
     Movimiento * siguiente, *anterior;
 
     //robot
