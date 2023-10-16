@@ -437,9 +437,9 @@ Producto * ListaProductos::borrarAlFinal(){
 Producto * ListaProductos::revisarProductosFaltantes(ListaDoble *listaArticulos){
 	Producto *tmp=primerProducto;
 	while(tmp!=NULL){
-		cout<<"Revisar" <<endl;
+		// cout<<"Revisar" <<endl;
 		if (tmp->cantidad>listaArticulos->cantidadArticuloBodega(tmp->codigoProducto)){
-			cout<<"Revisar22" <<endl;
+			// cout<<"Revisar22" <<endl;
 			return tmp; // si devuelve un producto, hay que enviar ese producto a fabricar
 		}
 		tmp=tmp->siguienteProducto;
@@ -920,44 +920,44 @@ void ThreadBalanceador::procesarPedidos(){
 		int cantidadFabricar=0;
 		Movimiento * nuevo=NULL;
 		string fechaInicio;
-		cout<<"BALANCEADOR" <<flush<<endl;
+		// cout<<"BALANCEADOR" <<flush<<endl;
 		if (!colaEspecial->estaVacia()&&!procesando){
-			cout<<"BALANCEADOR cola especial" <<endl;
+			// cout<<"BALANCEADOR cola especial" <<endl;
 			pedidoProcesandose=colaEspecial->desencolar();
-			cout<<"DESENCOLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"<<endl;
+			// cout<<"DESENCOLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"<<endl;
 			procesando=true;
 		}else if (!colaPrioridad->estaVacia()&&!procesando){
-			cout<<"BALANCEADOR cola prioridad" <<endl;
+			// cout<<"BALANCEADOR cola prioridad" <<endl;
 			// colaPrioridad->imprimir();
 			pedidoProcesandose=colaPrioridad->desencolar(); 
 			// colaPrioridad->imprimir();
 			procesando=true;
 		}else if (!cola->estaVacia()&&!procesando){
-			cout<<"BALANCEADOR cola normal" <<endl;
+			// cout<<"BALANCEADOR cola normal" <<endl;
 			pedidoProcesandose=cola->desencolar();
-			cout<<"DESENCOLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"<<endl;
+			// cout<<"DESENCOLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"<<endl;
 			procesando=true;
 		}else{
-			cout<<"BALANCEADOR esperando" <<endl;
+			// cout<<"BALANCEADOR esperando" <<endl;
 			procesando=false;
 			this_thread::sleep_for(chrono::seconds(5));
 		}
 		if (procesando){
-			cout<<"BALANCEADOR procesando" <<endl;
+			// cout<<"BALANCEADOR procesando" <<endl;
 			pedidoProcesandose->annadirMovimiento(new Movimiento("Balanceador: ", obtenerFechaYHoraActual()));
 			do{
-				cout<<"BALANCEADOR procesando3" <<endl;
+				// cout<<"BALANCEADOR procesando3" <<endl;
 				productoAElaborar=pedidoProcesandose->productos->revisarProductosFaltantes(listaArticulos);
 				if (productoAElaborar==NULL){//No hay ningún producto faltante
-					cout<<"BALANCEADOR ya elaboré2" <<endl;
+					// cout<<"BALANCEADOR ya elaboré2" <<endl;
 					listaArticulos->apartarProductos(pedidoProcesandose->productos);
 					colaDeAlisto->encolar(pedidoProcesandose);
 					procesando=false;
-					cout<<"BALANCEADOR ya elaboré" <<endl;
+					// cout<<"BALANCEADOR ya elaboré" <<endl;
 				}else{
-					cout<<"BALANCEADOR aquii en el else de chill" <<endl;
+					// cout<<"BALANCEADOR aquii en el else de chill" <<endl;
 					while(robotAsignado==NULL){
-						cout<<"BALANCEADOR robot" <<endl;
+						// cout<<"BALANCEADOR robot" <<endl;
 						robotAsignado=listaRobots->asignarPedidoRobot(productoAElaborar->codigoProducto);
 						this_thread::sleep_for(chrono::seconds(2));
 					}
@@ -966,13 +966,13 @@ void ThreadBalanceador::procesarPedidos(){
 					cantidadFabricar=productoAElaborar->cantidad-listaArticulos->cantidadArticuloBodega(productoAElaborar->codigoProducto);
 					fechaInicio=obtenerFechaYHoraActual();
 					esperarSegundos=cantidadFabricar*listaArticulos->sacarTiempoFabricacion(productoAElaborar->codigoProducto);
-					cout<<"BALANCEADOR elaborando" <<endl;
+					// cout<<"BALANCEADOR elaborando" <<endl;
 					this_thread::sleep_for(chrono::seconds(esperarSegundos));
 					listaArticulos->annadirProductoAlmacen(cantidadFabricar, productoAElaborar->codigoProducto);
 					nuevo=new Movimiento(productoAElaborar->codigoProducto,robotAsignado->codigoRobot,
 					to_string(cantidadFabricar),obtenerFechaYHoraActual(),fechaInicio);
 					pedidoProcesandose->annadirMovimiento(nuevo);
-					cout<<"BALANCEADOR elaborando2" <<endl;
+					// cout<<"BALANCEADOR elaborando2" <<endl;
 				}
 			}while (procesando);
 		}
@@ -987,13 +987,13 @@ void ThreadEmpacador::empacarPedidos(){
             this_thread::sleep_for(chrono::seconds(10));
         }
 		if (!colaAlistados->estaVacia()){
-			cout<<"Empacando"<<endl;
+			// cout<<"Empacando"<<endl;
 			NodoPedido *pedido= colaAlistados->desencolar();
 			int cantidadSegundos= pedido->productos->cantidadArticulosDistintos();
 			this_thread::sleep_for(chrono::seconds(cantidadSegundos));
 			colaFacturacion->encolar(pedido->numeroPedido,pedido->codigoCliente,pedido->productos, pedido->movimientos);
 		}else{
-			cout<<"Empacando esperando"<<flush<<endl;
+			// cout<<"Empacando esperando"<<flush<<endl;
 			this_thread::sleep_for(chrono::seconds(5));
 		}
 	}
@@ -1008,10 +1008,10 @@ void ThreadFacturador::facturarPedidos(){
         }
 		if (!colaFacturacion->estaVacia()){
 			pedidoEmpacado=colaFacturacion->desencolar();
-			cout<<"Desencolé"<<endl;
+			// cout<<"Desencolé"<<endl;
 		
 			pedidoEmpacado->annadirMovimiento(new Movimiento("Finalizado: ", obtenerFechaYHoraActual()));
-			cout<<"Añadí el movimiento"<<endl;
+			// cout<<"Añadí el movimiento"<<endl;
 			facturarPedido(pedidoEmpacado, to_string(pedidoEmpacado->numeroPedido)+"_"+
 			pedidoEmpacado->codigoCliente+"_"+obtenerFechaYHoraActual()+".txt"); //+"_"+obtenerFechaActual()+obtenerHoraActual()
 			// cout<<"Facturé"<<endl;
@@ -1098,21 +1098,21 @@ int ListaAlistadores::tiempoMaximo(){
 	int tiempoMaximo=0;
 	while (temp!=NULL){
 		if (temp->tiempo>tiempoMaximo){
-			cout<<"hola soy"<<tiempoMaximo<<endl;
+			// cout<<"hola soy"<<tiempoMaximo<<endl;
 			tiempoMaximo=temp->tiempo;
-			cout<<"hola soy"<<tiempoMaximo<<endl;
+			// cout<<"hola soy"<<tiempoMaximo<<endl;
 		}
-		cout<<"temporal tiempo: "<<temp->tiempo<<endl;
+		// cout<<"temporal tiempo: "<<temp->tiempo<<endl;
 		temp=temp->siguiente;
 	}
-	cout<<"retorno"<<endl;
+	// cout<<"retorno"<<endl;
 	return tiempoMaximo;
 }
 
 void ListaAlistadores::resetearTiempos(){
 	Alistador * temp= primerAlistador;
 	while (temp!=NULL){
-		cout<<temp->ID<<endl;
+		// cout<<temp->ID<<endl;
 		temp->tiempo=0;
 		temp= temp->siguiente;
 	}
@@ -1124,7 +1124,7 @@ void ListaAlistadores::apagarAlistador(int ID){
 	{
 		if (temp->ID==ID){
 			temp->apagado=true;
-			cout<<"Alistador "<<ID<<" apagado"<<endl;
+			// cout<<"Alistador "<<ID<<" apagado"<<endl;
 		}
 	}	 
 }
@@ -1135,8 +1135,7 @@ void ListaAlistadores::encenderAlistador(int ID){
 	{
 		if (temp->ID==ID){
 			temp->apagado=false;
-			cout<<"Alistador "<<ID<<" encendido"<<endl;
-
+			// cout<<"Alistador "<<ID<<" encendido"<<endl;
 		}
 	}	 
 }
@@ -1203,12 +1202,12 @@ void ThreadPicking::apagarAlistador(int ID){
                 alistadores->ultimoAlistador = temp->anterior;
             }
             delete temp;
-			cout<<"Alistador "<<ID<<" apagado"<<endl;
+			// cout<<"Alistador "<<ID<<" apagado"<<endl;
 			break;
 		}
 		temp= temp->siguiente;
 	}
-	cout<<"El alistador no existe o no se encuentra apagado"<<endl;
+	// cout<<"El alistador no existe o no se encuentra apagado"<<endl;
 	
 }
 
@@ -1245,51 +1244,51 @@ void ThreadPicking::picking(){
 		NodoPedido *pedido=NULL;
 		Producto *producto=NULL;
 		int tiempo=0;
-		cout<<"HOLA SOY EL PICKING"<<endl;
+		// cout<<"HOLA SOY EL PICKING"<<endl;
 		if (!paraAlisto->estaVacia()){
-			cout<<"Estoy alistando"<<endl;
+			// cout<<"Estoy alistando"<<endl;
 			alistador=alistadores->primerAlistador;
 			if(pedido==NULL||pedido->alistado){ //alistado empieza com NULL en todos los pedidos
 				pedido= paraAlisto->desencolar();
-				cout<<"Acabo de desencolar"<<endl;
+				// cout<<"Acabo de desencolar"<<endl;
 				producto = pedido->productos->primerProducto;
 			}
 			while (producto!=NULL && alistador!=NULL){
 			//listaordenada por tiempo
-				cout<<"Calculo Tiempo"<<endl;
+				// cout<<"Calculo Tiempo"<<endl;
 				alistador->tiempo=calcularTiempoIda(producto,articulos);
-				cout<<"Calculo Tiempo2"<<endl;
+				// cout<<"Calculo Tiempo2"<<endl;
 				//alistador->alistar(pedido,alistados, articulos);//
 				pedido->annadirMovimiento(new Movimiento(to_string(alistador->ID), producto->codigoProducto,
 					articulos->encontrarUbicacionArticulo(producto->codigoProducto),to_string(alistador->tiempo)));
-				cout<<"Calculo Tiempo3"<<endl;
+				// cout<<"Calculo Tiempo3"<<endl;
 				producto=producto->siguienteProducto;
 				alistador=alistador->siguiente;
 			}
 			if (producto==NULL){ pedido->alistado=true;}
 			//calcular duracion maxima (y durarla)
 			tiempo=alistadores->tiempoMaximo();
-			cout<<"Prueba!: "<<tiempo<<endl;
-			cout<<"Alistadores desplegados\nProductos listos en: "<<tiempo * 2<<endl;
+			// cout<<"Prueba!: "<<tiempo<<endl;
+			// cout<<"Alistadores desplegados\nProductos listos en: "<<tiempo * 2<<endl;
 			std::this_thread::sleep_for(std::chrono::seconds(tiempo));
 			//encolar producto
 
-			cout<<"Alistadores regresando..."<<endl;
+			// cout<<"Alistadores regresando..."<<endl;
 			//tiempo
 			this_thread::sleep_for(std::chrono::seconds(tiempo));
 			if (pedido->alistado){
 				alistados->encolar(pedido);
-				cout<<"Pedido "<<pedido->numeroPedido<< " alistado."<<endl;
+				// cout<<"Pedido "<<pedido->numeroPedido<< " alistado."<<endl;
 				//movimientos??
 			}
-			cout<<"ordenando"<<endl;
+			// cout<<"ordenando"<<endl;
 			alistadores->ordenarListaPorTiempo();
-			cout<<"ordenando2"<<endl;
+			// cout<<"ordenando2"<<endl;
 			//resetear tiempos
 			alistadores->resetearTiempos();
-			cout<<"resetear tiempos"<<endl;
+			// cout<<"resetear tiempos"<<endl;
 			pasarAlistadoresEncendidosYApagados();
-			cout<<"cambiarlos de lista"<<endl;
+			// cout<<"cambiarlos de lista"<<endl;
 		}else{
 			this_thread::sleep_for(std::chrono::seconds(10));
 		}
@@ -1419,7 +1418,7 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 	}
 	archivo<<"Pedido: \t"<<pedido->numeroPedido<<endl;
 	archivo<<"Cliente: \t"<<pedido->codigoCliente<<endl;
-	cout<<"Llegué aqui"<<endl;
+	// cout<<"Llegué aqui"<<endl;
 	Movimiento * tmpMov=pedido->movimientos->primerMov;
 	while (tmpMov!=NULL){
 		if (!tmpMov->robot && !tmpMov->alistador){
@@ -1427,7 +1426,7 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 		}
 		tmpMov=tmpMov->siguiente;
 	}
-	cout<<"Otra vez"<<endl;
+	// cout<<"Otra vez"<<endl;
 	tmpMov=pedido->movimientos->primerMov;
 	while (tmpMov!=NULL){
 		if(tmpMov->robot){ //robot
@@ -1447,7 +1446,7 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 		}
 		tmpMov=tmpMov->siguiente;
 	}
-	cout<<"Aqui también llegué"<<endl;
+	// cout<<"Aqui también llegué"<<endl;
 	archivo.close();
 	return "Listo";
 }
@@ -1455,13 +1454,13 @@ string facturarPedido(NodoPedido *pedido, string _nombreArchivo){
 int calcularTiempoIda(Producto * producto, ListaDoble * articulos){
 	string ubicacion=articulos->encontrarUbicacionArticulo(producto->codigoProducto);
 	int columna=ubicacion[0]-'A'+1;
-	cout<<"Ubicacion:"<<ubicacion<<endl;
+	// cout<<"Ubicacion:"<<ubicacion<<endl;
 	int fila = (ubicacion[1]-'0')*10+(ubicacion[2]-'0');
-	cout<<"columna:"<<columna<<endl;
-	cout<<"fila:"<<fila<<endl;
+	// cout<<"columna:"<<columna<<endl;
+	// cout<<"fila:"<<fila<<endl;
 
 	int tiempo =columna+fila;
-	cout<<"Tiempo:"<<tiempo<<endl;
+	// cout<<"Tiempo:"<<tiempo<<endl;
 	return tiempo;
 
 }
@@ -1537,7 +1536,7 @@ void menuNuevoCliente(ListaClientes * listaClientes){
 	string prioridad, codigoCliente, nombre;
 	cout<< "Ingrese el código del nuevo cliente: "<<endl; //validar que exista
 	getline(cin,codigoCliente);
-	cout<< "Ingrese el número de pedido: "<<endl;
+	cout<< "Ingrese el nombre del cliente: "<<endl;
 	getline(cin,nombre);
 	cout<< "Ingrese la prioridad del cliente: "<<endl;
 	getline(cin,prioridad);
