@@ -102,8 +102,8 @@ NodoPedido * ColaPedidosPrioridad::desencolar(){
         return NULL;  
 	}
     NodoPedido* borrado = primerPedido;
-    if (primerPedido->siguiente != NULL) {
-		primerPedido = primerPedido->siguiente;
+	primerPedido = primerPedido->siguiente;
+    if (primerPedido != NULL) {
 		primerPedido->anterior = NULL;
 	}else{
 		ultimoPedido = NULL;
@@ -970,6 +970,7 @@ void ThreadBalanceador::procesarPedidos(){
 					cout<<"BALANCEADOR elaborando2" <<endl;
 				}
 			}while (procesando);
+			pedidoProcesandose=NULL;
 		}
 		this_thread::sleep_for(chrono::seconds(10));
 	}
