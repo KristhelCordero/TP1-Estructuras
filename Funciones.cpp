@@ -1186,7 +1186,7 @@ void ThreadPicking::pasarAlistadoresEncendidosYApagados(){
 	}
 	while (tempApagados!=NULL)
 	{
-		if (!tempEncendidos->apagado){
+		if (!tempApagados->apagado){
 			encenderAlistador(tempApagados->ID);
 		}
 		tempApagados=tempApagados->siguiente;
@@ -1283,14 +1283,15 @@ void ThreadPicking::picking(){
 			cout<<"Alistadores desplegados\nProductos listos en: "<<tiempo<<endl;
 			std::this_thread::sleep_for(std::chrono::seconds(tiempo));
 			//encolar producto
+
+			cout<<"Alistadores regresando..."<<endl;
+			//tiempo
+			this_thread::sleep_for(std::chrono::seconds(tiempo));
 			if (pedido->alistado){
 				alistados->encolar(pedido);
 				cout<<"Pedido "<<pedido->numeroPedido<< " alistado."<<endl;
 				//movimientos??
 			}
-			cout<<"Alistadores regresando..."<<endl;
-			//tiempo
-			this_thread::sleep_for(std::chrono::seconds(tiempo));
 			cout<<"ordenando"<<endl;
 			alistadores->ordenarListaPorTiempo();
 			cout<<"ordenando2"<<endl;
