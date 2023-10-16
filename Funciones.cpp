@@ -916,21 +916,25 @@ void ThreadBalanceador::procesarPedidos(){
 		NodoPedido * pedidoProcesandose=NULL;
 		Producto * productoAElaborar=NULL;
 		Robot * robotAsignado=NULL;
-		int esperarSegundos=0, cantidadFabricar=0;
+		int esperarSegundos=0;
+		int cantidadFabricar=0;
 		Movimiento * nuevo=NULL;
 		string fechaInicio;
 		cout<<"BALANCEADOR" <<flush<<endl;
 		if (!colaEspecial->estaVacia()&&!procesando){
 			cout<<"BALANCEADOR cola especial" <<endl;
 			pedidoProcesandose=colaEspecial->desencolar();
+			cout<<"DESENCOLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"<<endl;
 			procesando=true;
 		}else if (!colaPrioridad->estaVacia()&&!procesando){
 			cout<<"BALANCEADOR cola prioridad" <<endl;
 			pedidoProcesandose=colaPrioridad->desencolar(); 
+			cout<<"DESENCOLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"<<endl;
 			procesando=true;
 		}else if (!cola->estaVacia()&&!procesando){
 			cout<<"BALANCEADOR cola normal" <<endl;
 			pedidoProcesandose=cola->desencolar();
+			cout<<"DESENCOLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"<<endl;
 			procesando=true;
 		}else{
 			cout<<"BALANCEADOR esperando" <<endl;
