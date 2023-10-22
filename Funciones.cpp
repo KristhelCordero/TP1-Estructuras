@@ -1245,7 +1245,21 @@ void ThreadPicking::encenderAlistador(int ID) {
         temp = temp->siguiente;
     }
 }
-
+void ThreadPicking ::alistarProducto(Pedido*pedido, Alistador* alistador, NodoPedido *pedido){
+		while (producto!=NULL && alistador!=NULL){
+		alistador->tiempo=calcularTiempoIda(producto,articulos);
+		pedido->annadirMovimiento(new Movimiento(to_string(alistador->ID), producto->codigoProducto,
+			articulos->encontrarUbicacionArticulo(producto->codigoProducto),to_string(alistador->tiempo)));
+		producto=producto->siguienteProducto;
+		alistador=alistador->siguiente;
+	}
+	if (producto==NULL){ pedido->alistado=true;}
+	tiempoIda=alistadores->tiempoMaximo();
+	this_thread::sleep_for(std::chrono::seconds(tiempoIda*2));
+	if (pedido->alistado){
+		alistados->encolar(pedido);
+	}
+}
 void ThreadPicking::picking(){
 	while (!terminar){
 		while(apagado){
@@ -1255,51 +1269,16 @@ void ThreadPicking::picking(){
 		NodoPedido *pedido=NULL;
 		Producto *producto=NULL;
 		int tiempo=0;
-		// cout<<"HOLA SOY EL PICKING"<<endl;
 		if (!paraAlisto->estaVacia()){
-			// cout<<"Estoy alistando"<<endl;
 			alistador=alistadores->primerAlistador;
-			if(pedido==NULL||pedido->alistado){ //alistado empieza com NULL en todos los pedidos
+			if(pedido==NULL||pedido->alistado){ 
 				pedido= paraAlisto->desencolar();
-				// cout<<"Acabo de desencolar"<<endl;
 				producto = pedido->productos->primerProducto;
 			}
-			while (producto!=NULL && alistador!=NULL){
-			//listaordenada por tiempo
-				// cout<<"Calculo Tiempo"<<endl;
-				alistador->tiempo=calcularTiempoIda(producto,articulos);
-				// cout<<"Calculo Tiempo2"<<endl;
-				//alistador->alistar(pedido,alistados, articulos);//
-				pedido->annadirMovimiento(new Movimiento(to_string(alistador->ID), producto->codigoProducto,
-					articulos->encontrarUbicacionArticulo(producto->codigoProducto),to_string(alistador->tiempo)));
-				// cout<<"Calculo Tiempo3"<<endl;
-				producto=producto->siguienteProducto;
-				alistador=alistador->siguiente;
-			}
-			if (producto==NULL){ pedido->alistado=true;}
-			//calcular duracion maxima (y durarla)
-			tiempo=alistadores->tiempoMaximo();
-			// cout<<"Prueba!: "<<tiempo<<endl;
-			// cout<<"Alistadores desplegados\nProductos listos en: "<<tiempo * 2<<endl;
-			std::this_thread::sleep_for(std::chrono::seconds(tiempo));
-			//encolar producto
-
-			// cout<<"Alistadores regresando..."<<endl;
-			//tiempo
-			this_thread::sleep_for(std::chrono::seconds(tiempo));
-			if (pedido->alistado){
-				alistados->encolar(pedido);
-				// cout<<"Pedido "<<pedido->numeroPedido<< " alistado."<<endl;
-				//movimientos??
-			}
-			// cout<<"ordenando"<<endl;
+			alistarProducto(pedido,alistador,pedido)
 			alistadores->ordenarListaPorTiempo();
-			// cout<<"ordenando2"<<endl;
-			//resetear tiempos
 			alistadores->resetearTiempos();
-			// cout<<"resetear tiempos"<<endl;
 			pasarAlistadoresEncendidosYApagados();
-			// cout<<"cambiarlos de lista"<<endl;
 		}else{
 			this_thread::sleep_for(std::chrono::seconds(10));
 		}
